@@ -73,5 +73,6 @@ private://メンバ変数
 	Vector3 m_position = Vector3::Zero;//建物の位置
 	Quaternion m_rotation = Quaternion::Identity;//建物の回転
 	Vector3 m_scale = Vector3::One;//建物の大きさ
+	PhysicsStaticObject m_physicsStaticObject;//静的オブジェクト
 };
 

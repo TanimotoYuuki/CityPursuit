@@ -20,7 +20,7 @@ bool Player::Start()
 	m_playerModel.SetPosition(m_position);
 
 	//プレイヤーモデルの大きさの設定
-	m_playerModel.SetScale(m_scale * 2.0f);
+	m_playerModel.SetScale(m_scale * 1.2f);
 
 	//プレイヤーモデルの回転の設定
 	m_rotation.SetRotationDegY(0.0f);

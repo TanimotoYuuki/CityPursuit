@@ -22,6 +22,9 @@ void PlayerMove::Execute(Vector3& position)
 	m_moveSpeed += cameraForward * lStick_y * 325.0f;	//奥方向への移動速度を加算。
 	m_moveSpeed += cameraRight * lStick_x * 325.0f;		//右方向への移動速度を加算。
 
+	//ジャンプ処理の実行
+	m_playerJump.Execute(m_charaCon, m_moveSpeed);
+
 	position = m_charaCon.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
 	m_charaCon.SetPosition(position);
 }

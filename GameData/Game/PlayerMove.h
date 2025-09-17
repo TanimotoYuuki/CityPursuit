@@ -1,4 +1,5 @@
 #pragma once
+#include "PlayerJump.h"
 /// <summary>
 /// プレイヤーの移動クラス
 /// </summary>
@@ -15,7 +16,7 @@ public:
 	void Init(const Vector3& position)
 	{
 		//キャラクターコントローラの設定
-		m_charaCon.Init(15.0f, 75.0f, position);
+		m_charaCon.Init(25.0f, 85.0f, position);
 	}
 
 	/// <summary>
@@ -35,5 +36,6 @@ public:
 private://メンバ変数
 	Vector3 m_moveSpeed = Vector3::Zero;//移動速度
 	CharacterController m_charaCon;//キャラクターコントローラ
+	PlayerJump m_playerJump;//プレイヤージャンプクラス
 };
 

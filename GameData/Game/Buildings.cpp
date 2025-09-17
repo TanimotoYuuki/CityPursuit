@@ -37,6 +37,9 @@ bool Buildings::Start()
 
 	//建物モデルの更新
 	m_buildingsModel[m_buildingsType].Update();
+
+	//モデルの静的オブジェクトの作成
+	m_physicsStaticObject.CreateFromModel(m_buildingsModel[m_buildingsType].GetModel(), m_buildingsModel[m_buildingsType].GetModel().GetWorldMatrix());
 	return true;
 }
 

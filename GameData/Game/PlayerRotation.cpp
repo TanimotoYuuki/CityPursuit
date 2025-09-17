@@ -7,7 +7,6 @@ bool PlayerRotation::Start()
 {
 	//プレイヤー移動のクラスのインスタンスの検索
 	m_playerMove = FindGO<PlayerMove>("playermove");
-
 	return true;
 }
 

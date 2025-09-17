@@ -44,5 +44,6 @@ private://メンバ変数
 	Vector3 m_position = Vector3::Zero;//道の位置
 	Quaternion m_rotation = Quaternion::Identity;//道の回転
 	Vector3 m_scale = Vector3::One;//道の大きさ
+	PhysicsStaticObject m_physicsStaticObject;
 };
 

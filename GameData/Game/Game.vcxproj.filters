@@ -18,6 +18,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerMove.cpp" />
     <ClCompile Include="PlayerRotation.cpp" />
+    <ClCompile Include="PlayerJump.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -31,5 +32,6 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerMove.h" />
     <ClInclude Include="PlayerRotation.h" />
+    <ClInclude Include="PlayerJump.h" />
   </ItemGroup>
 </Project>
