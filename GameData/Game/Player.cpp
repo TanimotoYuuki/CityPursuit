@@ -37,6 +37,9 @@ bool Player::Start()
 	//プレイヤー回転クラスのインスタンスの生成
 	m_playerRotation = NewGO<PlayerRotation>(0, "playerrotation");
 
+	//プレイヤーカメラクラスの初期化
+	m_playerCamera.Init();
+
 	return true;
 }
 
@@ -49,11 +52,14 @@ void Player::Update()
 	//プレイヤーの位置の更新
 	m_playerModel.SetPosition(m_position);
 
-	//プレイヤー回転クラスの初期化
+	//プレイヤー回転クラスの実行
 	m_playerRotation->Execute(m_rotation);
 
 	//プレイヤーの回転の更新
 	m_playerModel.SetRotation(m_rotation);
+
+	//カメラ追従処理の実行
+	m_playerCamera.Execute(m_position);
 
 	//プレイヤーモデルの更新
 	m_playerModel.Update();

@@ -1,4 +1,5 @@
 #pragma once
+#include "PlayerCamera.h"
 /// <summary>
 /// プレイヤークラス
 /// </summary>
@@ -21,5 +22,6 @@ private://メンバ変数
 	Vector3 m_scale = Vector3::One;//プレイヤーの大きさ
 	PlayerMove* m_playerMove = nullptr;//プレイヤー移動用のインスタンス
 	PlayerRotation* m_playerRotation = nullptr;//プレイヤー回転用のインスタンス
+	PlayerCamera m_playerCamera;//プレイヤーカメラクラス
 };
 
