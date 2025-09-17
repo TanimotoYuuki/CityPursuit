@@ -1,5 +1,14 @@
 #include "stdafx.h"
 #include "Player.h"
+#include "PlayerMove.h"
+#include "PlayerRotation.h"
+
+//デストラクタ
+Player::~Player()
+{
+	DeleteGO(m_playerMove);//プレイヤー移動
+	DeleteGO(m_playerRotation);//プレイヤー回転
+}
 
 //開始処理
 bool Player::Start()
@@ -17,14 +26,35 @@ bool Player::Start()
 	m_rotation.SetRotationDegY(0.0f);
 	m_playerModel.SetRotation(m_rotation);
 
+	//プレイヤー移動クラスのインスタンスの生成
+	m_playerMove = NewGO<PlayerMove>(0, "playermove");
+	//プレイヤー移動クラスの初期化
+	m_playerMove->Init(m_position);
+
 	//プレイヤーモデルの更新
 	m_playerModel.Update();
+
+	//プレイヤー回転クラスのインスタンスの生成
+	m_playerRotation = NewGO<PlayerRotation>(0, "playerrotation");
+
 	return true;
 }
 
 //更新処理
 void Player::Update()
 {
+	//移動処理の実行
+	m_playerMove->Execute(m_position);
+
+	//プレイヤーの位置の更新
+	m_playerModel.SetPosition(m_position);
+
+	//プレイヤー回転クラスの初期化
+	m_playerRotation->Execute(m_rotation);
+
+	//プレイヤーの回転の更新
+	m_playerModel.SetRotation(m_rotation);
+
 	//プレイヤーモデルの更新
 	m_playerModel.Update();
 }

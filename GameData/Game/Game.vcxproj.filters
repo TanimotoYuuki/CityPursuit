@@ -16,6 +16,8 @@
     <ClCompile Include="Buildings.cpp" />
     <ClCompile Include="Street.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerMove.cpp" />
+    <ClCompile Include="PlayerRotation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -27,5 +29,7 @@
     <ClInclude Include="Buildings.h" />
     <ClInclude Include="Street.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerMove.h" />
+    <ClInclude Include="PlayerRotation.h" />
   </ItemGroup>
 </Project>
