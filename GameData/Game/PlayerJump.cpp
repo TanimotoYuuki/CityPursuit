@@ -14,7 +14,7 @@ void PlayerJump::Execute(CharacterController& characterController, Vector3& move
         if (g_pad[0]->IsTrigger(enButtonA))
         {
             //ジャンプさせる
-            moveSpeed.y = 300.0f;
+            moveSpeed.y = 250.0f;
         }
     }
     //地面に付いていなかったら
