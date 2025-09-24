@@ -241,6 +241,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Preview|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Street.cpp" />
+    <ClCompile Include="SwingTarget.cpp" />
     <ClCompile Include="system\system.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -254,6 +255,7 @@
     <ClInclude Include="PlayerRotation.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Street.h" />
+    <ClInclude Include="SwingTarget.h" />
     <ClInclude Include="system\system.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

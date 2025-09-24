@@ -2,11 +2,12 @@
 /// <summary>
 /// 建物クラス
 /// </summary>
+class SwingTarget;
 class Buildings : public IGameObject
 {
 public:
 	Buildings() {};//コンストラクタ
-	~Buildings() {};//デストラクタ
+	~Buildings();//デストラクタ
 
 	bool Start();//開始処理
 	void Update();//更新処理
@@ -68,11 +69,16 @@ public:
 private://メンバ変数
 	int m_buildingsType = enBuildingsType_Building;//建物のタイプ
 	ModelRender m_buildingsModel[enBuildingsType_Num];//ビルモデル
+	SwingTarget* m_swingTarget;//スイングターゲット
 	std::string m_buildingsModelName = "building001";//建物モデルの名前
 	std::string m_buildingsModelPath = "";//建物モデルのファイルパス
 	Vector3 m_position = Vector3::Zero;//建物の位置
 	Quaternion m_rotation = Quaternion::Identity;//建物の回転
 	Vector3 m_scale = Vector3::One;//建物の大きさ
 	PhysicsStaticObject m_physicsStaticObject;//静的オブジェクト
+
+private://デバッグ用のメンバ変数
+	//std::array<ModelRender, 10000> m_debugModel;//デバッグ用のモデル
+	//int m_debugModelNum = 0;//デバッグ用のモデル数
 };
 
