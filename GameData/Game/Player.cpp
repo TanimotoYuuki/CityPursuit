@@ -28,11 +28,12 @@ bool Player::Start()
 
 	//プレイヤー移動クラスのインスタンスの生成
 	m_playerMove = NewGO<PlayerMove>(0, "playermove");
-	//プレイヤー移動クラスの初期化
-	m_playerMove->Init(m_position);
 
 	//プレイヤーモデルの更新
 	m_playerModel.Update();
+
+	//キャラクターコントローラの設定
+	m_charaCon.Init(25.0f, 85.0f, m_position);
 
 	//プレイヤー回転クラスのインスタンスの生成
 	m_playerRotation = NewGO<PlayerRotation>(0, "playerrotation");
@@ -47,7 +48,7 @@ bool Player::Start()
 void Player::Update()
 {
 	//移動処理の実行
-	m_playerMove->Execute(m_position);
+	m_playerMove->Execute(m_position, m_charaCon);
 
 	//プレイヤーの位置の更新
 	m_playerModel.SetPosition(m_position);

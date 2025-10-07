@@ -11,6 +11,7 @@ public:
 	/// <summary>
 	/// ジャンプ処理の実行
 	/// </summary>
-	void Execute(CharacterController& characterController,Vector3& moveSpeed);
+	/// <param name="moveSpeed">移動速度</param>
+	void Execute(Vector3& moveSpeed);
 };
 
