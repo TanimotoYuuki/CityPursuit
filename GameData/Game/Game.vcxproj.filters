@@ -15,6 +15,16 @@
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="Buildings.cpp" />
     <ClCompile Include="Street.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerMove.cpp" />
+    <ClCompile Include="PlayerRotation.cpp" />
+    <ClCompile Include="PlayerJump.cpp" />
+    <ClCompile Include="PlayerCamera.cpp" />
+    <ClCompile Include="SwingTarget.cpp" />
+    <ClCompile Include="PlayerSwingAction.cpp" />
+    <ClCompile Include="SwingActionManager.cpp" />
+    <ClCompile Include="SwingModel.cpp" />
+    <ClCompile Include="DebugLog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -25,5 +35,15 @@
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="Buildings.h" />
     <ClInclude Include="Street.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="PlayerMove.h" />
+    <ClInclude Include="PlayerRotation.h" />
+    <ClInclude Include="PlayerJump.h" />
+    <ClInclude Include="PlayerCamera.h" />
+    <ClInclude Include="SwingTarget.h" />
+    <ClInclude Include="PlayerSwingAction.h" />
+    <ClInclude Include="SwingActionManager.h" />
+    <ClInclude Include="SwingModel.h" />
+    <ClInclude Include="DebugLog.h" />
   </ItemGroup>
 </Project>

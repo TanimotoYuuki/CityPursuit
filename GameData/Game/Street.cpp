@@ -18,6 +18,9 @@ bool Street::Start()
 
 	//道モデルの更新
 	m_streetModel.Update();
+
+	//モデルの静的オブジェクトの作成
+	m_physicsStaticObject.CreateFromModel(m_streetModel.GetModel(), m_streetModel.GetModel().GetWorldMatrix());
 	return true;
 }
 

@@ -10,46 +10,76 @@ namespace nsK2EngineLow {
 		Vector3 centerPos = (vMax + vMin) * 0.5f;
 		m_centerPos = centerPos;
 
-		m_vertexPosition[0] = centerPos;
-		m_vertexPosition[0].x -= halfSize.x;
-		m_vertexPosition[0].y -= halfSize.y;
-		m_vertexPosition[0].z -= halfSize.z;
+		//左下奥
+		m_vertexPosition[enVertPos_X0Y0Z1] = centerPos;
+		m_vertexPosition[enVertPos_X0Y0Z1].x -= halfSize.x;
+		m_vertexPosition[enVertPos_X0Y0Z1].y -= halfSize.y;
+		m_vertexPosition[enVertPos_X0Y0Z1].z -= halfSize.z;
 
-		m_vertexPosition[1] = centerPos;
-		m_vertexPosition[1].x += halfSize.x;
-		m_vertexPosition[1].y -= halfSize.y;
-		m_vertexPosition[1].z -= halfSize.z;
+		//右下奥
+		m_vertexPosition[enVertPos_X1Y0Z1] = centerPos;
+		m_vertexPosition[enVertPos_X1Y0Z1].x += halfSize.x;
+		m_vertexPosition[enVertPos_X1Y0Z1].y -= halfSize.y;
+		m_vertexPosition[enVertPos_X1Y0Z1].z -= halfSize.z;
 
-		m_vertexPosition[2] = centerPos;
-		m_vertexPosition[2].x -= halfSize.x;
-		m_vertexPosition[2].y += halfSize.y;
-		m_vertexPosition[2].z -= halfSize.z;
+		//左下手前
+		m_vertexPosition[enVertPos_X0Y0Z0] = centerPos;
+		m_vertexPosition[enVertPos_X0Y0Z0].x -= halfSize.x;
+		m_vertexPosition[enVertPos_X0Y0Z0].y += halfSize.y;
+		m_vertexPosition[enVertPos_X0Y0Z0].z -= halfSize.z;
 
-		m_vertexPosition[3] = centerPos;
-		m_vertexPosition[3].x += halfSize.x;
-		m_vertexPosition[3].y += halfSize.y;
-		m_vertexPosition[3].z -= halfSize.z;
+		//右下手前
+		m_vertexPosition[enVertPos_X1Y0Z0] = centerPos;
+		m_vertexPosition[enVertPos_X1Y0Z0].x += halfSize.x;
+		m_vertexPosition[enVertPos_X1Y0Z0].y += halfSize.y;
+		m_vertexPosition[enVertPos_X1Y0Z0].z -= halfSize.z;
 
-		m_vertexPosition[4] = centerPos;
-		m_vertexPosition[4].x -= halfSize.x;
-		m_vertexPosition[4].y -= halfSize.y;
-		m_vertexPosition[4].z += halfSize.z;
+		//左上奥
+		m_vertexPosition[enVertPos_X0Y1Z1] = centerPos;
+		m_vertexPosition[enVertPos_X0Y1Z1].x -= halfSize.x;
+		m_vertexPosition[enVertPos_X0Y1Z1].y -= halfSize.y;
+		m_vertexPosition[enVertPos_X0Y1Z1].z += halfSize.z;
 
-		m_vertexPosition[5] = centerPos;
-		m_vertexPosition[5].x += halfSize.x;
-		m_vertexPosition[5].y -= halfSize.y;
-		m_vertexPosition[5].z += halfSize.z;
+		//右上奥
+		m_vertexPosition[enVertPos_X1Y1Z1] = centerPos;
+		m_vertexPosition[enVertPos_X1Y1Z1].x += halfSize.x;
+		m_vertexPosition[enVertPos_X1Y1Z1].y -= halfSize.y;
+		m_vertexPosition[enVertPos_X1Y1Z1].z += halfSize.z;
 
-		m_vertexPosition[6] = centerPos;
-		m_vertexPosition[6].x -= halfSize.x;
-		m_vertexPosition[6].y += halfSize.y;
-		m_vertexPosition[6].z += halfSize.z;
+		//左上手前
+		m_vertexPosition[enVertPos_X0Y1Z0] = centerPos;
+		m_vertexPosition[enVertPos_X0Y1Z0].x -= halfSize.x;
+		m_vertexPosition[enVertPos_X0Y1Z0].y += halfSize.y;
+		m_vertexPosition[enVertPos_X0Y1Z0].z += halfSize.z;
 
-		m_vertexPosition[7] = centerPos;
-		m_vertexPosition[7].x += halfSize.x;
-		m_vertexPosition[7].y += halfSize.y;
-		m_vertexPosition[7].z += halfSize.z;
+		//右上手前
+		m_vertexPosition[enVertPos_X1Y1Z0] = centerPos;
+		m_vertexPosition[enVertPos_X1Y1Z0].x += halfSize.x;
+		m_vertexPosition[enVertPos_X1Y1Z0].y += halfSize.y;
+		m_vertexPosition[enVertPos_X1Y1Z0].z += halfSize.z;
 
+	}
+
+	void AABB::InitFromTkmFile(const TkmFile& tkmFile)
+	{
+		Vector3 vMax = { -FLT_MAX,-FLT_MAX,-FLT_MAX };
+		Vector3 vMin = { FLT_MAX,FLT_MAX,FLT_MAX };
+
+		tkmFile.QueryMeshParts(
+			[&](const TkmFile::SMesh& mesh)
+			{
+				for (const auto& vertex : mesh.vertexBuffer)
+				{
+					vMax.Max(vertex.pos);
+					vMin.Min(vertex.pos);
+				}
+				
+				return;
+			}
+		);
+
+		Init(vMax, vMin);
+		return;
 	}
 
 	void AABB::CalcVertexPositions(Vector3* pos, const Matrix& mWorld)

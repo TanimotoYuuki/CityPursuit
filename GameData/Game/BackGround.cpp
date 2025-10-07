@@ -58,7 +58,7 @@ void BackGround::InitSkyCube()
 //レベルの読み込み処理
 void BackGround::LoadLevel()
 {
-	m_level3dRender.Init("Assets/level/stage.tkl", [&](LevelObjectData& objData)
+	m_level3dRender.Init("Assets/level/debug.tkl", [&](LevelObjectData& objData)
 	{
 		//オブジェの名前がstreetだったら
 		if (objData.EqualObjectName(L"street") == true)
