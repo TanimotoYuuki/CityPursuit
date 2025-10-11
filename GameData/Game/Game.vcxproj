@@ -229,6 +229,8 @@
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="Buildings.cpp" />
     <ClCompile Include="DebugLog.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyAI.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -252,6 +254,8 @@
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="Buildings.h" />
     <ClInclude Include="DebugLog.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyAI.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerCamera.h" />

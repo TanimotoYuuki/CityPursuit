@@ -2,6 +2,7 @@
 #include "BackGround.h"
 #include "Street.h"
 #include "Buildings.h"
+#include "Enemy.h"
 
 namespace {
 	// スカイキューブ
@@ -190,6 +191,23 @@ void BackGround::LoadLevel()
 
 			//レベルのデータに保存されている大きさを設定
 			buildings->SetScale(objData.scale);
+
+			return true;
+		}
+
+		//オブジェの名前がcarだったら
+		else if (objData.EqualObjectName(L"car") == true)
+		{
+			auto car = NewGO<Enemy>(0, "enemy");
+
+			//レベルのデータに保存されている座標を設定
+			car->SetPosition(objData.position);
+
+			//レベルのデータに保存されている回転を設定
+			car->SetRotation(objData.rotation);
+
+			//レベルのデータに保存されている大きさを設定
+			car->SetScale(objData.scale);
 
 			return true;
 		}
