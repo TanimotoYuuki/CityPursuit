@@ -241,7 +241,7 @@ namespace nsK2EngineLow {
 				m_rStickY = -1.0f;
 			}
 			//スティックの入力量を正規化。
-			float t = fabsf(m_rStickX) + fabsf(m_rStickY);
+			float t = sqrtf(m_rStickX * m_rStickX + m_rStickY * m_rStickY);
 			if (t > 0.0f) {
 				m_rStickX /= t;
 				m_rStickY /= t;
@@ -260,7 +260,7 @@ namespace nsK2EngineLow {
 				m_lStickY = -1.0f;
 			}
 			//スティックの入力量を正規化。
-			t = fabsf(m_lStickX) + fabsf(m_lStickY);
+			t = sqrtf(m_lStickX * m_lStickX + m_lStickY * m_lStickY);
 			if (t > 0.0f) {
 				m_lStickX /= t;
 				m_lStickY /= t;

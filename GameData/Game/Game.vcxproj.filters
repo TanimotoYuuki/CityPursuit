@@ -27,6 +27,8 @@
     <ClCompile Include="DebugLog.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyAI.cpp" />
+    <ClCompile Include="QteEvent.cpp" />
+    <ClCompile Include="QteEventInput.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -49,5 +51,7 @@
     <ClInclude Include="DebugLog.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyAI.h" />
+    <ClInclude Include="QteEvent.h" />
+    <ClInclude Include="QteEventInput.h" />
   </ItemGroup>
 </Project>
