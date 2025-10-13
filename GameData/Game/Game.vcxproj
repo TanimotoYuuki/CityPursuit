@@ -235,6 +235,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerCamera.cpp" />
+    <ClCompile Include="PlayerCatchEnemy.cpp" />
     <ClCompile Include="PlayerJump.cpp" />
     <ClCompile Include="PlayerMove.cpp" />
     <ClCompile Include="PlayerRotation.cpp" />
@@ -261,6 +262,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerCamera.h" />
+    <ClInclude Include="PlayerCatchEnemy.h" />
     <ClInclude Include="PlayerJump.h" />
     <ClInclude Include="PlayerMove.h" />
     <ClInclude Include="PlayerRotation.h" />

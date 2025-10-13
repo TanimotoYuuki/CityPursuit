@@ -34,7 +34,10 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 	}
 	else
 	{
-		m_moveSpeed.y -= 19.6f;
+		if (m_useGravity)
+		{
+			m_moveSpeed.y -= 19.6f;
+		}
 	}
 
 	//移動処理
@@ -69,23 +72,26 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 	m_cameraRight.y = 0.0f;
 	m_cameraRight.Normalize();
 
-	//ダッシュ
-	if (g_pad[0]->IsPress(enButtonRB2))
+	if(m_canMove)
 	{
-		//地面に着いているときのみダッシュできる
-		if (characterController.IsOnGround())
+		//ダッシュ
+		if (g_pad[0]->IsPress(enButtonRB2))
+		{
+			//地面に着いているときのみダッシュできる
+			if (characterController.IsOnGround())
+			{
+				//XZ成分の移動速度をクリア
+				m_moveSpeed += m_cameraForward * m_inputLStick.y * 700.0f;	//奥方向への移動速度を加算
+				m_moveSpeed += m_cameraRight * m_inputLStick.x * 700.0f;	//右方向への移動速度を加算
+			}
+		}
+		//歩き
+		else
 		{
 			//XZ成分の移動速度をクリア
-			m_moveSpeed += m_cameraForward * m_inputLStick.y * 700.0f;	//奥方向への移動速度を加算
-			m_moveSpeed += m_cameraRight * m_inputLStick.x * 700.0f;	//右方向への移動速度を加算
+			m_moveSpeed += m_cameraForward * m_inputLStick.y * 325.0f;	//奥方向への移動速度を加算
+			m_moveSpeed += m_cameraRight * m_inputLStick.x * 325.0f;	//右方向への移動速度を加算
 		}
-	}
-	//歩き
-	else
-	{
-		//XZ成分の移動速度をクリア
-		m_moveSpeed += m_cameraForward * m_inputLStick.y * 325.0f;	//奥方向への移動速度を加算
-		m_moveSpeed += m_cameraRight * m_inputLStick.x * 325.0f;	//右方向への移動速度を加算
 	}
 
 	//スイングアクションの更新処理

@@ -98,6 +98,14 @@ public://メンバ関数
 	void ChangeState(const EnSwingState enSwingState);
 
 	/// <summary>
+	/// スイングアクションのリセット処理
+	/// </summary>
+	void Reset()
+	{
+		SwingEnd();
+	}
+
+	/// <summary>
 	/// スイングの状態の取得
 	/// </summary>
 	/// <returns>スイングの状態</returns>

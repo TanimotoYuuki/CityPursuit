@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "QteEvent.h"
 #include "QteEventInput.h"
+#include "PlayerCatchEnemy.h"
+#include "Enemy.h"
 
 namespace {
 	//ゲームパッドUI
@@ -13,6 +15,27 @@ namespace {
 	const Vector3 GAMEPAD_UI_SCALE{ 0.1f,0.1f,0.1f };//ゲームパッドUIの大きさ
 
 	const float GAMEPAD_UI_INTERVAL_POSITION = 125.0f;//ゲームパッドUIの間隔位置
+
+	//制限時間UI
+	const float TIME_LIMIT_UI_WIDTH = 1024;//制限時間UIの横幅
+
+	const float TIME_LIMIT_UI_HEIGHT = 128;//制限時間UIの縦幅
+
+	const Vector3 TIME_LIMIT_UI_INIT_POSITION{ -255.0f,250.0f,0.0f };//制限時間UIの初期位置
+
+	const Vector3 TIME_LIMIT_BER_UI_INIT_POSITION{ 0.0f,250.0f,0.0f };//制限時間バーUIの初期位置
+
+	const Vector3 TIME_LIMIT_UI_SCALE{ 0.4956f,0.45f,0.45f };//制限時間UIの大きさ
+
+	const Vector3 TIME_LIMIT_BER_UI_SCALE{ 0.5f,0.5f,0.5f };//制限時間バーUIの大きさ
+
+	const Vector2 TIME_LIMIT_UI_PIVOT{ 0.0f,0.5f };//制限時間UIのピボット
+
+	const Vector4 TIME_LIMIT_UI_MULCOLOR_WHITE{ 1.0f,1.0f,1.0f,1.0f };//制限時間UIの乗算カラー(白色)
+
+	const Vector4 TIME_LIMIT_UI_MULCOLOR_YELLOW{ 1.0f,1.0f,0.0f,1.0f };//制限時間UIの乗算カラー(黄色)
+
+	const Vector4 TIME_LIMIT_UI_MULCOLOR_RED{ 1.0f,0.0f,0.0f,1.0f };//制限時間UIの乗算カラー(赤色)
 
 	//ボタン
 	const int A_BUTTON_SELECT_ID = 0;//AボタンID
@@ -42,6 +65,7 @@ bool QteEvent::Start()
 	//入力するコマンドの設定
 	SetInputCommand();
 
+	//QTEイベントでプレイヤー側が入力するクラスのインスタンスの生成
 	m_qteEventInput = NewGO<QteEventInput>(0, "qteeventInput");
 
 	return true;
@@ -73,10 +97,24 @@ void QteEvent::Update()
 			//全てのコマンドの入力成功時の演出が終わったらリセット処理をする
 			if (m_isGamePadUIEasingEnd[m_inputCommandList[m_inputCommandList.size() - 1]] == true)
 			{
+				m_succesInputCommand++;
+
+				//コマンド入力が3回成功したらQTEイベントを終了する
+				if (m_succesInputCommand >= 3)
+				{
+					DeleteGO(this);
+					DeleteGO(m_targetEnemy);
+					m_playerCatchEnemy->Reset();
+					return;
+				}
+
 				GamePadPushUIReset();
 			}
 		}
 	}
+
+	//制限時間の更新処理
+	TimeLimitUpdate();
 }
 
 //初期設定
@@ -89,6 +127,8 @@ void QteEvent::Init()
 
 		InitGamePadInputAfterUI((EnGamePadInputList)i);//ゲームパッドのボタンや方向キーを入力後のUIの初期設定
 	}
+
+	InitTimeLimitUI();//制限時間UI関連の初期化
 
 	//コマンド入力リストのコンテナのメモリ容量の確保
 	m_inputCommandList.reserve(15);
@@ -120,12 +160,32 @@ void QteEvent::InitGamePadInputAfterUI(EnGamePadInputList enGamePadInputList)
 	m_gamePadInputAfterUI[enGamePadInputList].Update();
 }
 
+//制限時間UI関連の初期化
+void QteEvent::InitTimeLimitUI()
+{
+	//制限時間UI
+	m_timeLimitUI.Init("Assets/sprite/timeLimit/timeLimit.dds", TIME_LIMIT_UI_WIDTH, TIME_LIMIT_UI_HEIGHT);
+	m_timeLimitUI.SetPosition(TIME_LIMIT_UI_INIT_POSITION);
+	m_timeLimitUI.SetScale(TIME_LIMIT_UI_SCALE);
+	m_timeLimitUI.SetPivot(TIME_LIMIT_UI_PIVOT);
+	m_timeLimitUI.Update();
+
+	//制限時間バーUI
+	m_timeLimitBerUI.Init("Assets/sprite/timeLimit/timeLimitBer.dds", TIME_LIMIT_UI_WIDTH, TIME_LIMIT_UI_HEIGHT);
+	m_timeLimitBerUI.SetPosition(TIME_LIMIT_BER_UI_INIT_POSITION);
+	m_timeLimitBerUI.SetScale(TIME_LIMIT_BER_UI_SCALE);
+	m_timeLimitBerUI.Update();
+
+	//制限時間の上限の設定
+	m_timeLimitMax = m_timeLimit;
+}
+
 //入力するコマンドの設定
 void QteEvent::SetInputCommand()
 {
 	//入力するコマンドをランダムで決める
 	m_nextInputCommand = EnCommandList(rand() % enCommandList_Num);
-	m_nowInputCommand = enCommandList_ScrewPiledriver;
+	m_nowInputCommand = m_nextInputCommand;
 
 	//現在入力するコマンド
 	switch (m_nowInputCommand)
@@ -324,6 +384,50 @@ void QteEvent::GamePadPushUIReset()
 	SetInputCommand();
 }
 
+//制限時間の更新処理
+void QteEvent::TimeLimitUpdate()
+{
+	m_timeLimit -= g_gameTime->GetFrameDeltaTime();
+
+	//制限時間が0秒になったらQTEイベントを終了する
+	if (m_timeLimit <= 0.0f)
+	{
+		DeleteGO(this);
+		m_playerCatchEnemy->Reset();
+		m_timeLimit = 0.0f;
+	}
+
+	//制限時間UIの色を変える処理
+	ChangeTimeLimitUIColor(m_timeLimit);
+
+	float timeLimitMax = m_timeLimitMax;
+	float timeLimitNow = m_timeLimit;
+	float timeLimitRemnanth = timeLimitNow / timeLimitMax;
+	Vector3 timeLimitUIScale = {0.5f,0.5f,0.5f};
+	timeLimitUIScale.x *= timeLimitRemnanth;
+	m_timeLimitUI.SetScale(timeLimitUIScale);
+	m_timeLimitUI.Update();
+}
+
+//制限時間UIの色を変える処理
+void QteEvent::ChangeTimeLimitUIColor(float timeLimit)
+{
+	//制限時間が上限の4分の1になったら制限時間UIのカラーを赤色に変える
+	if (timeLimit < m_timeLimitMax / 4)
+	{
+		m_timeLimitUI.SetMulColor(TIME_LIMIT_UI_MULCOLOR_RED);
+	}
+	//制限時間が上限の半分になったら制限時間UIのカラーを黄色に変える
+	else if (timeLimit < m_timeLimitMax / 2)
+	{
+		m_timeLimitUI.SetMulColor(TIME_LIMIT_UI_MULCOLOR_YELLOW);
+	}
+	else
+	{
+		m_timeLimitUI.SetMulColor(TIME_LIMIT_UI_MULCOLOR_WHITE);
+	}
+}
+
 //描画処理
 void QteEvent::Render(RenderContext& rc)
 {
@@ -341,4 +445,10 @@ void QteEvent::Render(RenderContext& rc)
 			}
 		}
 	}
+
+	//制限時間バーUIの描画
+	m_timeLimitBerUI.Draw(rc);
+
+	//制限時間UIの描画
+	m_timeLimitUI.Draw(rc);
 }

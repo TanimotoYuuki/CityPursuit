@@ -3,6 +3,8 @@
 /// QTEイベントクラス
 /// </summary>
 class QteEventInput;
+class PlayerCatchEnemy;
+class Enemy;
 class QteEvent : public IGameObject
 {
 public:
@@ -60,12 +62,28 @@ private://メンバ関数
 	/// </summary>
 	/// <param name="enGamePadInputList">ゲームパッド入力リスト</param>
 	void InitGamePadInputBeforeUI(EnGamePadInputList enGamePadInputList);
-	
+
 	/// <summary>
 	/// ゲームパッドのボタンや方向キーを入力後のUIの初期設定
 	/// </summary>
 	/// <param name="enGamePadInputList">ゲームパッド入力リスト</param>
 	void InitGamePadInputAfterUI(EnGamePadInputList enGamePadInputList);
+
+	/// <summary>
+	/// 制限時間UI関連の初期化
+	/// </summary>
+	void InitTimeLimitUI();
+
+	/// <summary>
+	/// 制限時間の更新処理
+	/// </summary>
+	void TimeLimitUpdate();
+
+	/// <summary>
+	/// 制限時間UIの色を変える処理
+	/// </summary>
+	/// <param name="timelimit">制限時間</param>
+	void ChangeTimeLimitUIColor(float timeLimit);
 
 	/// <summary>
 	/// ゲームパッドUIのリセット処理
@@ -102,6 +120,24 @@ private://メンバ関数
 public://メンバ関数
 
 	/// <summary>
+	/// ターゲットの敵を設定する
+	/// </summary>
+	/// <param name="target">ターゲットの敵</param>
+	void SetTargetEnemy(Enemy* target)
+	{
+		m_targetEnemy = target;
+	}
+
+	/// <summary>
+	/// プレイヤーが敵をキャッチするクラスのポインタの設定
+	/// </summary>
+	/// <param name="playerCatchEnemy">プレイヤーが敵をキャッチするクラスのポインタ</param>
+	void SetPlayerCatchEnemyPtr(PlayerCatchEnemy* playerCatchEnemy)
+	{
+		m_playerCatchEnemy = playerCatchEnemy;
+	}
+
+	/// <summary>
 	/// コマンド入力リストの取得
 	/// </summary>
 	std::vector<EnGamePadInputList> GetInputCommand()
@@ -121,17 +157,25 @@ public://メンバ関数
 private://メンバ変数
 	SpriteRender m_gamePadInputBeforeUI[enGamePadInputList_Num];//ゲームパッドのボタンや方向キーを入力前のUI
 	SpriteRender m_gamePadInputAfterUI[enGamePadInputList_Num];//ゲームパッドのボタンや方向キーを入力後のUI
+	SpriteRender m_timeLimitUI;//制限時間UI
+	SpriteRender m_timeLimitBerUI;//制限時間バーUI
 	Vector3 m_gamePadInputUIBeforeEasingPosition[enGamePadInputList_Num];//ゲームパッドUIイージング前用の位置
 	Vector3 m_gamePadInputUIAfterEasingPosition[enGamePadInputList_Num];//ゲームパッドUIイージング後用の位置
 	Vector3 m_gamePadInputUIEasingPosition[enGamePadInputList_Num];//ゲームパッドUIイージング中用の位置
+	Vector4 m_timeLimitUIColor = Vector4::White;//制限時間UIの色
 	EnCommandList m_nowInputCommand = enCommandList_None;//現在入力しているコマンド
 	EnCommandList m_nextInputCommand = enCommandList_None;//次入力するコマンド
+	int m_succesInputCommand = 0;//コマンド入力が成功した回数
 	float m_gamePadInputUIEasingTime[enGamePadInputList_Num] = { 0.0f };//ゲームパッドUIのイージング用の割合
+	float m_timeLimitMax = 0.0f;//制限時間(上限)
+	float m_timeLimit = 15.0f;//制限時間
 	bool m_isGamePadUIEasingStart[enGamePadInputList_Num] = { false };//ゲームパッドUIがイージングしているか?
 	bool m_isGamePadUIEasingEnd[enGamePadInputList_Num] = { false };//ゲームパッドUIがイージングし終わっているか?
 	bool m_isInputCommandSuccess[enGamePadInputList_Num] = { false };//コマンド入力が成功しているか?
 	std::vector<EnGamePadInputList> m_inputCommandList;//コマンド入力リスト
 	QteEventInput* m_qteEventInput = nullptr;//QTEイベントでプレイヤー側が入力する用のインスタンス
+	PlayerCatchEnemy* m_playerCatchEnemy = nullptr;//プレイヤーが敵をキャッチしている用のインスタンス
+	Enemy* m_targetEnemy = nullptr;//ターゲットにしているエネミー用のインスタンス
 
 private://データ関連のメンバ変数
 	//ゲームパッドのボタンや方向キーを入力前のUIのファイルパス
