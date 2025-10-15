@@ -25,6 +25,11 @@
     <ClCompile Include="SwingActionManager.cpp" />
     <ClCompile Include="SwingModel.cpp" />
     <ClCompile Include="DebugLog.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyAI.cpp" />
+    <ClCompile Include="QteEvent.cpp" />
+    <ClCompile Include="QteEventInput.cpp" />
+    <ClCompile Include="PlayerCatchEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -45,5 +50,10 @@
     <ClInclude Include="SwingActionManager.h" />
     <ClInclude Include="SwingModel.h" />
     <ClInclude Include="DebugLog.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyAI.h" />
+    <ClInclude Include="QteEvent.h" />
+    <ClInclude Include="QteEventInput.h" />
+    <ClInclude Include="PlayerCatchEnemy.h" />
   </ItemGroup>
 </Project>

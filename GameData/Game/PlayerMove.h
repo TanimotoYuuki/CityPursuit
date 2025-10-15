@@ -19,6 +19,24 @@ public:
 	void Execute(Vector3& position, CharacterController& characterController);
 
 	/// <summary>
+	/// 重力を使用するか？を設定する
+	/// </summary>
+	/// <param name="useGravity">trueなら重力を使用する</param>
+	void SetUseGravity(const bool useGravity)
+	{
+		m_useGravity = useGravity;
+	}
+
+	/// <summary>
+	/// 移動ができるか？を設定する
+	/// </summary>
+	/// <param name="useGravity">trueなら移動できる</param>
+	void SetCanMove(const bool canMove)
+	{
+		m_canMove = canMove;
+	}
+
+	/// <summary>
 	/// 移動速度の設定
 	/// </summary>
 	/// <param name="moveSpeed">移動速度</param>
@@ -102,6 +120,8 @@ private://メンバ変数
 	Vector3 m_cameraRight = Vector3::Zero;//カメラの横方向
 	Vector3 m_moveSpeed = Vector3::Zero;//移動速度
 	PlayerJump m_playerJump;//プレイヤージャンプクラス
+	bool m_canMove = true;//移動できるか？
+	bool m_useGravity = true;//重力を使用するか？
 	PlayerSwingAction* m_playerSwingAction = nullptr;//プレイヤースイングアクション用のインスタンス
 	DebugLog* m_debugLog = nullptr;//デバッグログ用のインスタンス
 };

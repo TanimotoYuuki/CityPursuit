@@ -86,16 +86,56 @@ namespace nsK2EngineLow {
 
 		//スティックのトリガー判定
 		//左スティック
-		bool IsTriggerLStickUp() const { return  m_lStickY > STICK_THRESHOLD && m_prevLStickY <= STICK_THRESHOLD; }
-		bool IsTriggerLStickDown() const { return  m_lStickY < -STICK_THRESHOLD && m_prevLStickY >= -STICK_THRESHOLD; }
-		bool IsTriggerLStickRight() const { return  m_lStickX > STICK_THRESHOLD && m_prevLStickX <= STICK_THRESHOLD; }
-		bool IsTriggerLStickLeft() const { return  m_lStickX < -STICK_THRESHOLD && m_prevLStickX >= -STICK_THRESHOLD; }
+		bool IsTriggerLStickUp() const {
+			bool current = m_lStickY > STICK_THRESHOLD && fabsf(m_lStickX) < STICK_THRESHOLD;
+			bool prev = m_prevLStickY > STICK_THRESHOLD && fabsf(m_prevLStickX) < STICK_THRESHOLD;
+			return current && !prev;
+		}
+		bool IsTriggerLStickDown() const {
+			bool current = m_lStickY < -STICK_THRESHOLD && fabsf(m_lStickX) < STICK_THRESHOLD;
+			bool prev = m_prevLStickY < -STICK_THRESHOLD && fabsf(m_prevLStickX) < STICK_THRESHOLD;
+			return current && !prev;
+		}
+		bool IsTriggerLStickRight() const {
+			bool current = m_lStickX > STICK_THRESHOLD && fabsf(m_lStickY) < STICK_THRESHOLD;
+			bool prev = m_prevLStickX > STICK_THRESHOLD && fabsf(m_prevLStickY) < STICK_THRESHOLD;
+			return current && !prev;
+		}
+		bool IsTriggerLStickLeft() const {
+			bool current = m_lStickX < -STICK_THRESHOLD && fabsf(m_lStickY) < STICK_THRESHOLD;
+			bool prev = m_prevLStickX < -STICK_THRESHOLD && fabsf(m_prevLStickY) < STICK_THRESHOLD;
+			return current && !prev;
+		}
+		bool IsTriggerLStickRightUp() const { return (m_lStickX > STICK_THRESHOLD && m_lStickY > STICK_THRESHOLD) && (m_prevLStickX <= STICK_THRESHOLD || m_prevLStickY <= STICK_THRESHOLD); }
+		bool IsTriggerLStickRightDown() const { return (m_lStickX > STICK_THRESHOLD && m_lStickY < -STICK_THRESHOLD) && (m_prevLStickX <= STICK_THRESHOLD || m_prevLStickY >= -STICK_THRESHOLD); }
+		bool IsTriggerLStickLeftUp() const { return (m_lStickX < -STICK_THRESHOLD && m_lStickY > STICK_THRESHOLD) && (m_prevLStickX >= -STICK_THRESHOLD || m_prevLStickY <= STICK_THRESHOLD); }
+		bool IsTriggerLStickLeftDown() const { return (m_lStickX < -STICK_THRESHOLD && m_lStickY < -STICK_THRESHOLD) && (m_prevLStickX >= -STICK_THRESHOLD || m_prevLStickY >= -STICK_THRESHOLD); }
 
 		//右スティック
-		bool IsTriggerRStickUp() const { return  m_rStickY > STICK_THRESHOLD && m_prevRStickY <= STICK_THRESHOLD; }
-		bool IsTriggerRStickDown() const { return  m_rStickY < -STICK_THRESHOLD && m_prevRStickY >= -STICK_THRESHOLD; }
-		bool IsTriggerRStickRight() const { return  m_rStickX > STICK_THRESHOLD && m_prevRStickX <= STICK_THRESHOLD; }
-		bool IsTriggerRStickLeft() const { return  m_rStickX < -STICK_THRESHOLD && m_prevRStickX >= -STICK_THRESHOLD; }
+		bool IsTriggerRStickUp() const {
+			bool current = m_rStickY > STICK_THRESHOLD && fabsf(m_rStickX) < STICK_THRESHOLD;
+			bool prev = m_prevRStickY > STICK_THRESHOLD && fabsf(m_prevRStickX) < STICK_THRESHOLD;
+			return current && !prev;
+		}
+		bool IsTriggerRStickDown() const {
+			bool current = m_rStickY < -STICK_THRESHOLD && fabsf(m_rStickX) < STICK_THRESHOLD;
+			bool prev = m_prevRStickY < -STICK_THRESHOLD && fabsf(m_prevRStickX) < STICK_THRESHOLD;
+			return current && !prev;
+		}
+		bool IsTriggerRStickRight() const {
+			bool current = m_rStickX > STICK_THRESHOLD && fabsf(m_rStickY) < STICK_THRESHOLD;
+			bool prev = m_prevRStickX > STICK_THRESHOLD && fabsf(m_prevRStickY) < STICK_THRESHOLD;
+			return current && !prev;
+		}
+		bool IsTriggerRStickLeft() const {
+			bool current = m_rStickX < -STICK_THRESHOLD && fabsf(m_rStickY) < STICK_THRESHOLD;
+			bool prev = m_prevRStickX < -STICK_THRESHOLD && fabsf(m_prevRStickY) < STICK_THRESHOLD;
+			return current && !prev;
+		}
+		bool IsTriggerRStickRightUp() const { return (m_rStickX > STICK_THRESHOLD && m_rStickY > STICK_THRESHOLD) && (m_prevRStickX <= STICK_THRESHOLD || m_prevRStickY <= STICK_THRESHOLD); }
+		bool IsTriggerRStickRightDown() const { return (m_rStickX > STICK_THRESHOLD && m_rStickY < -STICK_THRESHOLD) && (m_prevRStickX <= STICK_THRESHOLD || m_prevRStickY >= -STICK_THRESHOLD); }
+		bool IsTriggerRStickLeftUp() const { return (m_rStickX < -STICK_THRESHOLD && m_rStickY > STICK_THRESHOLD) && (m_prevRStickX >= -STICK_THRESHOLD || m_prevRStickY <= STICK_THRESHOLD); }
+		bool IsTriggerRStickLeftDown() const { return (m_rStickX < -STICK_THRESHOLD && m_rStickY < -STICK_THRESHOLD) && (m_prevRStickX >= -STICK_THRESHOLD || m_prevRStickY >= -STICK_THRESHOLD); }
 		
 		/// <summary>
 		/// ボタンが押されているか判定
@@ -113,12 +153,20 @@ namespace nsK2EngineLow {
 		bool IsPressLStickDown() const { return  m_lStickY < -STICK_THRESHOLD; }
 		bool IsPressLStickRight() const { return  m_lStickX > STICK_THRESHOLD; }
 		bool IsPressLStickLeft() const { return  m_lStickX < -STICK_THRESHOLD; }
+		bool IsPressLStickRightUp() const { return m_lStickX > STICK_THRESHOLD && m_lStickY > STICK_THRESHOLD; }
+		bool IsPressLStickRightDown() const { return m_lStickX > STICK_THRESHOLD && m_lStickY < -STICK_THRESHOLD; }
+		bool IsPressLStickLeftUp() const { return m_lStickX < -STICK_THRESHOLD && m_lStickY > STICK_THRESHOLD; }
+		bool IsPressLStickLeftDown() const { return m_lStickX < -STICK_THRESHOLD && m_lStickY < -STICK_THRESHOLD; }
 
 		//右スティック
 		bool IsPressRStickUp() const { return  m_rStickY > STICK_THRESHOLD; }
 		bool IsPressRStickDown() const { return  m_rStickY < -STICK_THRESHOLD; }
 		bool IsPressRStickRight() const { return  m_rStickX > STICK_THRESHOLD; }
 		bool IsPressRStickLeft() const { return  m_rStickX < -STICK_THRESHOLD; }
+		bool IsPressRStickRightUp() const { return m_rStickX > STICK_THRESHOLD && m_rStickY > STICK_THRESHOLD; }
+		bool IsPressRStickRightDown() const { return m_rStickX > STICK_THRESHOLD && m_rStickY < -STICK_THRESHOLD; }
+		bool IsPressRStickLeftUp() const { return m_rStickX < -STICK_THRESHOLD && m_rStickY > STICK_THRESHOLD; }
+		bool IsPressRStickLeftDown() const { return m_rStickX < -STICK_THRESHOLD && m_rStickY < -STICK_THRESHOLD; }
 
 		/// <summary>
 		/// 何かのボタンが押されているか判定。

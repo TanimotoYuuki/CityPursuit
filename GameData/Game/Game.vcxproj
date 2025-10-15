@@ -229,14 +229,19 @@
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="Buildings.cpp" />
     <ClCompile Include="DebugLog.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyAI.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerCamera.cpp" />
+    <ClCompile Include="PlayerCatchEnemy.cpp" />
     <ClCompile Include="PlayerJump.cpp" />
     <ClCompile Include="PlayerMove.cpp" />
     <ClCompile Include="PlayerRotation.cpp" />
     <ClCompile Include="PlayerSwingAction.cpp" />
+    <ClCompile Include="QteEvent.cpp" />
+    <ClCompile Include="QteEventInput.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -252,13 +257,18 @@
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="Buildings.h" />
     <ClInclude Include="DebugLog.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyAI.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerCamera.h" />
+    <ClInclude Include="PlayerCatchEnemy.h" />
     <ClInclude Include="PlayerJump.h" />
     <ClInclude Include="PlayerMove.h" />
     <ClInclude Include="PlayerRotation.h" />
     <ClInclude Include="PlayerSwingAction.h" />
+    <ClInclude Include="QteEvent.h" />
+    <ClInclude Include="QteEventInput.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Street.h" />
     <ClInclude Include="SwingActionManager.h" />

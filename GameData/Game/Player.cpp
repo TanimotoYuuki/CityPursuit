@@ -2,12 +2,14 @@
 #include "Player.h"
 #include "PlayerMove.h"
 #include "PlayerRotation.h"
+#include "PlayerCatchEnemy.h"
 
 //デストラクタ
 Player::~Player()
 {
 	DeleteGO(m_playerMove);//プレイヤー移動
 	DeleteGO(m_playerRotation);//プレイヤー回転
+	DeleteGO(m_playerCatchEnemy);//プレイヤーが敵をキャッチする
 }
 
 //開始処理
@@ -38,6 +40,9 @@ bool Player::Start()
 	//プレイヤー回転クラスのインスタンスの生成
 	m_playerRotation = NewGO<PlayerRotation>(0, "playerrotation");
 
+	//プレイヤーが敵をキャッチするクラスのインスタンス生成
+	m_playerCatchEnemy = NewGO<PlayerCatchEnemy>(0, "playercatchenemy");
+
 	//プレイヤーカメラクラスの初期化
 	m_playerCamera.Init();
 
@@ -62,8 +67,18 @@ void Player::Update()
 	//カメラ追従処理の実行
 	m_playerCamera.Execute(m_position);
 
+	//プレイヤーが敵をキャッチする処理の実行
+	m_playerCatchEnemy->Execute();
+
 	//プレイヤーモデルの更新
 	m_playerModel.Update();
+}
+
+//直接座標を設定
+void Player::SetDirectPosition(const Vector3& pos)
+{
+	m_charaCon.SetPosition(pos);
+	m_playerModel.SetPosition(pos);
 }
 
 //描画処理
