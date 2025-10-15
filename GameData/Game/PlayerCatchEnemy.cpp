@@ -88,7 +88,7 @@ void PlayerCatchEnemy::Reset()
 	m_catchEnemyState = enStartWireToEnemy;
 	m_player->GetPlayerCamera().SetIsOnEnemyCamera(false);
 	m_player->GetPlayerMove()->SetUseGravity(true);
-	m_player->GetPlayerCamera().SetCanMoveCamera(false);
+	m_player->GetPlayerCamera().SetCanMoveCamera(true);
 
 	Vector3 leaveJumpForce = Vector3::Front;
 	m_player->GetModelData().GetRotation().Apply(leaveJumpForce);

@@ -4,7 +4,7 @@
 
 namespace {
 	constexpr const wchar_t* PLAYER_BONE_NAME = L"Character1_RightHand";//プレイヤーの手のボーンの名前
-	const float STRETCHED_TIME = 0.3f;//糸が伸びきるまでの時間
+	const float STRETCHED_TIME = 0.15f;//糸が伸びきるまでの時間
 }
 
 //開始処理
@@ -71,7 +71,7 @@ void SwingModel::Update()
 	}
 
 	//モデルの拡大率と座標を設定する
-	m_swingModel.SetScale({ 1.0f,1.0f,atHandModelScale * 100 });
+	m_swingModel.SetScale({ 1.0f,1.0f,atHandModelScale * 2.5f });
 	m_swingModel.SetPosition(m_startStretchPos);
 	//スイングモデルの更新処理
 	m_swingModel.Update();

@@ -13,7 +13,7 @@ bool EnemyAI::Start()
 void EnemyAI::Execute(Vector3& position, const Vector3& targetPosition)
 {
 	bool isEnd;
-	if (g_pad[0]->IsTrigger(enButtonA))
+	if (g_pad[0]->IsTrigger(enButtonRB1))
 	{
 		//パス検索
 		m_pathFiding.Execute(
@@ -22,8 +22,8 @@ void EnemyAI::Execute(Vector3& position, const Vector3& targetPosition)
 			position,//開始処理
 			targetPosition,//移動目標位置
 			PhysicsWorld::GetInstance(),//物理エンジン
-			100.0f,//AIエージェントの半径
-			200.0f//AIエージェントの高さ
+			1000.0f,//AIエージェントの半径
+			2000.0f//AIエージェントの高さ
 		);
 	}
 

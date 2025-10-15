@@ -12,19 +12,19 @@ namespace{
 
 	const float INIT_VELOCITY_OF_ATER_SWING_ACCELERATION = 500.0f;//スイング後の加速の初速度
 
-	const float SWING_ROLL_UP_POWER = 250.0f;//スイングロールの上昇力
+	const float SWING_ROLL_UP_POWER = 500.0f;//スイングロールの上昇力
 
 //歩き
 	const float WALK_ACCELERATION = 50.0f;//歩き時の加速度
 
-	const float WALK_MAX_SPEED = 300.0f;//歩き時の最高速度
+	const float WALK_MAX_SPEED = 325.0f;//歩き時の最高速度
 
 //スピード
-	const float START_DECELERATE_SWING_SPEED_INIT_VALUE = -100.0f;//減速し始めるスピードの初期値
+	const float START_DECELERATE_SWING_SPEED_INIT_VALUE = -300.0f;//減速し始めるスピードの初期値
 
 	const float CAN_START_SWING_FALL_SPEED = -10.0f;//スイングを開始できる落下速度
 
-	const float INIT_SWING_SPEED = 500.0f;//最初のスイングスピード
+	const float INIT_SWING_SPEED = 900.0f;//最初のスイングスピード
 }
 
 //デストラクタ
@@ -63,7 +63,6 @@ void PlayerSwingAction::Execute()
 		//RB2ボタンが長押ししているときの処理
 		if (g_pad[0]->IsPress(enButtonRB2))
 		{
-			//スイングアクションしている
 			m_isSwingAction = true;
 
 			//スイングアクションの更新処理
@@ -97,19 +96,21 @@ void PlayerSwingAction::Execute()
 //スイングアクションの前に行う処理
 void PlayerSwingAction::PreSwingAction()
 {
+	//スイングターゲットを探すか？
+	if (m_swingState == enSwingState_FindSwingTarget)
+	{
+		//スイングターゲットを探す
+		FindSwingTarget();
+
+		//早期リターン
+		return;
+	}
+
 	//地面に着いているか
 	if (m_player->GetCharacterController().IsOnGround() == true)
 	{
-		// スイングターゲットを探すか？
-		if (m_swingState == enSwingState_FindSwingTarget)
-		{
-			//スイングターゲットを探す
-			FindSwingTarget();
-
-			//早期リターン
-			return;
-		}
-		else
+		//スイングターゲットを探さないか？
+		if(m_swingState != enSwingState_FindSwingTarget)
 		{
 			//スイング状態がスイング終了状態ではないとき
 			if (m_swingState != enSwingState_SwingEnd)
@@ -205,9 +206,6 @@ void PlayerSwingAction::Swinging()
 {
 	//スイングによるプレイヤーの移動
 	SwingPlayerMove();
-
-	//スイングの状態をスイング後の状態にする
-	//ChangeState(enSwingState_AirAfterSwing);
 }
 
 //スイング後の空中処理
@@ -218,6 +216,7 @@ void PlayerSwingAction::AirAfterSwing()
 		if (m_player->GetPlayerMove()->GetMoveSpeed().y < CAN_START_SWING_FALL_SPEED)
 		{
 			ChangeState(enSwingState_FindSwingTarget);
+			return;
 		}
 	}
 
@@ -300,7 +299,7 @@ void PlayerSwingAction::SwingEnd()
 	ChangeState(enSwingState_FindSwingTarget);
 	//ワイヤーに終了を知らせる
 	m_swingModel->EndWireStretchToPos();
-	//スイングスペードをリセット
+	//スイングスピードをリセット
 	m_swingSpeed = 0.0f;
 }
 
@@ -347,7 +346,7 @@ void PlayerSwingAction::FindSwingTarget()
 	//糸を出す方向への回転クォータニオン
 	Quaternion swingRotationQRot = Quaternion::Identity;
 
-	//入力がなかったらカメラの前方向に糸を出す。
+	//カメラの前方向に糸を出す。
 	Vector3 cameraDir = g_camera3D->GetForward();
 	cameraDir.y = 0.0f;
 	cameraDir.Normalize();
