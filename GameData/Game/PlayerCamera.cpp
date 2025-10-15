@@ -17,6 +17,14 @@ void PlayerCamera::Init()
 	//カメラのニアクリップとファークリップを設定する。
 	g_camera3D->SetNear(CAMERA_NEAR);
 	g_camera3D->SetFar(CAMERA_FAR);
+
+	//バネカメラの初期化
+	m_springCamera.Init(
+		*g_camera3D,//バネカメラに使うカメラ
+		1000.0f,//カメラの移動速度の最大値
+		true,//カメラと地形との当たり判定を取るかどうかのフラグ
+		5.0f//カメラに設定される球体コリジョンの半径
+	);
 }
 
 //カメラ追従処理の実行
@@ -25,7 +33,8 @@ void PlayerCamera::Execute(Vector3& position)
 	//注視点を計算する
 	Vector3 target = position;
 	//プレイヤの足元からちょっと上を注視点とする。
-	target.y += 125.0f;
+	target.y += 80.0f;
+	target += g_camera3D->GetForward() * 20.0f;
 
 	Vector3 toCameraPosOld = m_toCameraPos;
 
@@ -51,7 +60,7 @@ void PlayerCamera::Execute(Vector3& position)
 	Vector3 toPosDir = m_toCameraPos;
 	//注視点から視点までのベクトルを正規化
 	toPosDir.Normalize();
-	if (toPosDir.y < -0.2f) {
+	if (toPosDir.y < -0.5f) {
 		//カメラが上向きすぎ
 		m_toCameraPos = toCameraPosOld;
 	}
@@ -64,9 +73,9 @@ void PlayerCamera::Execute(Vector3& position)
 	Vector3 pos = target + m_toCameraPos;
 
 	//メインカメラに注視点と視点を設定する
-	g_camera3D->SetTarget(target);
-	g_camera3D->SetPosition(pos);
+	m_springCamera.SetTarget(target);
+	m_springCamera.SetPosition(pos);
 
 	//カメラの更新
-	g_camera3D->Update();
+	m_springCamera.Update();
 }
