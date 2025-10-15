@@ -37,6 +37,7 @@ public:
 	}
 
 private://メンバ変数
+	SpringCamera m_springCamera;//バネカメラ
 	Vector3 m_toCameraPos = Vector3::Zero;//注視点から視点までのベクトル
 	Vector2 m_inputRStick = Vector2::Zero;//右スティックの入力量
 	bool m_isOnEnemyCamera = false;//敵の上に乗っているときのカメラか？
