@@ -27,12 +27,12 @@ bool PlayerCatchEnemy::Start()
 {
 	m_player = FindGO<Player>("player");
 	m_playerSwingAction = FindGO<PlayerSwingAction>("playerswingaction");
-	m_enemy = FindGO<Enemy>("enemy");
 	return true;
 }
 
 void PlayerCatchEnemy::Execute()
 {
+	m_enemy = FindGO<Enemy>("enemy");
 	if (m_enemy == nullptr)
 	{
 		return;

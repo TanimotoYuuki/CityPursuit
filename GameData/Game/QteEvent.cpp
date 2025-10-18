@@ -37,6 +37,18 @@ namespace {
 
 	const Vector4 TIME_LIMIT_UI_MULCOLOR_RED{ 1.0f,0.0f,0.0f,1.0f };//制限時間UIの乗算カラー(赤色)
 
+	//QTEイベントの結果UI
+	const float QTE_EVENT_RESULT_UI_WIDTH = 1024;//QTEイベントの結果UIの横幅
+
+	const float QTE_EVENT_RESULT_UI_HEIGHT = 128;//QTEイベントの結果UIの縦幅
+
+	const Vector3 QTE_EVENT_RESULT_UI_INIT_POSITION{ 0.0f,100.0f,0.0f };//QTEイベントの結果UIの初期位置
+
+	const Vector3 QTE_EVENT_RESULT_UI_SCALE{ 0.5f,0.5f,0.5f };//QTEイベントの結果UIの大きさ
+
+	//時間
+	const float DELAY_TIME = 1.5f;//待機時間
+
 	//ボタン
 	const int A_BUTTON_SELECT_ID = 0;//AボタンID
 
@@ -74,47 +86,40 @@ bool QteEvent::Start()
 //更新処理
 void QteEvent::Update()
 {
+	//QTEイベントでプレイヤー側が入力する処理の実行
 	m_qteEventInput->Execute();
 
-	for (int i = 0; i < m_inputCommandList.size(); i++)
+	//ゲームパッドの入力前後のUIの更新処理
+	GamePadInputUIUpdate();
+
+	//QTEイベントでコマンド入力に失敗したら処理する
+	if (m_qteEventInput->IsInputFailed())
 	{
-		//コマンド入力が成功した時
-		if (m_isInputCommandSuccess[m_inputCommandList[i]] == true)
-		{
-			//イージング設定ができていないとき
-			if (m_isGamePadUIEasingStart[m_inputCommandList[i]] != true)
-			{
-				//イージング設定
-				SetGamePadInputUIEasing(m_inputCommandList[i], m_gamePadInputBeforeUI[m_inputCommandList[i]], m_gamePadInputAfterUI[m_inputCommandList[i]]);
-			}
-			//イージング設定ができているとき
-			else
-			{
-				//イージング更新処理
-				GamePadInputUIEasingUpdate(m_inputCommandList[i], m_gamePadInputAfterUI[m_inputCommandList[i]]);
-			}
-
-			//全てのコマンドの入力成功時の演出が終わったらリセット処理をする
-			if (m_isGamePadUIEasingEnd[m_inputCommandList[m_inputCommandList.size() - 1]] == true)
-			{
-				m_succesInputCommand++;
-
-				//コマンド入力が3回成功したらQTEイベントを終了する
-				if (m_succesInputCommand >= 3)
-				{
-					DeleteGO(this);
-					DeleteGO(m_targetEnemy);
-					m_playerCatchEnemy->Reset();
-					return;
-				}
-
-				GamePadPushUIReset();
-			}
-		}
+		//入力に失敗したときの処理
+		InputFailed();
 	}
 
-	//制限時間の更新処理
-	TimeLimitUpdate();
+	//制限時間が止まっていなかったら処理する
+	if (!m_isStopTimeLimit)
+	{
+		//制限時間の更新処理
+		TimeLimitUpdate();
+	}
+
+	//QTEイベントの結果が出たら処理する
+	if (m_isQteEventResult[enQteEventResult_Success] == true || m_isQteEventResult[enQteEventResult_Failed] == true)
+	{
+		//結果を表示して待機時間まで待ったらQTEイベントを終了する
+		if (g_gameTime->StopWatch(DELAY_TIME))
+		{
+			DeleteGO(this);
+			if (m_isQteEventResult[enQteEventResult_Success] == true)
+			{
+				DeleteGO(m_targetEnemy);
+			}
+			m_playerCatchEnemy->Reset();
+		}
+	}
 }
 
 //初期設定
@@ -129,6 +134,11 @@ void QteEvent::Init()
 	}
 
 	InitTimeLimitUI();//制限時間UI関連の初期化
+
+	for (int j = 0; j < enQteEventResult_Num; j++)
+	{
+		InitQteEventResultUI((EnQteEventResult)j);//QTEイベントの結果UIの初期化
+	}
 
 	//コマンド入力リストのコンテナのメモリ容量の確保
 	m_inputCommandList.reserve(15);
@@ -150,14 +160,25 @@ void QteEvent::InitGamePadInputBeforeUI(EnGamePadInputList enGamePadInputList)
 //ゲームパッドのボタンや方向キーを入力後のUIの初期設定
 void QteEvent::InitGamePadInputAfterUI(EnGamePadInputList enGamePadInputList)
 {
+	//QTEイベント成功用
 	//ゲームパッドのボタンや方向キーを入力後のUIの初期化
-	m_gamePadInputAfterUI[enGamePadInputList].Init(m_gamepadInputAfterUIFilePath[enGamePadInputList].c_str(), GAMEPAD_UI_WIDTH_AND_HEIGHT, GAMEPAD_UI_WIDTH_AND_HEIGHT);
+	m_gamePadInputAfterUI[enQteEventResult_Success][enGamePadInputList].Init(m_gamepadInputAfterUIFilePath[enGamePadInputList].c_str(), GAMEPAD_UI_WIDTH_AND_HEIGHT, GAMEPAD_UI_WIDTH_AND_HEIGHT);
 	//ゲームパッドのボタンや方向キーを入力後のUIの座標の設定
-	m_gamePadInputAfterUI[enGamePadInputList].SetPosition(GAMEPAD_INPUT_AFTER_UI_INIT_POSITION);
+	m_gamePadInputAfterUI[enQteEventResult_Success][enGamePadInputList].SetPosition(GAMEPAD_INPUT_AFTER_UI_INIT_POSITION);
 	//ゲームパッドのボタンや方向キーを入力後のUIの大きさの設定
-	m_gamePadInputAfterUI[enGamePadInputList].SetScale(GAMEPAD_UI_SCALE);
+	m_gamePadInputAfterUI[enQteEventResult_Success][enGamePadInputList].SetScale(GAMEPAD_UI_SCALE);
 	//ゲームパッドのボタンや方向キーを入力後のUIの更新処理
-	m_gamePadInputAfterUI[enGamePadInputList].Update();
+	m_gamePadInputAfterUI[enQteEventResult_Success][enGamePadInputList].Update();
+
+	//QTEイベント終了用
+	//ゲームパッドのボタンや方向キーを入力後のUIの初期化
+	m_gamePadInputAfterUI[enQteEventResult_Failed][enGamePadInputList].Init(m_gamepadInputFailedUIFilePath[enGamePadInputList].c_str(), GAMEPAD_UI_WIDTH_AND_HEIGHT, GAMEPAD_UI_WIDTH_AND_HEIGHT);
+	//ゲームパッドのボタンや方向キーを入力後のUIの座標の設定
+	m_gamePadInputAfterUI[enQteEventResult_Failed][enGamePadInputList].SetPosition(GAMEPAD_INPUT_AFTER_UI_INIT_POSITION);
+	//ゲームパッドのボタンや方向キーを入力後のUIの大きさの設定
+	m_gamePadInputAfterUI[enQteEventResult_Failed][enGamePadInputList].SetScale(GAMEPAD_UI_SCALE);
+	//ゲームパッドのボタンや方向キーを入力後のUIの更新処理
+	m_gamePadInputAfterUI[enQteEventResult_Failed][enGamePadInputList].Update();
 }
 
 //制限時間UI関連の初期化
@@ -178,6 +199,15 @@ void QteEvent::InitTimeLimitUI()
 
 	//制限時間の上限の設定
 	m_timeLimitMax = m_timeLimit;
+}
+
+//QTEイベントの結果UIの初期化
+void QteEvent::InitQteEventResultUI(EnQteEventResult enQteEventResult)
+{
+	m_qteEventResultUI[enQteEventResult].Init(m_qteEventResultUIFilePath[enQteEventResult].c_str(), QTE_EVENT_RESULT_UI_WIDTH, QTE_EVENT_RESULT_UI_HEIGHT);
+	m_qteEventResultUI[enQteEventResult].SetPosition(QTE_EVENT_RESULT_UI_INIT_POSITION);
+	m_qteEventResultUI[enQteEventResult].SetScale(QTE_EVENT_RESULT_UI_SCALE);
+	m_qteEventResultUI[enQteEventResult].Update();
 }
 
 //入力するコマンドの設定
@@ -294,57 +324,58 @@ void QteEvent::SetGamePadInputUIPosition(int commandNum, EnGamePadInputList enGa
 	m_gamePadInputBeforeUI[enGamePadInputList].Update();
 
 	//コマンド入力の順番に応じてゲームパッドUIの座標を設定する
-	Vector3 afterUIPos = m_gamePadInputAfterUI[enGamePadInputList].GetPosition();
+	Vector3 afterUIPos = m_gamePadInputAfterUI[enQteEventResult_Success][enGamePadInputList].GetPosition();
 	afterUIPos.x = posX; //計算したX座標を適用
 
 	//ゲームパッドのボタンや方向キーを入力後のUIの座標の設定
-	m_gamePadInputAfterUI[enGamePadInputList].SetPosition(afterUIPos);
+	m_gamePadInputAfterUI[enQteEventResult_Success][enGamePadInputList].SetPosition(afterUIPos);
 	//ゲームパッドのボタンや方向キーを入力後のUIの更新処理
-	m_gamePadInputAfterUI[enGamePadInputList].Update();
+	m_gamePadInputAfterUI[enQteEventResult_Success][enGamePadInputList].Update();
 }
 
 //ゲームパッドの入力前後のUIのイージング設定
-void QteEvent::SetGamePadInputUIEasing(EnGamePadInputList enGamePadInputList, SpriteRender& easingBeforeUI, SpriteRender& easingAfterUI)
+void QteEvent::SetGamePadInputUIEasing(EnQteEventResult enQteEventResult, EnGamePadInputList enGamePadInputList, SpriteRender& easingBeforeUI, SpriteRender& easingAfterUI)
 {
 	//イージング前の位置の設定
-	m_gamePadInputUIBeforeEasingPosition[enGamePadInputList] = easingAfterUI.GetPosition();
+	m_gamePadInputUIBeforeEasingPosition[enQteEventResult][enGamePadInputList] = easingAfterUI.GetPosition();
 
 	//イージング後の位置の設定
-	m_gamePadInputUIAfterEasingPosition[enGamePadInputList] = easingBeforeUI.GetPosition();
+	m_gamePadInputUIAfterEasingPosition[enQteEventResult][enGamePadInputList] = easingBeforeUI.GetPosition();
 
 	//イージング中の位置の設定
-	m_gamePadInputUIEasingPosition[enGamePadInputList] = easingAfterUI.GetPosition();
+	m_gamePadInputUIEasingPosition[enQteEventResult][enGamePadInputList] = easingAfterUI.GetPosition();
 
 	//イージングの割合の設定
-	m_gamePadInputUIEasingTime[enGamePadInputList] = 0.0f;
+	m_gamePadInputUIEasingTime[enQteEventResult][enGamePadInputList] = 0.0f;
 
 	//イージング実行可能な状態にする
-	m_isGamePadUIEasingStart[enGamePadInputList] = true;
+	m_isGamePadUIEasingStart[enQteEventResult][enGamePadInputList] = true;
 }
 
 //ゲームパッドの入力前後のUIのイージング更新処理
-void QteEvent::GamePadInputUIEasingUpdate(EnGamePadInputList enGamePadInputList, SpriteRender& afterInputUI)
+void QteEvent::GamePadInputUIEasingUpdate(EnQteEventResult enQteEventResult, EnGamePadInputList enGamePadInputList, SpriteRender& afterInputUI)
 {
-	m_gamePadInputUIEasingTime[enGamePadInputList] += 2.5f * g_gameTime->GetFrameDeltaTime();
+	m_gamePadInputUIEasingTime[enQteEventResult][enGamePadInputList] += 2.5f * g_gameTime->GetFrameDeltaTime();
 
-	m_gamePadInputUIBeforeEasingPosition[enGamePadInputList].y += 1.0f;
+	m_gamePadInputUIBeforeEasingPosition[enQteEventResult][enGamePadInputList].y += 1.0f;
 
 	//割合が1.0fになったら演出終了する
-	if (m_gamePadInputUIEasingTime[enGamePadInputList] > 1.0f)
+	if (m_gamePadInputUIEasingTime[enQteEventResult][enGamePadInputList] > 1.0f)
 	{
-		m_gamePadInputUIEasingTime[enGamePadInputList] = 1.0f;
-		m_isGamePadUIEasingEnd[enGamePadInputList] = true;
+		m_gamePadInputUIEasingTime[enQteEventResult][enGamePadInputList] = 1.0f;
+
+		m_isGamePadUIEasingEnd[enQteEventResult][enGamePadInputList] = true;
 	}
 
 	//イージング処理
-	m_gamePadInputUIEasingPosition[enGamePadInputList].Lerp(
-			m_gamePadInputUIEasingTime[enGamePadInputList], //イージング用の割合
-			m_gamePadInputUIBeforeEasingPosition[enGamePadInputList],//イージング前の位置
-			m_gamePadInputUIAfterEasingPosition[enGamePadInputList]//イージング後の位置
+	m_gamePadInputUIEasingPosition[enQteEventResult][enGamePadInputList].Lerp(
+			m_gamePadInputUIEasingTime[enQteEventResult][enGamePadInputList], //イージング用の割合
+			m_gamePadInputUIBeforeEasingPosition[enQteEventResult][enGamePadInputList],//イージング前の位置
+			m_gamePadInputUIAfterEasingPosition[enQteEventResult][enGamePadInputList]//イージング後の位置
 			);
 
 	//イージングした位置を設定
-	afterInputUI.SetPosition(m_gamePadInputUIEasingPosition[enGamePadInputList]);
+	afterInputUI.SetPosition(m_gamePadInputUIEasingPosition[enQteEventResult][enGamePadInputList]);
 
 	//入力後のUIの更新処理
 	afterInputUI.Update();
@@ -362,13 +393,13 @@ void QteEvent::GamePadPushUIReset()
 		m_gamePadInputBeforeUI[m_inputCommandList[i]].Update();
 
 		//ゲームパッドのボタンや方向キーを入力後のUIの座標の設定
-		m_gamePadInputAfterUI[m_inputCommandList[i]].SetPosition(GAMEPAD_INPUT_AFTER_UI_INIT_POSITION);
+		m_gamePadInputAfterUI[enQteEventResult_Success][m_inputCommandList[i]].SetPosition(GAMEPAD_INPUT_AFTER_UI_INIT_POSITION);
 		//ゲームパッドのボタンや方向キーを入力後のUIの更新処理
-		m_gamePadInputAfterUI[m_inputCommandList[i]].Update();
+		m_gamePadInputAfterUI[enQteEventResult_Success][m_inputCommandList[i]].Update();
 
 		//イージング実行不可能な状態にする
-		m_isGamePadUIEasingStart[m_inputCommandList[i]] = false;
-		m_isGamePadUIEasingEnd[m_inputCommandList[i]] = false;
+		m_isGamePadUIEasingStart[enQteEventResult_Success][m_inputCommandList[i]] = false;
+		m_isGamePadUIEasingEnd[enQteEventResult_Success][m_inputCommandList[i]] = false;
 
 		//コマンド入力が成功しているか判断するフラグをリセット
 		m_isInputCommandSuccess[m_inputCommandList[i]] = false;
@@ -384,6 +415,57 @@ void QteEvent::GamePadPushUIReset()
 	SetInputCommand();
 }
 
+//ゲームパッドの入力前後のUIの更新処理
+void QteEvent::GamePadInputUIUpdate()
+{
+	for (int i = 0; i < m_inputCommandList.size(); i++)
+	{
+		//コマンド入力が成功した時
+		if (m_isInputCommandSuccess[m_inputCommandList[i]] == true)
+		{
+			//イージング設定ができていないとき
+			if (m_isGamePadUIEasingStart[enQteEventResult_Success][m_inputCommandList[i]] != true)
+			{
+				//イージング設定
+				SetGamePadInputUIEasing(
+					enQteEventResult_Success,//QTEイベントの結果
+					m_inputCommandList[i],//コマンドリスト
+					m_gamePadInputBeforeUI[m_inputCommandList[i]],//イージング前の設定用のUI
+					m_gamePadInputAfterUI[enQteEventResult_Success][m_inputCommandList[i]]//イージング後の設定用のUI
+				);
+			}
+			//イージング設定ができているとき
+			else
+			{
+				//イージング更新処理
+				GamePadInputUIEasingUpdate(
+					enQteEventResult_Success,//QTEイベントの結果
+					m_inputCommandList[i],//コマンドリスト
+					m_gamePadInputAfterUI[enQteEventResult_Success][m_inputCommandList[i]]//描画するUI
+				);
+			}
+
+			//全てのコマンドの入力成功時の演出が終わったらリセット処理をする
+			if (m_isGamePadUIEasingEnd[enQteEventResult_Success][m_inputCommandList[m_inputCommandList.size() - 1]] == true)
+			{
+				m_succesInputCommand++;
+
+				//コマンド入力が3回成功したらQTEイベントを終了する
+				if (m_succesInputCommand >= 3)
+				{
+					m_isQteEventResult[enQteEventResult_Success] = true;
+					StopTimeLimit();
+					return;
+				}
+
+				GamePadPushUIReset();
+
+				m_qteEventInput->ResetInputLastCommand();
+			}
+		}
+	}
+}
+
 //制限時間の更新処理
 void QteEvent::TimeLimitUpdate()
 {
@@ -392,9 +474,9 @@ void QteEvent::TimeLimitUpdate()
 	//制限時間が0秒になったらQTEイベントを終了する
 	if (m_timeLimit <= 0.0f)
 	{
-		DeleteGO(this);
-		m_playerCatchEnemy->Reset();
+		m_isQteEventResult[enQteEventResult_Failed] = true;
 		m_timeLimit = 0.0f;
+		StopTimeLimit();
 	}
 
 	//制限時間UIの色を変える処理
@@ -428,9 +510,60 @@ void QteEvent::ChangeTimeLimitUIColor(float timeLimit)
 	}
 }
 
+//入力に失敗したときの処理
+void QteEvent::InputFailed()
+{
+	//イージング設定ができていないとき
+	if (m_isGamePadUIEasingStart[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] != true)
+	{
+		//イージング設定
+		SetGamePadInputUIEasing(
+			enQteEventResult_Failed,//QTEイベントの結果
+			(EnGamePadInputList)m_qteEventInput->GetInputCommand(),//コマンドリスト
+			m_gamePadInputBeforeUI[m_inputCommandList[m_qteEventInput->GetNowInputCommandOrder()]],//イージング前の設定用のUI
+			m_gamePadInputAfterUI[enQteEventResult_Success][m_inputCommandList[m_qteEventInput->GetNowInputCommandOrder()]]//イージング後の設定用のUI
+		);
+
+		//ゲームパッドのボタンや方向キーを入力後のUI(QTEイベント失敗用)の位置の設定
+		m_gamePadInputAfterUI[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()]
+			.SetPosition(m_gamePadInputUIEasingPosition[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()]);
+
+		//ゲームパッドのボタンや方向キーを入力後のUI(QTEイベント失敗用)の更新処理
+		m_gamePadInputAfterUI[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()].Update();
+	}
+	//イージング設定ができているとき
+	else
+	{
+		//イージング更新処理
+		GamePadInputUIEasingUpdate(
+			enQteEventResult_Failed,//QTEイベントの結果
+			(EnGamePadInputList)m_qteEventInput->GetInputCommand(),//コマンドリスト
+			m_gamePadInputAfterUI[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()]//描画するUI
+		);
+	}
+
+	//イージングが終わったら入力に失敗したときのリセット処理をする
+	if (m_isGamePadUIEasingEnd[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] == true)
+	{
+		m_isGamePadUIEasingStart[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] = false;
+		m_isGamePadUIEasingEnd[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] = false;
+		m_qteEventInput->ResetInputFailed();
+	}
+}
+
 //描画処理
 void QteEvent::Render(RenderContext& rc)
 {
+	for (int i = 0; i < enQteEventResult_Num; i++)
+	{
+		//QTEの結果が出ているかときに描画する
+		if (m_isQteEventResult[i] == true)
+		{
+			//QTE結果UIの描画処理
+			m_qteEventResultUI[i].Draw(rc);
+		}
+	}
+
 	for (int i = 0; i < m_inputCommandList.size(); i++)
 	{
 		//ゲームパッドのボタンや方向キーを入力前のUIの描画処理
@@ -440,9 +573,16 @@ void QteEvent::Render(RenderContext& rc)
 		if (m_isInputCommandSuccess[m_inputCommandList[i]] == true)
 		{
 			{
-				//ゲームパッドのボタンや方向キーを入力後のUIの描画処理
-				m_gamePadInputAfterUI[m_inputCommandList[i]].Draw(rc);
+				//ゲームパッドのボタンや方向キーを入力後のUIの描画処理(QTEイベント成功用)
+				m_gamePadInputAfterUI[enQteEventResult_Success][m_inputCommandList[i]].Draw(rc);
 			}
+		}
+
+		//コマンド入力が失敗しているときに描画する
+		if (m_qteEventInput->IsInputFailed())
+		{
+			//ゲームパッドのボタンや方向キーを入力後のUIの描画処理(QTEイベント失敗用)
+			m_gamePadInputAfterUI[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()].Draw(rc);
 		}
 	}
 
