@@ -50,6 +50,14 @@ public://列挙型
 		enCommandList_None//コマンドなし
 	};
 
+	//QTEイベントの結果
+	enum EnQteEventResult
+	{
+		enQteEventResult_Success,//成功
+		enQteEventResult_Failed,//失敗
+		enQteEventResult_Num//QTE結果UI数
+	};
+
 private://メンバ関数
 
 	/// <summary>
@@ -75,9 +83,24 @@ private://メンバ関数
 	void InitTimeLimitUI();
 
 	/// <summary>
+	/// QTEイベントの結果UIの初期化
+	/// </summary>
+	void InitQteEventResultUI(EnQteEventResult enQteEventReulst);
+
+	/// <summary>
+	/// ゲームパッドの入力前後のUIの更新処理
+	/// </summary>
+	void GamePadInputUIUpdate();
+
+	/// <summary>
 	/// 制限時間の更新処理
 	/// </summary>
 	void TimeLimitUpdate();
+
+	/// <summary>
+	/// 入力に失敗したときの処理
+	/// </summary>
+	void InputFailed();
 
 	/// <summary>
 	/// 制限時間UIの色を変える処理
@@ -105,17 +128,19 @@ private://メンバ関数
 	/// <summary>
 	/// ゲームパッドの入力前後のUIのイージング設定
 	/// </summary>
+	/// <param name="enQteEventResult">QTEイベントの結果</param>
 	/// <param name="enGamePadInputList">ゲームパッド入力リスト</param>
 	/// <param name="easingBeforeUI">イージング前の設定用のゲームパッドUI</param>
 	/// <param name="easingAfterUI">イージング後の設定用のゲームパッドUI</param>
-	void SetGamePadInputUIEasing(EnGamePadInputList enGamePadInputList, SpriteRender& easingBeforeUI, SpriteRender& easingAfterUI);
+	void SetGamePadInputUIEasing(EnQteEventResult enQteEventResult, EnGamePadInputList enGamePadInputList, SpriteRender& easingBeforeUI, SpriteRender& easingAfterUI);
 
 	/// <summary>
 	/// ゲームパッドの入力前後のUIのイージング更新処理
 	/// </summary>
+	/// <param name="enQteEventResult">QTEイベントの結果</param>
 	/// <param name="enGamePadInputList">ゲームパッド入力リスト</param>
 	/// <param name="inputAferUI">ゲームパッドUI(入力後)</param>
-	void GamePadInputUIEasingUpdate(EnGamePadInputList enGamePadInputList, SpriteRender& inputAfterUI);
+	void GamePadInputUIEasingUpdate(EnQteEventResult enQteEventResult, EnGamePadInputList enGamePadInputList, SpriteRender& inputAfterUI);
 
 public://メンバ関数
 
@@ -154,30 +179,59 @@ public://メンバ関数
 		m_isInputCommandSuccess[command] = true;
 	}
 
+	/// <summary>
+	/// 制限時間を動かす
+	/// </summary>
+	void StartTimeLimit()
+	{
+		m_isStopTimeLimit = false;
+	}
+
+	/// <summary>
+	/// 制限時間を止める
+	/// </summary>
+	void StopTimeLimit()
+	{
+		m_isStopTimeLimit = true;
+	}
+
+	/// <summary>
+	/// 時間が止まっているか?
+	/// </summary>
+	/// <returns>trueなら止まっている</returns>
+	bool IsStopTimeLimit()
+	{
+		return m_isStopTimeLimit;
+	}
+
 private://メンバ変数
 	SpriteRender m_gamePadInputBeforeUI[enGamePadInputList_Num];//ゲームパッドのボタンや方向キーを入力前のUI
-	SpriteRender m_gamePadInputAfterUI[enGamePadInputList_Num];//ゲームパッドのボタンや方向キーを入力後のUI
+	SpriteRender m_gamePadInputAfterUI[enQteEventResult_Num][enGamePadInputList_Num];//ゲームパッドのボタンや方向キーを入力後のUI
+	SpriteRender m_qteEventResultUI[enQteEventResult_Num];//QTEイベントの結果UI
 	SpriteRender m_timeLimitUI;//制限時間UI
 	SpriteRender m_timeLimitBerUI;//制限時間バーUI
-	Vector3 m_gamePadInputUIBeforeEasingPosition[enGamePadInputList_Num];//ゲームパッドUIイージング前用の位置
-	Vector3 m_gamePadInputUIAfterEasingPosition[enGamePadInputList_Num];//ゲームパッドUIイージング後用の位置
-	Vector3 m_gamePadInputUIEasingPosition[enGamePadInputList_Num];//ゲームパッドUIイージング中用の位置
+	Vector3 m_gamePadInputUIBeforeEasingPosition[enQteEventResult_Num][enGamePadInputList_Num];//ゲームパッドUIイージング前用の位置
+	Vector3 m_gamePadInputUIAfterEasingPosition[enQteEventResult_Num][enGamePadInputList_Num];//ゲームパッドUIイージング後用の位置
+	Vector3 m_gamePadInputUIEasingPosition[enQteEventResult_Num][enGamePadInputList_Num];//ゲームパッドUIイージング中用の位置
 	Vector4 m_timeLimitUIColor = Vector4::White;//制限時間UIの色
 	EnCommandList m_nowInputCommand = enCommandList_None;//現在入力しているコマンド
 	EnCommandList m_nextInputCommand = enCommandList_None;//次入力するコマンド
-	int m_succesInputCommand = 0;//コマンド入力が成功した回数
-	float m_gamePadInputUIEasingTime[enGamePadInputList_Num] = { 0.0f };//ゲームパッドUIのイージング用の割合
+	int m_succesInputCommandCount = 0;//コマンド入力が成功した回数
+	float m_gamePadInputUIEasingTime[enQteEventResult_Num][enGamePadInputList_Num] = { 0.0f };//ゲームパッドUIのイージング用の割合
 	float m_timeLimitMax = 0.0f;//制限時間(上限)
 	float m_timeLimit = 15.0f;//制限時間
-	bool m_isGamePadUIEasingStart[enGamePadInputList_Num] = { false };//ゲームパッドUIがイージングしているか?
-	bool m_isGamePadUIEasingEnd[enGamePadInputList_Num] = { false };//ゲームパッドUIがイージングし終わっているか?
+	bool m_isGamePadUIEasingStart[enQteEventResult_Num][enGamePadInputList_Num] = { false };//ゲームパッドUIがイージングしているか?
+	bool m_isGamePadUIEasingEnd[enQteEventResult_Num][enGamePadInputList_Num] = { false };//ゲームパッドUIがイージングし終わっているか?
 	bool m_isInputCommandSuccess[enGamePadInputList_Num] = { false };//コマンド入力が成功しているか?
+	bool m_isStopTimeLimit = false;//制限時間を止めるかどうか？
+	bool m_isQteEventResult[enQteEventResult_Num] = { false,false };//QTEイベントの結果
+	bool m_isAddSuccessInputCommandCount = false;//コマンド入力成功回数を増やしたかどうか?
 	std::vector<EnGamePadInputList> m_inputCommandList;//コマンド入力リスト
 	QteEventInput* m_qteEventInput = nullptr;//QTEイベントでプレイヤー側が入力する用のインスタンス
 	PlayerCatchEnemy* m_playerCatchEnemy = nullptr;//プレイヤーが敵をキャッチしている用のインスタンス
 	Enemy* m_targetEnemy = nullptr;//ターゲットにしているエネミー用のインスタンス
 
-private://データ関連のメンバ変数
+private://ファイルパス関連のメンバ変数
 	//ゲームパッドのボタンや方向キーを入力前のUIのファイルパス
 	const std::string m_gamepadInputBeforeUIFilePath[enGamePadInputList_Num] = {
 		"Assets/sprite/gamepad/inputBefore/arrow/upArrow.dds",//上方向
@@ -208,6 +262,28 @@ private://データ関連のメンバ変数
 		"Assets/sprite/gamepad/inputAfter/button/bButton.dds",//Bボタン
 		"Assets/sprite/gamepad/inputAfter/button/xButton.dds",//Xボタン
 		"Assets/sprite/gamepad/inputAfter/button/yButton.dds"//Yボタン
+	};
+
+	//ゲームパッドのボタンや方向キーを入力前のUIのファイルパス
+	const std::string m_gamepadInputFailedUIFilePath[enGamePadInputList_Num] = {
+		"Assets/sprite/gamepad/inputFailed/arrow/upArrow.dds",//上方向
+		"Assets/sprite/gamepad/inputFailed/arrow/downArrow.dds",//下方向
+		"Assets/sprite/gamepad/inputFailed/arrow/leftArrow.dds",//左方向
+		"Assets/sprite/gamepad/inputFailed/arrow/leftUpArrow.dds",//左上方向
+		"Assets/sprite/gamepad/inputFailed/arrow/leftDownArrow.dds",//左下方向
+		"Assets/sprite/gamepad/inputFailed/arrow/rightArrow.dds",//右方向
+		"Assets/sprite/gamepad/inputFailed/arrow/rightUpArrow.dds",//右上方向
+		"Assets/sprite/gamepad/inputFailed/arrow/rightdownArrow.dds",//右下方向
+		"Assets/sprite/gamepad/inputFailed/button/aButton.dds",//Aボタン
+		"Assets/sprite/gamepad/inputFailed/button/bButton.dds",//Bボタン
+		"Assets/sprite/gamepad/inputFailed/button/xButton.dds",//Xボタン
+		"Assets/sprite/gamepad/inputFailed/button/yButton.dds"//Yボタン
+	};
+
+	//QTEイベントの結果UIのファイルパス
+	const std::string m_qteEventResultUIFilePath[enQteEventResult_Num] = {
+		"Assets/sprite/text/success.dds",//成功
+		"Assets/sprite/text/failed.dds"//失敗
 	};
 };
 
