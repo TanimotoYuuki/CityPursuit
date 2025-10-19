@@ -57,6 +57,9 @@ namespace {
 	const int X_BUTTON_SELECT_ID = 2;//XボタンID
 
 	const int Y_BUTTON_SELECT_ID = 3;//YボタンID
+
+	//QTEイベント
+	const int SUCCESS_INPUT_COMMAND_COUNT_MAX = 3;//QTEイベントでコマンド入力成功数の上限
 }
 
 //デストラクタ
@@ -99,8 +102,9 @@ void QteEvent::Update()
 		InputFailed();
 	}
 
-	//制限時間が止まっていなかったら処理する
-	if (!m_isStopTimeLimit)
+	//制限時間が止まっていなかったら かつ
+	//プレイヤー側が最後のコマンドを入力していないときに処理する
+	if (!m_isStopTimeLimit && !(m_qteEventInput->IsInputLastCommand() && m_succesInputCommandCount >= SUCCESS_INPUT_COMMAND_COUNT_MAX))
 	{
 		//制限時間の更新処理
 		TimeLimitUpdate();
@@ -418,6 +422,16 @@ void QteEvent::GamePadPushUIReset()
 //ゲームパッドの入力前後のUIの更新処理
 void QteEvent::GamePadInputUIUpdate()
 {
+	//入力したコマンドが最後のとき
+	if (m_qteEventInput->IsInputLastCommand())
+	{
+		if (!m_isAddSuccessInputCommandCount)//カウントアップしていないとき
+		{
+			m_succesInputCommandCount++;//コマンド入力成功数をカウントアップ
+			m_isAddSuccessInputCommandCount = true;//カウントアップ完了
+		}
+	}
+
 	for (int i = 0; i < m_inputCommandList.size(); i++)
 	{
 		//コマンド入力が成功した時
@@ -448,10 +462,8 @@ void QteEvent::GamePadInputUIUpdate()
 			//全てのコマンドの入力成功時の演出が終わったらリセット処理をする
 			if (m_isGamePadUIEasingEnd[enQteEventResult_Success][m_inputCommandList[m_inputCommandList.size() - 1]] == true)
 			{
-				m_succesInputCommand++;
-
 				//コマンド入力が3回成功したらQTEイベントを終了する
-				if (m_succesInputCommand >= 3)
+				if (m_succesInputCommandCount >= SUCCESS_INPUT_COMMAND_COUNT_MAX)
 				{
 					m_isQteEventResult[enQteEventResult_Success] = true;
 					StopTimeLimit();
@@ -459,6 +471,8 @@ void QteEvent::GamePadInputUIUpdate()
 				}
 
 				GamePadPushUIReset();
+
+				m_isAddSuccessInputCommandCount = false;
 
 				m_qteEventInput->ResetInputLastCommand();
 			}

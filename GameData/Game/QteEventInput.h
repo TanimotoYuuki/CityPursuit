@@ -53,6 +53,15 @@ public://メンバ関数
 	}
 
 	/// <summary>
+	/// 最後のコマンド入力したか?
+	/// </summary>
+	/// <returns>trueなら最後のコマンド入力している</returns>
+	bool IsInputLastCommand()
+	{
+		return m_isInputLastCommand;
+	}
+
+	/// <summary>
 	/// 入力失敗しているか判断している変数のリセット処理
 	/// </summary>
 	void ResetInputFailed()

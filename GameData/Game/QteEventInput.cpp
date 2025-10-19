@@ -15,9 +15,10 @@ void QteEventInput::Execute()
 	auto commandList = m_qteEvent->GetInputCommand();
 	
 	//コマンド入力が失敗していない かつ
-	//最後のコマンド入力していなければ
+	//最後のコマンド入力していない　かつ
+	//制限時間が止まっていない　なら
 	//コマンド入力することができる
-	if (!m_isInputFailed && !m_isInputLastCommand)
+	if (!m_isInputFailed && !m_isInputLastCommand && !m_qteEvent->IsStopTimeLimit())
 	{
 		//コマンド入力
 		InputCommand();

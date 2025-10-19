@@ -216,7 +216,7 @@ private://メンバ変数
 	Vector4 m_timeLimitUIColor = Vector4::White;//制限時間UIの色
 	EnCommandList m_nowInputCommand = enCommandList_None;//現在入力しているコマンド
 	EnCommandList m_nextInputCommand = enCommandList_None;//次入力するコマンド
-	int m_succesInputCommand = 0;//コマンド入力が成功した回数
+	int m_succesInputCommandCount = 0;//コマンド入力が成功した回数
 	float m_gamePadInputUIEasingTime[enQteEventResult_Num][enGamePadInputList_Num] = { 0.0f };//ゲームパッドUIのイージング用の割合
 	float m_timeLimitMax = 0.0f;//制限時間(上限)
 	float m_timeLimit = 15.0f;//制限時間
@@ -225,6 +225,7 @@ private://メンバ変数
 	bool m_isInputCommandSuccess[enGamePadInputList_Num] = { false };//コマンド入力が成功しているか?
 	bool m_isStopTimeLimit = false;//制限時間を止めるかどうか？
 	bool m_isQteEventResult[enQteEventResult_Num] = { false,false };//QTEイベントの結果
+	bool m_isAddSuccessInputCommandCount = false;//コマンド入力成功回数を増やしたかどうか?
 	std::vector<EnGamePadInputList> m_inputCommandList;//コマンド入力リスト
 	QteEventInput* m_qteEventInput = nullptr;//QTEイベントでプレイヤー側が入力する用のインスタンス
 	PlayerCatchEnemy* m_playerCatchEnemy = nullptr;//プレイヤーが敵をキャッチしている用のインスタンス
