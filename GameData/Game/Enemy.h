@@ -3,7 +3,6 @@
 /// 敵クラス
 /// </summary>
 class EnemyAI;
-class Player;
 class Enemy : public IGameObject
 {
 public:
@@ -70,7 +69,6 @@ public:
 
 public://メンバ変数
 	ModelRender m_enemyModel;//敵モデル
-	Player* m_player = nullptr;//プレイヤーのインスタンス
 	Vector3 m_position = Vector3::Zero;//敵の位置
 	Quaternion m_rotation = Quaternion::Identity;//敵の回転
 	Vector3 m_scale = Vector3::Zero;//敵の大きさ
