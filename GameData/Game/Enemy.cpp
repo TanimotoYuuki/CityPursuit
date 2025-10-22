@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Enemy.h"
 #include "EnemyAI.h"
-#include "Player.h"//デバッグ用
 
 //デストラクタ
 Enemy::~Enemy()
@@ -31,20 +30,14 @@ bool Enemy::Start()
 //更新処理
 void Enemy::Update()
 {
-	//プレイヤーのインスタンスが存在しているとき処理する
-	if (m_player != nullptr)
-	{
-		//敵AIの実行処理
-		m_enemyAI->Execute(m_position, m_player->GetModelData().GetPosition());
-	}
-	else
-	{
-		//デバッグ用
-		m_player = FindGO<Player>("player");
-	}
+	//敵AIの実行処理
+	m_enemyAI->Execute(m_position, m_rotation);
 
 	//敵モデルの位置の設定
 	m_enemyModel.SetPosition(m_position);
+
+	//敵モデルの回転の設定
+	m_enemyModel.SetRotation(m_rotation);
 
 	//敵モデルの更新処理
 	m_enemyModel.Update();
