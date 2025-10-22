@@ -89,6 +89,11 @@ private://メンバ関数
 	/// </summary>
 	void SwingPlayerMove();
 
+	/// <summary>
+	/// カメラのイージング処理
+	/// </summary>
+	void CameraEasing();
+
 public://メンバ関数
 
 	/// <summary>
@@ -103,6 +108,15 @@ public://メンバ関数
 	void Reset()
 	{
 		SwingEnd();
+	}
+
+	/// <summary>
+	/// スイングアクションしているか?
+	/// </summary>
+	/// <returns>trueならスイングアクションしている</returns>
+	bool IsSwingAction()
+	{
+		return m_isSwingAction;
 	}
 
 	/// <summary>
@@ -122,9 +136,11 @@ private://メンバ変数
 	float m_startDecelerateSwingSpeed = -100.0f;//スイング減速開始速度
 	float m_velocityAfterSwing = 0.0f;//スイング後の速度
 	float m_accelerationAfterSwing = 0.0f;//スイング後の加速
+	float m_cameraEasingTime = 0.0f;//カメラのイージング用の割合
 	bool m_afterSwing = false;//スイングを行ったか？
 	bool m_swingRollFlag = false;//スイングロールを行うか？
 	bool m_isSwingAction = false;//スイングアクションしているか？
+	bool m_isInputSwingAction = false;//スイングアクションの入力をしたか？
 	float m_g = 0.0f;
 	Vector3 m_inputMoveDirXZ = Vector3::Zero;//入力によって生じたXZ平面での移動方向
 	SwingActionManager* m_swingActionManager = nullptr;//スイングアクションマネージャー用のインスタンス

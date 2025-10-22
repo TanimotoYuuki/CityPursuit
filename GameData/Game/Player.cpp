@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Player.h"
+#include "PlayerAnimation.h"
 #include "PlayerMove.h"
 #include "PlayerRotation.h"
 #include "PlayerCatchEnemy.h"
@@ -7,6 +8,7 @@
 //デストラクタ
 Player::~Player()
 {
+	DeleteGO(m_playerAnimation);//プレイヤーアニメーション
 	DeleteGO(m_playerMove);//プレイヤー移動
 	DeleteGO(m_playerRotation);//プレイヤー回転
 	DeleteGO(m_playerCatchEnemy);//プレイヤーが敵をキャッチする
@@ -15,14 +17,20 @@ Player::~Player()
 //開始処理
 bool Player::Start()
 {
+	//プレイヤーアニメーションクラスのインスタンスの生成
+	m_playerAnimation = NewGO<PlayerAnimation>(0,"playeranimation");
+
+	//アニメーションの初期化
+	m_playerAnimation->Init();
+
 	//プレイヤーモデルの初期化
-	m_playerModel.Init("Assets/modelData/unitychan.tkm");
+	m_playerModel.Init("Assets/modelData/player/player.tkm", m_playerAnimation->GetAnimationClips(), PlayerAnimation::enAnimationList_Num);
 
 	//プレイヤーモデルの初期位置の設定
 	m_playerModel.SetPosition(m_position);
 
 	//プレイヤーモデルの大きさの設定
-	m_playerModel.SetScale(m_scale * 1.2f);
+	m_playerModel.SetScale(m_scale * 2.0f);
 
 	//プレイヤーモデルの回転の設定
 	m_rotation.SetRotationDegY(0.0f);
@@ -65,10 +73,13 @@ void Player::Update()
 	m_playerModel.SetRotation(m_rotation);
 
 	//カメラ追従処理の実行
-	m_playerCamera.Execute(m_position);
+	m_playerCamera.Execute(this, m_position);
 
 	//プレイヤーが敵をキャッチする処理の実行
 	m_playerCatchEnemy->Execute();
+
+	//アニメーションの実行
+	m_playerAnimation->Execute(m_playerModel, this);
 
 	//プレイヤーモデルの更新
 	m_playerModel.Update();

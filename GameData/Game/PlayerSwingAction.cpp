@@ -8,9 +8,9 @@
 
 namespace{ 
 //スイング
-	const float MIN_VELOCITY_OF_AFTER_SWING_ACCELERATION = 50.0f;//スイング後の加速の最低速度
+	const float MIN_VELOCITY_OF_AFTER_SWING_ACCELERATION = 100.0f;//スイング後の加速の最低速度
 
-	const float INIT_VELOCITY_OF_ATER_SWING_ACCELERATION = 500.0f;//スイング後の加速の初速度
+	const float INIT_VELOCITY_OF_ATER_SWING_ACCELERATION = 1000.0f;//スイング後の加速の初速度
 
 	const float SWING_ROLL_UP_POWER = 500.0f;//スイングロールの上昇力
 
@@ -63,7 +63,7 @@ void PlayerSwingAction::Execute()
 		//RB2ボタンが長押ししているときの処理
 		if (g_pad[0]->IsPress(enButtonRB2))
 		{
-			m_isSwingAction = true;
+			m_isInputSwingAction = true;
 
 			//スイングアクションの更新処理
 			SwingActionUpdate();
@@ -76,8 +76,8 @@ void PlayerSwingAction::Execute()
 				AirAfterSwing();//スイング後の空中状態
 			}
 
-			//スイングアクションしていない
-			m_isSwingAction = false;
+			//スイングアクションの入力していない
+			m_isInputSwingAction = false;
 		}
 	}
 	else
@@ -88,8 +88,8 @@ void PlayerSwingAction::Execute()
 			SwingEnd();//スイング終了処理
 		}
 
-		//スイングアクションしていない
-		m_isSwingAction = false;
+		//スイングアクションの入力していない
+		m_isInputSwingAction = false;
 	}
 }
 
@@ -138,10 +138,10 @@ void PlayerSwingAction::PreSwingAction()
 		return;
 	}
 
-	//スイングアクションをやめたか？かつ
+	//スイングアクションの入力していないかつ
 	//スイング後の空中状態ではないか？
 	//スイングターゲットを探している状態ではないか？
-	if (m_isSwingAction != true &&
+	if (m_isInputSwingAction != true &&
 		m_swingState != enSwingState_AirAfterSwing &&
 		m_swingState != enSwingState_FindSwingTarget)
 	{
@@ -211,8 +211,13 @@ void PlayerSwingAction::Swinging()
 //スイング後の空中処理
 void PlayerSwingAction::AirAfterSwing()
 {
-	if (m_isSwingAction == true)
+	//カメラのイージング処理
+	CameraEasing();
+
+	//スイングアクションの入力があるとき
+	if (m_isInputSwingAction == true)
 	{
+		//落下速度がマイナスになっていたらスイングターゲットを探す状態に戻る
 		if (m_player->GetPlayerMove()->GetMoveSpeed().y < CAN_START_SWING_FALL_SPEED)
 		{
 			ChangeState(enSwingState_FindSwingTarget);
@@ -301,6 +306,10 @@ void PlayerSwingAction::SwingEnd()
 	m_swingModel->EndWireStretchToPos();
 	//スイングスピードをリセット
 	m_swingSpeed = 0.0f;
+	//カメラの値をリセット
+	m_player->GetPlayerCamera().LerpDampingRate(0.0f);
+	m_player->GetPlayerCamera().LerpTargetOffsetUp(0.0f);
+	m_player->GetPlayerCamera().LerpTargetOffsetForward(0.0f);
 }
 
 //スイングの状態の変更
@@ -321,6 +330,8 @@ void PlayerSwingAction::ChangeState(const EnSwingState enSwingState)
 	switch (m_swingState)
 	{
 	case enSwingState_FindSwingTarget://スイングターゲット検索状態
+		//スイングアクションしてしていない
+		m_isSwingAction = false;
 		break;
 	case enSwingState_WireStretching://ワイヤーを伸ばしている状態
 		IsWireStretchingEvent();
@@ -332,6 +343,8 @@ void PlayerSwingAction::ChangeState(const EnSwingState enSwingState)
 		IsAirAfterSwingEvent();
 		break;
 	case enSwingState_SwingEnd://スイング終了状態
+		//スイングアクションしてしていない
+		m_isSwingAction = false;
 		break;
 	}
 
@@ -366,6 +379,9 @@ void PlayerSwingAction::FindSwingTarget()
 //スイングによるプレイヤーの移動
 void PlayerSwingAction::SwingPlayerMove()
 {
+	//カメラのイージング処理
+	CameraEasing();
+
 	//1.必要なベクトルを用意
 	//プレイヤーからスイングターゲットまでのXZ平面でのベクトル
 	Vector3 playerToTargetVecXZ = m_swingActionManager->GetSwingActionShortestDistance() - m_player->GetModelData().GetPosition();
@@ -576,11 +592,47 @@ void PlayerSwingAction::SwingPlayerMove()
 	m_swingForwardDir.Normalize();
 }
 
+//カメラのイージング処理
+void PlayerSwingAction::CameraEasing()
+{
+	if (m_swingState == enSwingState_Swinging)//スイング中のカメラのイージング処理
+	{
+		if (m_cameraEasingTime > 1.0f)
+		{
+			return;
+		}
+
+		m_cameraEasingTime += 3.0f * g_gameTime->GetFrameDeltaTime();
+		m_player->GetPlayerCamera().LerpDampingRate(m_cameraEasingTime * m_cameraEasingTime);
+		m_player->GetPlayerCamera().LerpTargetOffsetUp(m_cameraEasingTime * m_cameraEasingTime);
+		m_player->GetPlayerCamera().LerpTargetOffsetForward(m_cameraEasingTime * m_cameraEasingTime);
+	}
+	else if (m_swingState == enSwingState_AirAfterSwing)//スイング後の空中状態のカメラのイージング処理
+	{
+		if (m_cameraEasingTime < 0.0f)
+		{
+			m_player->GetPlayerMove()->SetUseSwingActionGravity(false);//スイングアクション用の重力を使わない
+			return;
+		}
+
+		m_cameraEasingTime -= 3.0f * g_gameTime->GetFrameDeltaTime();
+		m_player->GetPlayerCamera().LerpDampingRate((m_cameraEasingTime * m_cameraEasingTime) / 2.0f);
+		m_player->GetPlayerCamera().LerpTargetOffsetUp(m_cameraEasingTime * m_cameraEasingTime);
+		m_player->GetPlayerCamera().LerpTargetOffsetForward(m_cameraEasingTime * m_cameraEasingTime);
+	}
+}
+
 //ワイヤーが伸びるイベント処理
 void PlayerSwingAction::IsWireStretchingEvent()
 {
 	//ワイヤーをスイングターゲットに向かって伸ばし始める
 	m_swingModel->StartWireStretchToPos(m_swingActionManager->GetSwingActionShortestDistance());
+
+	// カメラの値を線形変化させるタイマーをリセットする
+	m_cameraEasingTime = 0.0f;
+
+	//スイングアクションしている
+	m_isSwingAction = true;
 }
 
 //スイングしているイベント処理
@@ -592,6 +644,9 @@ void PlayerSwingAction::IsSwingingEvent()
 	m_inputMoveDirXZ = Vector3::Zero;
 
 	m_afterSwing = true;
+
+	//スイングアクションしている
+	m_isSwingAction = true;
 
 	//スイングスピードが初期速度より遅いか？
 	if (m_swingSpeed <= INIT_SWING_SPEED)
@@ -619,6 +674,9 @@ void PlayerSwingAction::IsSwingingEvent()
 //スイング後の空中処理
 void PlayerSwingAction::IsAirAfterSwingEvent()
 {
+	//スイングアクションしてしていない
+	m_isSwingAction = false;
+
 	//糸に終了を知らせる
 	m_swingModel->EndWireStretchToPos();
 
@@ -631,6 +689,9 @@ void PlayerSwingAction::IsAirAfterSwingEvent()
 		m_velocityAfterSwing = m_player->GetPlayerMove()->GetXZSpeed();
 		//入力によって生じたXZ平面での移動方向をリセット
 		m_inputMoveDirXZ = Vector3::Zero;
+		
+		m_player->GetPlayerMove()->SetUseSwingActionGravity(true);//スイングアクション用の重力を使う
+
 		m_swingForwardDir = m_player->GetPlayerMove()->GetMoveSpeed();
 		m_swingForwardDir.y = 0.0f;
 		m_swingForwardDir.Normalize();

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "PlayerMove.h"
+#include "PlayerAnimation.h"
 #include "PlayerSwingAction.h"
 #include "DebugLog.h"
 
@@ -30,13 +31,20 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 	if (characterController.IsOnGround())
 	{
 		//ジャンプ処理の実行
-		m_playerJump.Execute(m_moveSpeed);
+		m_playerJump.Execute(m_moveSpeed, characterController);
 	}
 	else
 	{
 		if (m_useGravity)
 		{
-			m_moveSpeed.y -= 19.6f;
+			if (m_ussSwingActionGravity)//スイングアクション用の重力
+			{
+				m_moveSpeed.y -= 19.6f / 1.5f;
+			}
+			else//通常の重力
+			{
+				m_moveSpeed.y -= 19.6f;
+			}
 		}
 	}
 
@@ -83,6 +91,17 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 				//XZ成分の移動速度をクリア
 				m_moveSpeed += m_cameraForward * m_inputLStick.y * 700.0f;	//奥方向への移動速度を加算
 				m_moveSpeed += m_cameraRight * m_inputLStick.x * 700.0f;	//右方向への移動速度を加算
+
+				if (m_moveSpeed.Length() != 0.0f)
+				{
+					m_isRun = true;//走っている
+					m_isWalk = false;//歩いていない
+				}
+				else
+				{
+					m_isRun = false;//走っていない
+					m_isWalk = false;//歩いていない
+				}
 			}
 		}
 		//歩き
@@ -91,6 +110,17 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 			//XZ成分の移動速度をクリア
 			m_moveSpeed += m_cameraForward * m_inputLStick.y * 325.0f;	//奥方向への移動速度を加算
 			m_moveSpeed += m_cameraRight * m_inputLStick.x * 325.0f;	//右方向への移動速度を加算
+
+			if (m_moveSpeed.Length() != 0.0f)
+			{
+				m_isWalk = true;//歩いている
+				m_isRun = false;//走っていない
+			}
+			else
+			{
+				m_isWalk = false;//歩いていない
+				m_isRun = false;//走っていない
+			}
 		}
 	}
 

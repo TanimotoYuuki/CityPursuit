@@ -85,12 +85,32 @@ public://メンバ関数
 		return m_isCatchEnemy;
 	}
 
+	/// <summary>
+	/// QTEイベント中か?
+	/// </summary>
+	/// <returns>trueならQTEイベント中</returns>
+	bool IsQteEvent()
+	{
+		return m_isQteEvent;
+	}
+
+	/// <summary>
+	/// キャッチした敵のインスタンスの取得
+	/// </summary>
+	/// <returns>キャッチした敵</returns>
+	Enemy* GetCatchEnemy()
+	{
+		return m_enemy;
+	}
+
 private://メンバ変数
 	EnCatchEnemyState m_catchEnemyState = enStartWireToEnemy;//敵をキャッチする状態
 	Vector3 m_distance = Vector3::Zero;//距離
 	Vector3 m_startGoOnEnemyPos = Vector3::Zero;//敵の上に行くときの最初の座標
 	float m_goOnEnemyTimer = 0.0f;//敵の上に行くまでのタイマー
+	bool m_isInputCatchEnemy = false;//敵をキャッチする入力しているか?
 	bool m_isCatchEnemy = false;//敵をキャッチしているか？
+	bool m_isQteEvent = false;//QTEイベント中か?
 	Player* m_player = nullptr;//プレイヤー用のインスタンス
 	PlayerSwingAction* m_playerSwingAction = nullptr;//プレイヤースイングアクション用のインスタンス
 	SwingModel* m_swingModel = nullptr;//スイングモデル用のインスタンス

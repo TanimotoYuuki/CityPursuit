@@ -28,6 +28,15 @@ public:
 	}
 
 	/// <summary>
+	/// スイングアクション用の重力を使用するか？を設定する
+	/// </summary>
+	/// <param name="useGravity">trueならスイングアクション用の重力を使用する</param>
+	void SetUseSwingActionGravity(const bool useGravity)
+	{
+		m_ussSwingActionGravity = useGravity;
+	}
+
+	/// <summary>
 	/// 移動ができるか？を設定する
 	/// </summary>
 	/// <param name="useGravity">trueなら移動できる</param>
@@ -113,6 +122,42 @@ public:
 		return m_moveSpeed;
 	}
 
+	/// <summary>
+	/// 歩いているか?
+	/// </summary>
+	/// <returns>trueなら歩いている</returns>
+	bool IsWalk() const
+	{
+		return m_isWalk;
+	}
+
+	/// <summary>
+	/// 走っているか?
+	/// </summary>
+	/// <returns>trueなら走っている</returns>
+	bool IsRun() const
+	{
+		return m_isRun;
+	}
+
+	/// <summary>
+	/// プレイヤージャンプの取得
+	/// </summary>
+	/// <returns>プレイヤージャンプ</returns>
+	PlayerJump& GetPlayerJump()
+	{
+		return m_playerJump;
+	}
+
+	/// <summary>
+	/// プレイヤースイングアクションの取得
+	/// </summary>
+	/// <returns>プレイヤースイングアクション</returns>
+	PlayerSwingAction* GetPlayerSwingAction()
+	{
+		return m_playerSwingAction;
+	}
+
 private://メンバ変数
 	Vector3 m_inputLStickMemory = Vector3::Zero;//左スティックの入力量を格納する変数
 	Vector3 m_inputLStick = Vector3::Zero;//左スティックの入力量
@@ -122,6 +167,9 @@ private://メンバ変数
 	PlayerJump m_playerJump;//プレイヤージャンプクラス
 	bool m_canMove = true;//移動できるか？
 	bool m_useGravity = true;//重力を使用するか？
+	bool m_ussSwingActionGravity = false;//スイングアクション用の重力を使用するか?
+	bool m_isWalk = false;//歩いているか?
+	bool m_isRun = false;//走っているか?
 	PlayerSwingAction* m_playerSwingAction = nullptr;//プレイヤースイングアクション用のインスタンス
 	DebugLog* m_debugLog = nullptr;//デバッグログ用のインスタンス
 };

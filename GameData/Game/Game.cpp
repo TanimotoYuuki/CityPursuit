@@ -7,7 +7,7 @@
 //開始処理
 bool Game::Start()
 {
-	m_debugLog = NewGO<DebugLog>(0, "debuglog");
+	//m_debugLog = NewGO<DebugLog>(0, "debuglog");
 	m_backGround = NewGO<BackGround>(0, "background");
 	m_player = NewGO<Player>(0, "player");
 	return true;
@@ -16,5 +16,10 @@ bool Game::Start()
 //更新処理
 void Game::Update()
 {
+	DebugLog::GetInstance()->Update();
+}
 
+void Game::Render(RenderContext& rc)
+{
+	DebugLog::GetInstance()->Render(rc);
 }

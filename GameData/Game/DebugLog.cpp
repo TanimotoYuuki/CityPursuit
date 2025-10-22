@@ -6,6 +6,8 @@ namespace
 	const int DEBUG_LOG_DRAWING__MAX = 100;//デバッグログを描画の上限
 }
 
+DebugLog* DebugLog::m_instance = nullptr;
+
 bool DebugLog::Start()
 {
 	m_debugLogName.reserve(100);
