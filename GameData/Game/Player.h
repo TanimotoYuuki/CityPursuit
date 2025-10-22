@@ -3,6 +3,7 @@
 /// <summary>
 /// プレイヤークラス
 /// </summary>
+class PlayerAnimation;
 class PlayerMove;
 class PlayerRotation;
 class PlayerCatchEnemy;
@@ -50,6 +51,15 @@ public:
 	}
 
 	/// <summary>
+	/// プレイヤーが敵をキャッチする用のインスタンスの取得
+	/// </summary>
+	/// <returns>プレイヤーが敵をキャッチする用のインスタンス</returns>
+	PlayerCatchEnemy* GetPlayerCatchEnemy()
+	{
+		return m_playerCatchEnemy;
+	}
+
+	/// <summary>
 	/// プレイヤーカメラの取得
 	/// </summary>
 	/// <returns>プレイヤーカメラ</returns>
@@ -62,8 +72,10 @@ private://メンバ変数
 	ModelRender m_playerModel;//プレイヤークラス
 	CharacterController m_charaCon;//キャラクターコントローラ
 	Vector3 m_position = Vector3::Zero;//プレイヤーの位置
+	//Vector3 m_position = Vector3{ -11242.1758,-0.00112915039,-9552.204110 };;//プレイヤーの位置(デバッグ用)
 	Quaternion m_rotation = Quaternion::Identity;//プレイヤーの回転
 	Vector3 m_scale = Vector3::One;//プレイヤーの大きさ
+	PlayerAnimation* m_playerAnimation = nullptr;//プレイヤーアニメーション用のインスタンス
 	PlayerMove* m_playerMove = nullptr;//プレイヤー移動用のインスタンス
 	PlayerRotation* m_playerRotation = nullptr;//プレイヤー回転用のインスタンス
 	PlayerCatchEnemy* m_playerCatchEnemy = nullptr;//プレイヤーが敵をキャッチする用のインスタンス

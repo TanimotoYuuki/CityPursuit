@@ -13,6 +13,7 @@ public:
 
 	bool Start();//開始処理
 	void Update();//更新処理
+	void Render(RenderContext& rc);
 
 private:
 	BackGround* m_backGround = nullptr;//背景用のインスタンス

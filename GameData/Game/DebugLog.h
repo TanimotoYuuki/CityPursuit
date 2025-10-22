@@ -2,12 +2,13 @@
 /// <summary>
 /// デバッグ用のクラス
 /// </summary>
-class DebugLog : public IGameObject
+class DebugLog
 {
-public:
+private:
 	DebugLog() {};//コンストラクタ
 	~DebugLog() {};//デストラクタ
 
+public:
 	bool Start();//開始処理
 	void Update();//更新処理
 	void Render(RenderContext& rc);//描画処理
@@ -61,5 +62,26 @@ private://メンバ変数
 	std::vector<std::string> m_debugLogName;//デバッグログの名前
 	int m_debugLogID = 0;//デバッグログID
 	Vector3 m_DebugLogPosition = Vector3{ 300.0f, 500.0f, 0.0f };//デバッグログの表示位置
+	
+private:
+	static DebugLog* m_instance;//シングルトンインスタンス
+
+public:
+	static DebugLog* GetInstance()//シングルトンインスタンスの取得
+	{
+		if (m_instance == nullptr)
+		{
+			m_instance = new DebugLog();
+		}
+		return m_instance;
+	}
+	static void DeleteInstance()//シングルトンインスタンスの削除
+	{
+		if (m_instance != nullptr)
+		{
+			delete m_instance;
+			m_instance = nullptr;
+		}
+	}
 };
 

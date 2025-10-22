@@ -1,16 +1,27 @@
 #include "stdafx.h"
 #include "PlayerCamera.h"
+#include "Player.h"
+#include "PlayerCatchEnemy.h"
+#include "Enemy.h"
 
 namespace {
-	// カメラ。
+	//カメラ。
+	const float TARGET_OFFSET_UP = 120.0f;//注視点のオフセット
+
 	const float CAMERA_NEAR(1.0f);//カメラの近平面。
 
 	const float CAMERA_FAR(1000000000.0f);//カメラの遠平面。
+
+	const float ON_ENEMY_CAMERA_VERTICAL_ANGLE = -45.0f;
+
+	const float NEAR_TO_CAMERA_DISTANCE = 500.0f;
 }
 
 //初期化
 void PlayerCamera::Init()
 {
+	m_targetOffsetUp = TARGET_OFFSET_UP;
+
 	//注視点から視点までのベクトルを設定。
 	m_toCameraPos.Set(0.0f, 10.0f, -300.0f);
 
@@ -21,20 +32,29 @@ void PlayerCamera::Init()
 	//バネカメラの初期化
 	m_springCamera.Init(
 		*g_camera3D,//バネカメラに使うカメラ
-		1000.0f,//カメラの移動速度の最大値
+		100000.0f,//カメラの移動速度の最大値
 		true,//カメラと地形との当たり判定を取るかどうかのフラグ
-		5.0f//カメラに設定される球体コリジョンの半径
+		1.0f//カメラに設定される球体コリジョンの半径
 	);
+
+	m_springCamera.SetDampingRate(0.85f);//減衰率の設定
 }
 
 //カメラ追従処理の実行
-void PlayerCamera::Execute(Vector3& position)
+void PlayerCamera::Execute(Player* playerData, const Vector3& position)
 {
+	if (m_isOnEnemyCamera)
+	{
+		OnEnemyCamera(playerData, position);//敵の上に乗っている用のカメラ
+	}
+
 	//注視点を計算する
 	Vector3 target = position;
 	//プレイヤの足元からちょっと上を注視点とする。
-	target.y += 80.0f;
-	target += g_camera3D->GetForward() * 20.0f;
+	target.x += m_targetOffsetXZ * g_camera3D->GetForward().x;
+	target.y += m_targetOffsetUp;
+	target.z += m_targetOffsetXZ * g_camera3D->GetForward().z;
+	target += g_camera3D->GetForward() * 30.0f;
 
 	Vector3 toCameraPosOld = m_toCameraPos;
 
@@ -78,4 +98,38 @@ void PlayerCamera::Execute(Vector3& position)
 
 	//カメラの更新
 	m_springCamera.Update();
+}
+
+//敵の上に乗っている用のカメラ
+void PlayerCamera::OnEnemyCamera(Player* playerData, const Vector3& position)
+{
+	const auto& enemy = playerData->GetPlayerCatchEnemy()->GetCatchEnemy();
+	if (enemy == nullptr)
+	{
+		return;
+	}
+	const Quaternion& enemyRot = enemy->GetRotation();
+	m_toCameraPos = Vector3{ 0.0f, 10.0f, -300.0f };
+	enemyRot.Apply(m_toCameraPos);
+
+	// 垂直方向のカメラの回転を計算する
+	// 水平な軸
+	Vector3 axisH;
+	// 外積で、Y軸と、注視点から視点へのベクトルに、直交するベクトルを求める
+	axisH.Cross(Vector3::AxisY, m_toCameraPos);
+	// 正規化する
+	axisH.Normalize();
+	// 水平な軸周りで回転させる
+	Quaternion cameraVRot;
+	cameraVRot.SetRotationDeg(
+		axisH,
+		ON_ENEMY_CAMERA_VERTICAL_ANGLE
+	);
+	// 注視点から視点へのベクトルを回転させる
+	cameraVRot.Apply(m_toCameraPos);
+
+	// 向きを正規化してから
+	m_toCameraPos.Normalize();
+	// 伸ばす
+	m_toCameraPos.Scale(NEAR_TO_CAMERA_DISTANCE);
 }

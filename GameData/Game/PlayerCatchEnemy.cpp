@@ -12,6 +12,8 @@ namespace{
 	
 	const float ON_ENEMY_HEIGHT = 150.0f;//敵の上に乗る時の高さ
 
+	const float ON_ENEMY_CENTER = 30.0f;//敵の上に乗る時の中央
+
 	const float GO_ON_ENEMY_TIME = 0.8f;//敵の上に行くまでの時間
 
 	const float ON_ENEMY_BACK_LENGTH = 70.0f;//敵の上に乗るときの後ろの長さ
@@ -40,20 +42,15 @@ void PlayerCatchEnemy::Execute()
 
 	FindTarget();//ターゲットを探す処理
 
-	//敵をキャッチしない場合
-	if (m_isCatchEnemy != true)
+	//敵をキャッチする入力していないとき
+	if (m_isInputCatchEnemy != true)
 	{
-		if(m_player->GetCharacterController().IsOnGround())
-		{
-			m_player->GetPlayerMove()->SetCanMove(true);
-		}
-
 		if (m_distance.Length() < CATCH_ENEMY_LENGTH)
 		{
 			if (g_pad[0]->IsTrigger(enButtonY))
 			{
 				m_playerSwingAction->Reset();
-				m_isCatchEnemy = true;
+				m_isInputCatchEnemy = true;
 
 				if (m_swingModel == nullptr)
 				{
@@ -86,9 +83,18 @@ void PlayerCatchEnemy::Execute()
 void PlayerCatchEnemy::Reset()
 {
 	m_catchEnemyState = enStartWireToEnemy;
+
+	//移動ベクトルをリセットする
+	m_player->GetPlayerMove()->ResetMoveSpeedX();
+	m_player->GetPlayerMove()->ResetMoveSpeedY();
+	m_player->GetPlayerMove()->ResetMoveSpeedZ();
+
 	m_player->GetPlayerCamera().SetIsOnEnemyCamera(false);
 	m_player->GetPlayerMove()->SetUseGravity(true);
+	m_player->GetPlayerMove()->SetCanMove(true);
 	m_player->GetPlayerCamera().SetCanMoveCamera(true);
+
+	m_player->GetPlayerCamera().Reset();
 
 	Vector3 leaveJumpForce = Vector3::Front;
 	m_player->GetModelData().GetRotation().Apply(leaveJumpForce);
@@ -96,7 +102,8 @@ void PlayerCatchEnemy::Reset()
 	leaveJumpForce.y = LEAVE_ENEMY_JUMP_FORCE_UP;
 
 	m_player->GetPlayerMove()->AddMoveSpeed(leaveJumpForce);
-	m_isCatchEnemy = false;
+	m_isInputCatchEnemy = false;
+	m_isQteEvent = false;
 }
 
 //ターゲットを探す処理
@@ -113,9 +120,14 @@ void PlayerCatchEnemy::StartWireToEnemy()
 	m_player->GetPlayerMove()->SetCanMove(false);
 	//カメラ移動ができないようにする
 	m_player->GetPlayerCamera().SetCanMoveCamera(false);
+	//スイングアクション用の重力を使わないようににする
+	m_player->GetPlayerMove()->SetUseSwingActionGravity(false);
 
-	// 敵の方を向かせる
+	//敵の方を向かせる
 	LookAtEnemy();
+
+	//敵をキャッチしているか?
+	m_isCatchEnemy = true;
 
 	//敵がいれば、ステートを遷移する。
 	ChangeState(enWireingToEnemy);
@@ -202,6 +214,7 @@ void PlayerCatchEnemy::OnEnemy()
 	Vector3 targetPos = m_enemy->GetPosition();
 	//高さをちょっと上げる
 	targetPos.y += ON_ENEMY_HEIGHT;
+	targetPos.z += ON_ENEMY_CENTER;
 
 	// ちょっと後ろに乗る
 	Vector3 targetBackVec = Vector3::Back;
@@ -252,6 +265,8 @@ void PlayerCatchEnemy::ChangeState(const EnCatchEnemyState newState)
 		m_qteEvent = NewGO<QteEvent>(0, "qteevent");
 		m_qteEvent->SetTargetEnemy(m_enemy);
 		m_qteEvent->SetPlayerCatchEnemyPtr(this);
+		m_isCatchEnemy = false;
+		m_isQteEvent = true;
 		break;
 	}
 
