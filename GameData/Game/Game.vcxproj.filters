@@ -31,6 +31,7 @@
     <ClCompile Include="QteEventInput.cpp" />
     <ClCompile Include="PlayerCatchEnemy.cpp" />
     <ClCompile Include="PlayerAnimation.cpp" />
+    <ClCompile Include="SpriteAnimation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -57,5 +58,6 @@
     <ClInclude Include="QteEventInput.h" />
     <ClInclude Include="PlayerCatchEnemy.h" />
     <ClInclude Include="PlayerAnimation.h" />
+    <ClInclude Include="SpriteAnimation.h" />
   </ItemGroup>
 </Project>
