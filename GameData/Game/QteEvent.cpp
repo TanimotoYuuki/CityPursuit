@@ -42,12 +42,14 @@ namespace {
 
 	const float QTE_EVENT_RESULT_UI_HEIGHT = 128;//QTEイベントの結果UIの縦幅
 
-	const Vector3 QTE_EVENT_RESULT_UI_INIT_POSITION{ 0.0f,100.0f,0.0f };//QTEイベントの結果UIの初期位置
+	const Vector3 QTE_EVENT_RESULT_UI_INIT_POSITION{ -150.0f,100.0f,0.0f };//QTEイベントの結果UIの初期位置
 
 	const Vector3 QTE_EVENT_RESULT_UI_SCALE{ 0.5f,0.5f,0.5f };//QTEイベントの結果UIの大きさ
 
+	const Vector4 QTE_EVENT_RESULT_UI_MULCOLOR{ 1.0f,1.0f,1.0f,0.0f };//QTEイベントの結果の乗算カラー
+
 	//時間
-	const float DELAY_TIME = 1.5f;//待機時間
+	const float DELAY_TIME = 1.0f;//待機時間
 
 	//ボタン
 	const int A_BUTTON_SELECT_ID = 0;//AボタンID
@@ -60,6 +62,21 @@ namespace {
 
 	//QTEイベント
 	const int SUCCESS_INPUT_COMMAND_COUNT_MAX = 3;//QTEイベントでコマンド入力成功数の上限
+
+	//スプライトのアニメーション
+	const Vector3 AFTER_START_DIRECTION_ANIMATION_POSITION{ 0.0f,100.0f,0.0f };//QTEイベントの結果UIのアニメーション後の座標(開始演出)
+
+	const Vector3 QTE_RESULT_SUCCESS_AFTER_END_DIRECTION_ANIMATION_POSITION{ 150.0f,100.0f,0.0f };//QTEイベントの結果UI(成功版)のアニメーション後の座標(終了演出)
+
+	const Vector3 QTE_RESULT_FAILED_AFTER_END_DIRECTION_ANIMATION_POSITION{0.0f,0.0f,0.0f};//QTEイベントの結果UI(失敗版)のアニメーション後の座標(終了演出)
+
+	const float AFTER_END_DIRECTION_ANIMATION_ANGLE = -10.0f;//QTEイベントの結果UIのアニメーション後の角度(終了演出)
+
+	const float AFTER_START_DIRECTION_ANIMATION_ALPHA = 1.0f;//QTEイベントの結果UIのアニメーション後の透明度(開始演出)
+
+	const float AFTER_END_DIRECTION_ANIMATION_ALPHA = 0.0f;//QTEイベントの結果UIのアニメーション後の透明度(終了演出)
+
+	const float ANIMATION_PLAY_SPEED = 3.0f;//透明度を変えるアニメーションの再生速度
 }
 
 //デストラクタ
@@ -82,6 +99,70 @@ bool QteEvent::Start()
 
 	//QTEイベントでプレイヤー側が入力するクラスのインスタンスの生成
 	m_qteEventInput = NewGO<QteEventInput>(0, "qteeventInput");
+
+	//QTEイベントの結果の終了演出の後の座標
+	const Vector3 qteEventResultUIEndAnimationPosition[enQteEventResultUIDirection_Num] = {
+		QTE_RESULT_SUCCESS_AFTER_END_DIRECTION_ANIMATION_POSITION,
+		QTE_RESULT_FAILED_AFTER_END_DIRECTION_ANIMATION_POSITION
+	};
+
+	for (int i = 0; i < enQteEventResult_Num; i++)
+	{
+		//スプライトのアニメーションクラスのインスタンスの生成
+		
+		//座標を変えるアニメーションクラス
+		m_positionSpriteAnimation[i][enQteEventResultUIDirection_Start] = std::make_unique<PositionSpriteAnimation>(
+			&m_qteEventResultUI[i], //アニメーションをさせるスプライト
+			1.0f, //ターゲットの割合
+			ANIMATION_PLAY_SPEED,//アニメーションの再生速度
+			false, //ループするか?
+			m_qteEventResultUI[i].GetPosition(), //元の位置
+			AFTER_START_DIRECTION_ANIMATION_POSITION//ターゲットの位置
+		);
+
+		m_positionSpriteAnimation[i][enQteEventResultUIDirection_End] = std::make_unique<PositionSpriteAnimation>(
+			&m_qteEventResultUI[i], //アニメーションをさせるスプライト
+			1.0f, //ターゲットの割合
+			ANIMATION_PLAY_SPEED,//アニメーションの再生速度
+			false, //ループするか?
+			AFTER_START_DIRECTION_ANIMATION_POSITION, //元の位置
+			qteEventResultUIEndAnimationPosition[i]//ターゲットの位置
+		);
+
+
+		//透明度を変えるアニメーションクラス
+		m_alphaSpriteAnimation[i][enQteEventResultUIDirection_Start] = std::make_unique<AlphaSpriteAnimation>(
+			&m_qteEventResultUI[i],  //アニメーションをさせるスプライト
+			1.0f,  //ターゲットの割合
+			ANIMATION_PLAY_SPEED,//アニメーションの再生速度
+			false, //ループするか?
+			m_qteEventResultUI[i].GetMulColor().a, //元の透明度
+			AFTER_START_DIRECTION_ANIMATION_ALPHA//ターゲットの透明度
+		);
+
+		m_alphaSpriteAnimation[i][enQteEventResultUIDirection_End] = std::make_unique<AlphaSpriteAnimation>(
+			&m_qteEventResultUI[i],  //アニメーションをさせるスプライト
+			1.0f,  //ターゲットの割合
+			ANIMATION_PLAY_SPEED,//アニメーションの再生速度
+			false, //ループするか?
+			AFTER_START_DIRECTION_ANIMATION_ALPHA, //元の透明度
+			AFTER_END_DIRECTION_ANIMATION_ALPHA//ターゲットの透明度
+		);
+	}
+
+	//QTEイベントの結果UIのアニメーション後の回転(終了演出)の設定
+	Quaternion afterEndDirectionAnimationRotation;
+	afterEndDirectionAnimationRotation.SetRotationDegZ(AFTER_END_DIRECTION_ANIMATION_ANGLE);
+
+	//回転を変えるアニメーションクラス
+	m_rotationSpriteAnimation = std::make_unique<RotationSpriteAnimation>(
+		&m_qteEventResultUI[enQteEventResult_Failed],  //アニメーションをさせるスプライト
+		1.0f,  //ターゲットの割合
+		ANIMATION_PLAY_SPEED,//アニメーションの再生速度
+		false, //ループするか?
+		m_qteEventResultUI[enQteEventResult_Failed].GetRotation(), //元の回転
+		afterEndDirectionAnimationRotation//ターゲットの回転
+	);
 
 	return true;
 }
@@ -113,15 +194,35 @@ void QteEvent::Update()
 	//QTEイベントの結果が出たら処理する
 	if (m_isQteEventResult[enQteEventResult_Success] == true || m_isQteEventResult[enQteEventResult_Failed] == true)
 	{
-		//結果を表示して待機時間まで待ったらQTEイベントを終了する
-		if (g_gameTime->StopWatch(DELAY_TIME))
+		//スプライトのアニメーションの更新処理
+		m_positionSpriteAnimation[m_qteEventResult][m_qteEventResultUIDirection]->Update();
+		m_alphaSpriteAnimation[m_qteEventResult][m_qteEventResultUIDirection]->Update();
+		
+		//QTEイベントの結果が失敗　かつ
+		//QTEイベントの演出が終了演出なら処理する
+		if (m_qteEventResult == enQteEventResult_Failed && m_qteEventResultUIDirection == enQteEventResultUIDirection_End)
 		{
+			m_rotationSpriteAnimation->Update();
+		}
+
+
+		if (m_positionSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_End]->IsCompleted())//アニメーションが終わったか?
+		{
+			//QTEイベントを終了する処理
 			DeleteGO(this);
 			if (m_isQteEventResult[enQteEventResult_Success] == true)
 			{
 				DeleteGO(m_targetEnemy);
 			}
 			m_playerCatchEnemy->Reset();
+		}
+		else if (m_positionSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_Start]->IsCompleted())//アニメーションが終わったか?
+		{
+			//結果を表示して待機時間まで待ったら終了演出のアニメーションを再生する
+			if (g_gameTime->StopWatch(DELAY_TIME))
+			{
+				m_qteEventResultUIDirection = enQteEventResultUIDirection_End;
+			}
 		}
 	}
 }
@@ -211,6 +312,7 @@ void QteEvent::InitQteEventResultUI(EnQteEventResult enQteEventResult)
 	m_qteEventResultUI[enQteEventResult].Init(m_qteEventResultUIFilePath[enQteEventResult].c_str(), QTE_EVENT_RESULT_UI_WIDTH, QTE_EVENT_RESULT_UI_HEIGHT);
 	m_qteEventResultUI[enQteEventResult].SetPosition(QTE_EVENT_RESULT_UI_INIT_POSITION);
 	m_qteEventResultUI[enQteEventResult].SetScale(QTE_EVENT_RESULT_UI_SCALE);
+	m_qteEventResultUI[enQteEventResult].SetMulColor(QTE_EVENT_RESULT_UI_MULCOLOR);
 	m_qteEventResultUI[enQteEventResult].Update();
 }
 
@@ -465,6 +567,7 @@ void QteEvent::GamePadInputUIUpdate()
 				//コマンド入力が3回成功したらQTEイベントを終了する
 				if (m_succesInputCommandCount >= SUCCESS_INPUT_COMMAND_COUNT_MAX)
 				{
+					m_qteEventResult = enQteEventResult_Success;
 					m_isQteEventResult[enQteEventResult_Success] = true;
 					StopTimeLimit();
 					return;
@@ -488,6 +591,7 @@ void QteEvent::TimeLimitUpdate()
 	//制限時間が0秒になったらQTEイベントを終了する
 	if (m_timeLimit <= 0.0f)
 	{
+		m_qteEventResult = enQteEventResult_Failed;
 		m_isQteEventResult[enQteEventResult_Failed] = true;
 		m_timeLimit = 0.0f;
 		StopTimeLimit();

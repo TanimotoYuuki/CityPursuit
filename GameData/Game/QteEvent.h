@@ -1,4 +1,5 @@
 #pragma once
+#include "SpriteAnimation.h"
 /// <summary>
 /// QTEイベントクラス
 /// </summary>
@@ -56,6 +57,14 @@ public://列挙型
 		enQteEventResult_Success,//成功
 		enQteEventResult_Failed,//失敗
 		enQteEventResult_Num//QTE結果UI数
+	};
+
+	//QTEイベントの結果UIの演出
+	enum EnQteEventResultUIDirection
+	{
+		enQteEventResultUIDirection_Start,//開始処理
+		enQteEventResultUIDirection_End,//終了処理
+		enQteEventResultUIDirection_Num,//演出数
 	};
 
 private://メンバ関数
@@ -216,6 +225,8 @@ private://メンバ変数
 	Vector4 m_timeLimitUIColor = Vector4::White;//制限時間UIの色
 	EnCommandList m_nowInputCommand = enCommandList_None;//現在入力しているコマンド
 	EnCommandList m_nextInputCommand = enCommandList_None;//次入力するコマンド
+	EnQteEventResult m_qteEventResult = enQteEventResult_Num;//QTEイベントの結果
+	EnQteEventResultUIDirection m_qteEventResultUIDirection = enQteEventResultUIDirection_Start;//QTEイベントの結果UIの演出
 	int m_succesInputCommandCount = 0;//コマンド入力が成功した回数
 	float m_gamePadInputUIEasingTime[enQteEventResult_Num][enGamePadInputList_Num] = { 0.0f };//ゲームパッドUIのイージング用の割合
 	float m_timeLimitMax = 0.0f;//制限時間(上限)
@@ -230,6 +241,9 @@ private://メンバ変数
 	QteEventInput* m_qteEventInput = nullptr;//QTEイベントでプレイヤー側が入力する用のインスタンス
 	PlayerCatchEnemy* m_playerCatchEnemy = nullptr;//プレイヤーが敵をキャッチしている用のインスタンス
 	Enemy* m_targetEnemy = nullptr;//ターゲットにしているエネミー用のインスタンス
+	std::unique_ptr<PositionSpriteAnimation> m_positionSpriteAnimation[enQteEventResult_Num][enQteEventResultUIDirection_Num];//座標を変えるアニメーション用のユニークポインタ
+	std::unique_ptr<AlphaSpriteAnimation> m_alphaSpriteAnimation[enQteEventResult_Num][enQteEventResultUIDirection_Num];//透明度を変えるアニメーション用のユニークポインタ
+	std::unique_ptr<RotationSpriteAnimation> m_rotationSpriteAnimation;//回転を変えるアニメーション用のユニークポインタ
 
 private://ファイルパス関連のメンバ変数
 	//ゲームパッドのボタンや方向キーを入力前のUIのファイルパス
