@@ -43,9 +43,12 @@ void QteEventInput::Execute()
 	//コマンド入力が一致していなければ
 	else
 	{
-		if (m_inputCommand != -1)
+		if (!m_qteEvent->IsStopTimeLimit())
 		{
-			m_isInputFailed = true;//コマンド入力失敗している
+			if (m_inputCommand != -1)
+			{
+				m_isInputFailed = true;//コマンド入力失敗している
+			}
 		}
 	}
 }
@@ -53,7 +56,7 @@ void QteEventInput::Execute()
 //コマンド入力
 void QteEventInput::InputCommand()
 {
-	m_inputCommand = -1;
+	m_inputCommand = -1;//更新時に入力をデフォルトに戻る
 
 	//左上方向
 	if (g_pad[0]->IsTriggerLStickLeftUp()) { m_inputCommand = QteEvent::enGamePadInputList_LeftUpArrow; }
