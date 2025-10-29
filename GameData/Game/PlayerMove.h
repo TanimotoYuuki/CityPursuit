@@ -158,12 +158,22 @@ public:
 		return m_playerSwingAction;
 	}
 
+	/// <summary>
+	/// プレイヤーの進行方向の取得
+	/// </summary>
+	/// <returns>プレイヤーの進行方向</returns>
+	const Vector3& GetMoveDirection() const
+	{
+		return m_moveDirection;
+	}
+
 private://メンバ変数
 	Vector3 m_inputLStickMemory = Vector3::Zero;//左スティックの入力量を格納する変数
 	Vector3 m_inputLStick = Vector3::Zero;//左スティックの入力量
 	Vector3 m_cameraForward = Vector3::Zero;//カメラの前方向
 	Vector3 m_cameraRight = Vector3::Zero;//カメラの横方向
 	Vector3 m_moveSpeed = Vector3::Zero;//移動速度
+	Vector3 m_moveDirection = Vector3{ 0.0f,0.0f,1.0f };//進行方向
 	PlayerJump m_playerJump;//プレイヤージャンプクラス
 	bool m_canMove = true;//移動できるか？
 	bool m_useGravity = true;//重力を使用するか？

@@ -28,7 +28,12 @@ namespace{
 bool PlayerCatchEnemy::Start()
 {
 	m_player = FindGO<Player>("player");
+
 	m_playerSwingAction = FindGO<PlayerSwingAction>("playerswingaction");
+
+	m_qteEvent = NewGO<QteEvent>(0, "qteevent");
+	m_qteEvent->SetPlayerPtr(m_player);
+
 	return true;
 }
 
@@ -45,6 +50,12 @@ void PlayerCatchEnemy::Execute()
 	//敵をキャッチする入力していないとき
 	if (m_isInputCatchEnemy != true)
 	{
+		if (m_player->GetCharacterController().IsOnGround())
+		{
+			m_player->GetPlayerMove()->SetCanMove(true);
+			m_player->GetPlayerCamera().SetCanMoveCamera(true);
+		}
+
 		if (m_distance.Length() < CATCH_ENEMY_LENGTH)
 		{
 			if (g_pad[0]->IsTrigger(enButtonY))
@@ -91,8 +102,6 @@ void PlayerCatchEnemy::Reset()
 
 	m_player->GetPlayerCamera().SetIsOnEnemyCamera(false);
 	m_player->GetPlayerMove()->SetUseGravity(true);
-	m_player->GetPlayerMove()->SetCanMove(true);
-	m_player->GetPlayerCamera().SetCanMoveCamera(true);
 
 	m_player->GetPlayerCamera().Reset();
 
@@ -262,9 +271,7 @@ void PlayerCatchEnemy::ChangeState(const EnCatchEnemyState newState)
 		//補完率をリセットして、糸の伸ばしを終える。
 		m_goOnEnemyTimer = 0.0f;
 		m_swingModel->EndWireStretchToPos();
-		m_qteEvent = NewGO<QteEvent>(0, "qteevent");
 		m_qteEvent->SetTargetEnemy(m_enemy);
-		m_qteEvent->SetPlayerCatchEnemyPtr(this);
 		m_isCatchEnemy = false;
 		m_isQteEvent = true;
 		break;

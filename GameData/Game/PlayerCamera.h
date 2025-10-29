@@ -90,6 +90,15 @@ public://メンバ関数
 		return m_springCamera;
 	}
 
+	/// <summary>
+	/// 注視点から視点までのベクトルの取得
+	/// </summary>
+	/// <returns>注視点から視点までのベクトル</returns>
+	const Vector3& GetToCameraPos() const
+	{
+		return m_toCameraPos;
+	}
+
 private://メンバ変数
 	SpringCamera m_springCamera;//バネカメラ
 	float m_targetOffsetUp = 0.0f;//注視点の上方向オフセット

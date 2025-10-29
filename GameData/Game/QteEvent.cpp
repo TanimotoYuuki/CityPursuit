@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "QteEvent.h"
 #include "QteEventInput.h"
+#include "Player.h"
 #include "PlayerCatchEnemy.h"
 #include "Enemy.h"
 
@@ -170,6 +171,11 @@ bool QteEvent::Start()
 //更新処理
 void QteEvent::Update()
 {
+	if (!m_player->GetPlayerCatchEnemy()->IsQteEvent())
+	{
+		return;
+	}
+
 	//QTEイベントでプレイヤー側が入力する処理の実行
 	m_qteEventInput->Execute();
 
@@ -214,7 +220,7 @@ void QteEvent::Update()
 			{
 				DeleteGO(m_targetEnemy);
 			}
-			m_playerCatchEnemy->Reset();
+			m_player->GetPlayerCatchEnemy()->Reset();
 		}
 		else if (m_positionSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_Start]->IsCompleted())//アニメーションが終わったか?
 		{
@@ -672,6 +678,11 @@ void QteEvent::InputFailed()
 //描画処理
 void QteEvent::Render(RenderContext& rc)
 {
+	if (!m_player->GetPlayerCatchEnemy()->IsQteEvent())
+	{
+		return;
+	}
+
 	for (int i = 0; i < enQteEventResult_Num; i++)
 	{
 		//QTEの結果が出ているかときに描画する

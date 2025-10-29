@@ -5,6 +5,8 @@
 #include "PlayerJump.h"
 #include "PlayerSwingAction.h"
 #include "PlayerCatchEnemy.h"
+#include "Game.h"
+#include "GameClear.h"
 
 namespace{
 	const float INIT_PLAY_ANIMATION_SPEED = 1.0f;//初期のアニメーション再生速度
@@ -68,6 +70,9 @@ void PlayerAnimation::Execute(ModelRender& modelData, Player* playerData)
 	case PlayerAnimation::enAnimationList_QteEvent://QTEイベント用アニメーション
 		modelData.PlayAnimation(enAnimationList_QteEvent, m_animationInterpolateTime);
 		break;
+	case PlayerAnimation::enAnimationList_GameClear://ゲームクリア用アニメション
+		modelData.PlayAnimation(enAnimationList_GameClear, m_animationInterpolateTime);
+		break;
 	default:
 		break;
 	}
@@ -79,6 +84,22 @@ void PlayerAnimation::ChangeAnimation(ModelRender& modelData, Player* playerData
 	//待機アニメーション
 	m_nowPlayAnimation = enAnimationList_Idle;
 	m_animationInterpolateTime = 0.1f;
+
+	if (playerData->GetGamePtr()->IsGameClear())
+	{
+		//ゲームクリアポインタの中身がnullptrだったら処理しない
+		if (m_gameClear == nullptr)
+		{
+			return;
+		}
+
+		if (m_gameClear->IsGameClear())
+		{
+			//ゲームクリア用のアニメション
+			m_nowPlayAnimation = enAnimationList_GameClear;
+		}
+		return;
+	}
 
 	if (playerData->GetPlayerCatchEnemy()->IsQteEvent())
 	{

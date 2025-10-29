@@ -4,6 +4,7 @@
 #include "PlayerMove.h"
 #include "PlayerRotation.h"
 #include "PlayerCatchEnemy.h"
+#include "Game.h"
 
 //デストラクタ
 Player::~Player()
@@ -60,26 +61,29 @@ bool Player::Start()
 //更新処理
 void Player::Update()
 {
-	//移動処理の実行
-	m_playerMove->Execute(m_position, m_charaCon);
+	if (!GetGamePtr()->IsGameClear())
+	{
+		//移動処理の実行
+		m_playerMove->Execute(m_position, m_charaCon);
+
+		//プレイヤー回転クラスの実行
+		m_playerRotation->Execute(m_rotation);
+
+		//カメラ追従処理の実行
+		m_playerCamera.Execute(this, m_position);
+
+		//プレイヤーが敵をキャッチする処理の実行
+		m_playerCatchEnemy->Execute();
+	}
+
+	//アニメーションの実行
+	m_playerAnimation->Execute(m_playerModel, this);
 
 	//プレイヤーの位置の更新
 	m_playerModel.SetPosition(m_position);
 
-	//プレイヤー回転クラスの実行
-	m_playerRotation->Execute(m_rotation);
-
 	//プレイヤーの回転の更新
 	m_playerModel.SetRotation(m_rotation);
-
-	//カメラ追従処理の実行
-	m_playerCamera.Execute(this, m_position);
-
-	//プレイヤーが敵をキャッチする処理の実行
-	m_playerCatchEnemy->Execute();
-
-	//アニメーションの実行
-	m_playerAnimation->Execute(m_playerModel, this);
 
 	//プレイヤーモデルの更新
 	m_playerModel.Update();
