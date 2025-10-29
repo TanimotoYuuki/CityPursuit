@@ -31,7 +31,11 @@ bool Enemy::Start()
 void Enemy::Update()
 {
 	//敵AIの実行処理
-	m_enemyAI->Execute(m_position, m_rotation);
+	//m_enemyAI->Execute(m_position, m_rotation);
+
+	//検証用のステージは直進のみなので
+	//敵を真っすぐ移動させる
+	m_position.z += 900.0f * g_gameTime->GetFrameDeltaTime();
 
 	//敵モデルの位置の設定
 	m_enemyModel.SetPosition(m_position);
