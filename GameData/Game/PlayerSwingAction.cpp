@@ -8,9 +8,9 @@
 
 namespace{ 
 //スイング
-	const float MIN_VELOCITY_OF_AFTER_SWING_ACCELERATION = 100.0f;//スイング後の加速の最低速度
+	const float MIN_VELOCITY_OF_AFTER_SWING_ACCELERATION = 50.0f;//スイング後の加速の最低速度
 
-	const float INIT_VELOCITY_OF_ATER_SWING_ACCELERATION = 1000.0f;//スイング後の加速の初速度
+	const float INIT_VELOCITY_OF_ATER_SWING_ACCELERATION = 1200.0f;//スイング後の加速の初速度
 
 	const float SWING_ROLL_UP_POWER = 500.0f;//スイングロールの上昇力
 
@@ -20,7 +20,7 @@ namespace{
 	const float WALK_MAX_SPEED = 325.0f;//歩き時の最高速度
 
 //スピード
-	const float START_DECELERATE_SWING_SPEED_INIT_VALUE = -300.0f;//減速し始めるスピードの初期値
+	const float START_DECELERATE_SWING_SPEED_INIT_VALUE = -700.0f;//減速し始めるスピードの初期値
 
 	const float CAN_START_SWING_FALL_SPEED = -10.0f;//スイングを開始できる落下速度
 
