@@ -4,7 +4,7 @@
 
 namespace {
 	constexpr const wchar_t* PLAYER_RIGHT_BONE_NAME = L"RightHand";//プレイヤーの手のボーンの名前
-	constexpr const wchar_t* PLAYER_LEFT_BONE_NAME = L"LightHand";//プレイヤーの手のボーンの名前
+	constexpr const wchar_t* PLAYER_LEFT_BONE_NAME = L"LeftHand";//プレイヤーの手のボーンの名前
 	const float STRETCHED_TIME = 0.15f;//糸が伸びきるまでの時間
 }
 
@@ -26,7 +26,7 @@ void SwingModel::Update()
 {
 	//糸を伸びる開始座標の計算
 	//プレイヤーの手のボーンIDの検索
-	int boneID = m_player->GetModelData().FindBoneID(PLAYER_RIGHT_BONE_NAME);
+	int boneID = m_player->GetModelData().FindBoneID(PLAYER_LEFT_BONE_NAME);
 
 	//プレイヤーの手のボーンのワールド行列の取得
 	const Matrix& mHand = m_player->GetModelData().GetBone(boneID)->GetWorldMatrix();
