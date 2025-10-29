@@ -4,7 +4,7 @@
 /// QTEイベントクラス
 /// </summary>
 class QteEventInput;
-class PlayerCatchEnemy;
+class Player;
 class Enemy;
 class QteEvent : public IGameObject
 {
@@ -163,12 +163,12 @@ public://メンバ関数
 	}
 
 	/// <summary>
-	/// プレイヤーが敵をキャッチするクラスのポインタの設定
+	/// プレイヤークラスのポインタの設定
 	/// </summary>
-	/// <param name="playerCatchEnemy">プレイヤーが敵をキャッチするクラスのポインタ</param>
-	void SetPlayerCatchEnemyPtr(PlayerCatchEnemy* playerCatchEnemy)
+	/// <param name="playerCatchEnemy">プレイヤークラスのポインタ</param>
+	void SetPlayerPtr(Player* player)
 	{
-		m_playerCatchEnemy = playerCatchEnemy;
+		m_player = player;
 	}
 
 	/// <summary>
@@ -239,7 +239,7 @@ private://メンバ変数
 	bool m_isAddSuccessInputCommandCount = false;//コマンド入力成功回数を増やしたかどうか?
 	std::vector<EnGamePadInputList> m_inputCommandList;//コマンド入力リスト
 	QteEventInput* m_qteEventInput = nullptr;//QTEイベントでプレイヤー側が入力する用のインスタンス
-	PlayerCatchEnemy* m_playerCatchEnemy = nullptr;//プレイヤーが敵をキャッチしている用のインスタンス
+	Player* m_player = nullptr;//プレイヤー用のインスタンス
 	Enemy* m_targetEnemy = nullptr;//ターゲットにしているエネミー用のインスタンス
 	std::unique_ptr<PositionSpriteAnimation> m_positionSpriteAnimation[enQteEventResult_Num][enQteEventResultUIDirection_Num];//座標を変えるアニメーション用のユニークポインタ
 	std::unique_ptr<AlphaSpriteAnimation> m_alphaSpriteAnimation[enQteEventResult_Num][enQteEventResultUIDirection_Num];//透明度を変えるアニメーション用のユニークポインタ

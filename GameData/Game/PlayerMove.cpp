@@ -129,6 +129,16 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 	
 	//m_debugLog->SetDebugLogData("MoveSpeed", m_moveSpeed);
 
+	//プレイヤーのが移動しているときに処理する
+	if (m_moveSpeed.x != 0.0f ||
+		m_moveSpeed.z != 0.0f)
+	{
+		//プレイヤーの進行方向を計算
+		m_moveDirection = m_moveSpeed;
+		m_moveDirection.y = 0.0f;
+		m_moveDirection.Normalize();
+	}
+
 	position = characterController.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
 	characterController.SetPosition(position);
 
