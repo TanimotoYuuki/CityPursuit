@@ -6,7 +6,7 @@ class Game;
 class GameClearSprite;
 class GameClearCamera;
 class GameResult;
-class GameClearSelect;
+class GameEndSelect;
 class GameClear : public IGameObject
 {
 public:
@@ -88,6 +88,6 @@ private://メンバ変数
 	GameClearSprite* m_gameClearSprite = nullptr;//ゲームクリアのスプライトを表示する用のインスタンス
 	GameClearCamera* m_gameClearCamera = nullptr;//ゲームクリア時のカメラ用のインスタンス
 	GameResult* m_gameResult = nullptr;//ゲームリザルト用のインスタンス
-	GameClearSelect* m_gameClearSelect = nullptr;//ゲームクリア選択用のインスタンス
+	GameEndSelect* m_gameEndSelect = nullptr;//ゲーム終了したときに選択する用のインスタンス
 };
 

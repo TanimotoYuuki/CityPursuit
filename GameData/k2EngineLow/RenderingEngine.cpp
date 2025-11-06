@@ -15,6 +15,9 @@ namespace nsK2EngineLow
 		//2D(フォントとスプライト)の初期化
 		Init2DSprite();
 
+		//ゲーム終了のときにするポストエフェクトの初期化
+		m_gameEndPostEffect.Init(m_mainRenderTarget);
+
 		//メインレンダリングターゲットのカラーバッファの内容を
 		//フレームバッファにコピーするためのスプライトを初期化する
 		InitCopyMainRenderTargetToFrameBuffer();
@@ -164,6 +167,9 @@ namespace nsK2EngineLow
 
 		//エフェクトの描画
 		EffectEngine::GetInstance()->Draw();
+
+		//ゲーム終了のときにするポストエフェクトの描画処理を実行
+		m_gameEndPostEffect.Execute(rc, m_mainRenderTarget);
 
 		//2D(フォントとスプライト)の描画
 		SpriteFontDraw(rc);

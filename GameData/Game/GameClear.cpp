@@ -5,14 +5,14 @@
 #include "GameClearSprite.h"
 #include "GameTimeLimit.h"
 #include "GameResult.h"
-#include "GameClearSelect.h"
+#include "GameEndSelect.h"
 
 //デストラクタ
 GameClear::~GameClear()
 {
 	DeleteGO(m_gameClearCamera);
 	DeleteGO(m_gameResult);
-	DeleteGO(m_gameClearSelect);
+	DeleteGO(m_gameEndSelect);
 }
 
 //開始処理
@@ -28,7 +28,7 @@ bool GameClear::Start()
 	m_gameResult->SetQteEventFailedCount(m_game->GetQteEventFailedCount());
 	m_gameResult->SetGameClearTimeLimit(m_game->GetGameTimeLimitPtr()->GetTimeLimit());
 
-	m_gameClearSelect = NewGO<GameClearSelect>(0,"gameclearselect");
+	m_gameEndSelect = NewGO<GameEndSelect>(0,"gameendselect");
 
 	return true;
 }
@@ -81,12 +81,13 @@ void GameClear::ResultUpdate()
 	if (m_gameResult->IsPlayNoneAlphaAnimation())
 	{
 		m_gameClearSprite->PlayAlphaSpriteAnimation(GameClearSprite::enSpriteAlphaState_Transparent);
+		g_renderingEngine->GetGameEndPostEffect().SetDrawingGameEndPostEffect(GameEndPostEffect::enGameEndPostEffect_Boke);
 	}
 
 	//透明度(不透明から透明)を変えるアニメーションを再生終了していたら次のステートに移行する
 	if (m_gameResult->IsFinishNoneAlphaAnimation())
 	{
-		m_gameClearSelect->EnableDrawingUI();
+		m_gameEndSelect->EnableDrawingUI();
 		m_gameClearState = enGameClearState_Select;
 	}
 }
@@ -94,5 +95,5 @@ void GameClear::ResultUpdate()
 //選択の更新処理
 void GameClear::SelectUpdate()
 {
-	m_gameClearSelect->Execute();
+	m_gameEndSelect->Execute();
 }

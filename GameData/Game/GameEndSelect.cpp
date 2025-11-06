@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "GameClearSelect.h"
+#include "GameEndSelect.h"
 
 namespace {
 	//選択テキストUI
@@ -37,19 +37,19 @@ namespace {
 }
 
 //開始処理
-bool GameClearSelect::Start()
+bool GameEndSelect::Start()
 {
 	//選択テキストUI用の座標の設定
-	Vector3 selectTextUIPosition[enGameClearSelect_Num] = {
+	Vector3 selectTextUIPosition[enGameEndSelect_Num] = {
 		RETRY_TEXT_UI_POSITION,
 		RETURN_TITLE_TEXT_UI_POSITION
 	};
 
-	for (int i = 0; i < enGameClearSelect_Num; i++)
+	for (int i = 0; i < enGameEndSelect_Num; i++)
 	{
 		//選択テキストUIの初期化
 		m_selectTextUIPosition[i] = selectTextUIPosition[i];
-		InitSelectTextUI((EnGameClearSelect)i);
+		InitSelectTextUI((EnGameEndSelect)i);
 
 		//選択テキストUI用の座標の設定
 		m_currentSelectUIPosition[i] = m_selectTextUIPosition[i];
@@ -63,7 +63,7 @@ bool GameClearSelect::Start()
 }
 
 //実行処理
-void GameClearSelect::Execute()
+void GameEndSelect::Execute()
 {
 	//一定の回数までカウントしたら処理しない
 	if (m_noDrawingCurrentSelectUICount == NO_DRAWING_CURRENT_SELECT_UI_COUNT_MAX)
@@ -74,7 +74,7 @@ void GameClearSelect::Execute()
 	}
 
 	//現在何を選択しているかを表すUIの更新処理
-	CurrentSelectUIUpdate((EnGameClearSelect)m_currentSelect);
+	CurrentSelectUIUpdate((EnGameEndSelect)m_currentSelect);
 
 	//選択できていないとき処理する
 	if (!m_isSelect)
@@ -85,7 +85,7 @@ void GameClearSelect::Execute()
 }
 
 //描画処理
-void GameClearSelect::Render(RenderContext& rc)
+void GameEndSelect::Render(RenderContext& rc)
 {
 	//UIを描画しないなら処理しない
 	if (!m_isDrawingUI)
@@ -93,7 +93,7 @@ void GameClearSelect::Render(RenderContext& rc)
 		return;
 	}
 
-	for (int i = 0; i < enGameClearSelect_Num; i++)
+	for (int i = 0; i < enGameEndSelect_Num; i++)
 	{
 		//選択テキストUIの描画
 		m_selectTextUI[i].Draw(rc);
@@ -107,25 +107,25 @@ void GameClearSelect::Render(RenderContext& rc)
 }
 
 //選択テキストUIの初期化
-void GameClearSelect::InitSelectTextUI(EnGameClearSelect enGameClearSelect)
+void GameEndSelect::InitSelectTextUI(EnGameEndSelect enGameEndSelect)
 {
 	//選択テキストUIのの初期化
-	m_selectTextUI[enGameClearSelect].Init(m_selectTextUIFilePath[enGameClearSelect].c_str(), SELECT_TEXT_UI_WIDTH, SELECT_TEXT_UI_HEIGHT);
+	m_selectTextUI[enGameEndSelect].Init(m_selectTextUIFilePath[enGameEndSelect].c_str(), SELECT_TEXT_UI_WIDTH, SELECT_TEXT_UI_HEIGHT);
 	//選択テキストUIの座標の設定
-	m_selectTextUI[enGameClearSelect].SetPosition(m_selectTextUIPosition[enGameClearSelect]);
+	m_selectTextUI[enGameEndSelect].SetPosition(m_selectTextUIPosition[enGameEndSelect]);
 	//選択テキストUIの大きさの設定
-	m_selectTextUI[enGameClearSelect].SetScale(SELECT_TEXT_UI_SCALE);
+	m_selectTextUI[enGameEndSelect].SetScale(SELECT_TEXT_UI_SCALE);
 	//選択テキストUIの更新処理
-	m_selectTextUI[enGameClearSelect].Update();
+	m_selectTextUI[enGameEndSelect].Update();
 }
 
 //現在何を選択しているかを表すUIの初期化
-void GameClearSelect::InitCurrentSelectUI()
+void GameEndSelect::InitCurrentSelectUI()
 {
 	//現在何を選択しているかを表すUIの初期化
 	m_currentSelectUI.Init(m_currentSelectUIFilePath.c_str(), CURRENT_SELECT_UI_WIDTH, CURRENT_SELECT_UI_HEIGHT);
 	//現在何を選択しているかを表すUIの座標の設定(デフォルトの選択はリトライ)
-	m_currentSelectUI.SetPosition(m_currentSelectUIPosition[enGameClearSelect_Retry]);
+	m_currentSelectUI.SetPosition(m_currentSelectUIPosition[enGameEndSelect_Retry]);
 	//現在何を選択しているかを表すUIの大きさの設定
 	m_currentSelectUI.SetScale(CURRENT_SELECT_UI_SCALE);
 	//現在何を選択しているかを表すUIの更新処理
@@ -133,7 +133,7 @@ void GameClearSelect::InitCurrentSelectUI()
 }
 
 //現在何を選択しているかを表すUIの更新処理
-void GameClearSelect::CurrentSelectUIUpdate(EnGameClearSelect enGameClearSelect)
+void GameEndSelect::CurrentSelectUIUpdate(EnGameEndSelect enGameEndSelect)
 {
 	if (m_isSelect)
 	{
@@ -146,13 +146,13 @@ void GameClearSelect::CurrentSelectUIUpdate(EnGameClearSelect enGameClearSelect)
 		CurrentSelectUIAnimationUpdate(ANIMATION_SPEED_NORMAL);
 	}
 	//現在何を選択しているかを表すUIの座標の設定
-	m_currentSelectUI.SetPosition(m_currentSelectUIPosition[enGameClearSelect]);
+	m_currentSelectUI.SetPosition(m_currentSelectUIPosition[enGameEndSelect]);
 	//現在何を選択しているかを表すUIの更新処理
 	m_currentSelectUI.Update();
 }
 
 //現在何を選択しているかを表すUIのアニメーションの更新処理
-void GameClearSelect::CurrentSelectUIAnimationUpdate(float speed)
+void GameEndSelect::CurrentSelectUIAnimationUpdate(float speed)
 {
 	m_time += speed * g_gameTime->GetFrameDeltaTime();
 
@@ -175,15 +175,15 @@ void GameClearSelect::CurrentSelectUIAnimationUpdate(float speed)
 }
 
 //入力の更新処理
-void GameClearSelect::InputUpdate()
+void GameEndSelect::InputUpdate()
 {
 	//十字キーを上に倒す または
 	//左スティックを上に倒したとき
 	if (g_pad[0]->IsTrigger(enButtonUp) || g_pad[0]->IsTriggerLStickUp())
 	{
-		if (m_currentSelect == enGameClearSelect_Retry)
+		if (m_currentSelect == enGameEndSelect_Retry)
 		{
-			m_currentSelect = enGameClearSelect_ReturnTitle;
+			m_currentSelect = enGameEndSelect_ReturnTitle;
 			return;
 		}
 
@@ -193,9 +193,9 @@ void GameClearSelect::InputUpdate()
 	//左スティックを下に倒したとき
 	else if (g_pad[0]->IsTrigger(enButtonDown) || g_pad[0]->IsTriggerLStickDown())
 	{
-		if (m_currentSelect == enGameClearSelect_ReturnTitle)
+		if (m_currentSelect == enGameEndSelect_ReturnTitle)
 		{
-			m_currentSelect = enGameClearSelect_Retry;
+			m_currentSelect = enGameEndSelect_Retry;
 			return;
 		}
 
@@ -210,14 +210,14 @@ void GameClearSelect::InputUpdate()
 }
 
 //シーンの遷移処理
-void GameClearSelect::TransitionScene()
+void GameEndSelect::TransitionScene()
 {
 	//現在の選択
 	switch (m_currentSelect)
 	{
-	case EnGameClearSelect::enGameClearSelect_Retry:
+	case EnGameEndSelect::enGameEndSelect_Retry:
 		break;
-	case EnGameClearSelect::enGameClearSelect_ReturnTitle:
+	case EnGameEndSelect::enGameEndSelect_ReturnTitle:
 		break;
 	default:
 		break;

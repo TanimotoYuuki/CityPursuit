@@ -1,6 +1,7 @@
 #pragma once
 
 class Game;
+class GameOver;
 class GameClear;
 class IScene : public Noncopyable
 {
@@ -15,11 +16,13 @@ public:
 	enum EnSceneID
 	{
 		enSceneID_InGame,
+		enSceneID_GameOver,
 		enSceneID_GameClear,
 		enSceneID_None
 	};
 
 	Game* m_game = nullptr;//ゲーム用のインスタンス
+	GameOver* m_gameOver = nullptr;//ゲームオーバー用のインスタンス
 	GameClear* m_gameClear = nullptr;//ゲームクリア用のインスタンス
 	EnSceneID m_createScene = enSceneID_None;//生成するシーン
 	EnSceneID m_currentScene = enSceneID_None;//現在のシーン

@@ -34,7 +34,14 @@ void Game::Update()
 	{
 		SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_GameClear);
 		m_gameTimeLimit->DisableDrawingUI();
-		m_isGameClear = true;
+		m_isGameEnd = true;
+	}
+
+	if(m_gameTimeLimit->IsTimeUp())
+	//if (g_pad[0]->IsTrigger(enButtonX))//デバッグ用
+	{
+		SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_GameOver);
+		m_isGameEnd = true;
 	}
 	DebugLog::GetInstance()->Update();
 }

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SceneManager.h"
 #include "Game.h"
+#include "GameOver.h"
 #include "GameClear.h"
 #include "Player.h"
 #include "PlayerAnimation.h"
@@ -29,6 +30,12 @@ void SceneManager::Update()
 	case enSceneID_InGame://インゲームシーン
 		m_game = NewGO<Game>(0, "game");
 		m_currentScene = enSceneID_InGame;
+		break;
+	case enSceneID_GameOver://ゲームオーバーシーン
+		m_gameOver = NewGO<GameOver>(0, "gameover");
+		m_gameOver->SetGaamePtr(m_game);
+		m_game->GetPlayerPtr()->GetPlayerAnimation()->SetGameOverPtr(m_gameOver);
+		m_currentScene = enSceneID_GameOver;
 		break;
 	case enSceneID_GameClear://ゲームクリアシーン
 		m_gameClear = NewGO<GameClear>(0, "gameclear");
