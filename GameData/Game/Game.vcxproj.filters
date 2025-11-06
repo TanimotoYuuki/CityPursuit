@@ -35,6 +35,10 @@
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="GameClear.cpp" />
     <ClCompile Include="GameClearCamera.cpp" />
+    <ClCompile Include="GameResult.cpp" />
+    <ClCompile Include="GameTimeLimit.cpp" />
+    <ClCompile Include="GameClearSelect.cpp" />
+    <ClCompile Include="GameClearSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -65,5 +69,9 @@
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="GameClear.h" />
     <ClInclude Include="GameClearCamera.h" />
+    <ClInclude Include="GameResult.h" />
+    <ClInclude Include="GameTimeLimit.h" />
+    <ClInclude Include="GameClearSelect.h" />
+    <ClInclude Include="GameClearSprite.h" />
   </ItemGroup>
 </Project>

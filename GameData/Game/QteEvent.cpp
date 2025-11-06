@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "QteEvent.h"
 #include "QteEventInput.h"
+#include "Game.h"
 #include "Player.h"
 #include "PlayerCatchEnemy.h"
 #include "Enemy.h"
@@ -211,14 +212,18 @@ void QteEvent::Update()
 			m_rotationSpriteAnimation->Update();
 		}
 
-
 		if (m_positionSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_End]->IsCompleted())//アニメーションが終わったか?
 		{
 			//QTEイベントを終了する処理
 			DeleteGO(this);
-			if (m_isQteEventResult[enQteEventResult_Success] == true)
+			if (m_isQteEventResult[enQteEventResult_Success] == true)//QTEイベントで成功したときの処理
 			{
 				DeleteGO(m_targetEnemy);
+				m_game->QteEventSuccessCountUp();
+			}
+			else//QTEイベントで失敗したときの処理
+			{
+				m_game->QteEventFailedCountUp();
 			}
 			m_player->GetPlayerCatchEnemy()->Reset();
 		}
@@ -701,10 +706,8 @@ void QteEvent::Render(RenderContext& rc)
 		//コマンド入力が成功しているときに描画する
 		if (m_isInputCommandSuccess[m_inputCommandList[i]] == true)
 		{
-			{
-				//ゲームパッドのボタンや方向キーを入力後のUIの描画処理(QTEイベント成功用)
-				m_gamePadInputAfterUI[enQteEventResult_Success][m_inputCommandList[i]].Draw(rc);
-			}
+			//ゲームパッドのボタンや方向キーを入力後のUIの描画処理(QTEイベント成功用)
+			m_gamePadInputAfterUI[enQteEventResult_Success][m_inputCommandList[i]].Draw(rc);
 		}
 
 		//コマンド入力が失敗しているときに描画する

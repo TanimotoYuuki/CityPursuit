@@ -7,6 +7,7 @@
 #include "PlayerCatchEnemy.h"
 #include "Game.h"
 #include "GameClear.h"
+#include "GameClearCamera.h"
 
 namespace{
 	const float INIT_PLAY_ANIMATION_SPEED = 1.0f;//初期のアニメーション再生速度
@@ -93,7 +94,8 @@ void PlayerAnimation::ChangeAnimation(ModelRender& modelData, Player* playerData
 			return;
 		}
 
-		if (m_gameClear->IsGameClear())
+		//ゲームクリアしたときの演出が終了したか?
+		if (m_gameClear->GetGameClearCamera()->IsFinishRotationCamera())
 		{
 			//ゲームクリア用のアニメション
 			m_nowPlayAnimation = enAnimationList_GameClear;

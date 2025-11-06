@@ -7,6 +7,7 @@ class PlayerSwingAction;
 class SwingModel;
 class Enemy;
 class QteEvent;
+class Game;
 class PlayerCatchEnemy : public IGameObject
 {
 public:
@@ -116,5 +117,6 @@ private://メンバ変数
 	SwingModel* m_swingModel = nullptr;//スイングモデル用のインスタンス
 	QteEvent* m_qteEvent = nullptr;//QTEイベント用のインスタンス
 	Enemy* m_enemy = nullptr;//敵用のインスタンス
+	Game* m_game = nullptr;//ゲーム全体を管理する用のインスタンス
 };
 

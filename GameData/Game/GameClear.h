@@ -2,8 +2,11 @@
 /// <summary>
 /// ゲームクリアクラス
 /// </summary>
-class Player;
+class Game;
+class GameClearSprite;
 class GameClearCamera;
+class GameResult;
+class GameClearSelect;
 class GameClear : public IGameObject
 {
 public:
@@ -13,38 +16,78 @@ public:
 	bool Start();//開始処理
 	void Update();//更新処理
 
+public://列挙型
+
+	//ゲームクリアの状態
+	enum EnGameClearState
+	{
+		enGameClearState_GameClearDirection,//ゲームクリア演出
+		enGameClearState_Result,//リザルト
+		enGameClearState_Select,//選択
+		enGameClearState_Num//ゲームクリアの状態数
+	};
+
+private://メンバ変数
+
+	/// <summary>
+	/// ゲームクリア演出の更新処理
+	/// </summary>
+	void GameClearDirectionUpdate();
+
+	/// <summary>
+	/// リザルトの更新処理
+	/// </summary>
+	void ResultUpdate();
+
+	/// <summary>
+	/// 選択の更新処理
+	/// </summary>
+	void SelectUpdate();
+
 public://メンバ関数
 
 	/// <summary>
-	/// プレイヤークラスのポインタの設定
+	/// ゲーム全体を管理するクラスのポインタの設定
 	/// </summary>
-	/// <param name="player">プレイヤークラスのポインタの設定</param>
-	void SetPlayerPtr(Player* player)
+	/// <param name="player">ゲーム全体を管理するクラスのポインタの設定</param>
+	void SetGamePtr(Game* game)
 	{
-		m_player = player;
+		m_game = game;
 	}
 	
 	/// <summary>
-	/// プレイヤークラスのポインタの取得
+	/// ゲーム全体を管理するクラスのポインタの取得
 	/// </summary>
-	/// <returns>プレイヤークラスのポインタ</returns>
-	Player* GetPlayerPtr()
+	/// <returns>ゲーム全体を管理するクラスのポインタ</returns>
+	Game* GetGamePtr()
 	{
-		return m_player;
+		return m_game;
 	}
 
 	/// <summary>
-	/// ゲームクリアしたか?
+	/// ゲームクリア時のカメラクラスのポインタの取得
 	/// </summary>
-	/// <returns>trueならゲームクリアしている</returns>
-	bool IsGameClear() const
+	/// <returns>ゲームクリア時のカメラクラスのポインタ</returns>
+	GameClearCamera* GetGameClearCamera()
 	{
-		return m_isGameClear;
+		return m_gameClearCamera;
+	}
+
+	/// <summary>
+	/// ゲームクリアのスプライトを表示するクラスのポインタの取得
+	/// </summary>
+	/// <returns>ゲームクリアのスプライトを表示するクラスのポインタ</returns>
+	GameClearSprite* GetGameClearSprite()
+	{
+		return m_gameClearSprite;
 	}
 
 private://メンバ変数
-	bool m_isGameClear = false;//ゲームクリアしたか?
-	Player* m_player = nullptr;//ゲームクリア用のインスタンス
+	EnGameClearState m_gameClearState = enGameClearState_GameClearDirection;//ゲームクリアの状態
+	Game* m_game = nullptr;//ゲーム全体を管理する用のインスタンス
+	GameClearSprite* m_gameClearSprite = nullptr;//ゲームクリアのスプライトを表示する用のインスタンス
 	GameClearCamera* m_gameClearCamera = nullptr;//ゲームクリア時のカメラ用のインスタンス
+	GameResult* m_gameResult = nullptr;//ゲームリザルト用のインスタンス
+	GameClearSelect* m_gameClearSelect = nullptr;//ゲームクリア選択用のインスタンス
 };
 
