@@ -142,12 +142,29 @@ public://メンバ関数
 		m_isTimeStop = false;
 	}
 
+	/// <summary>
+	/// 時間切れの演出
+	/// </summary>
+	void TimeUpDirection();
+
+	/// <summary>
+	/// 演出が終わったか?
+	/// </summary>
+	/// <returns>trueなら演出が終わっている</returns>
+	bool IsFinishDirection() const
+	{
+		return m_isFinishDirection;
+	}
+
 private://メンバ変数
 	SpriteRender m_timeLimitUI[enTime_Num][enTimeLimitDisplayUI_Num];//制限時間UI
+	int m_noDirectionDrawingTimeLimitUICount = 0;//演出のときに制限時間UIを描画していない回数
 	float m_timeLimit = 0.0f;//制限時間
+	float m_directionTime = 0.0f;//演出時間
 	bool m_isTimeUp = false;//タイムアップしたかどうか?
 	bool m_isDrawingUI = false;//UIを描画するか?
 	bool m_isTimeStop = false;//時間を止めるか?
+	bool m_isFinishDirection = false;//演出が終わったか?
 	std::vector<EnTimeLimitDisplayUI> m_timeLimitManage;//制限時間を管理する変数
 
 private://表示するUIのファイルパス用のメンバ変数

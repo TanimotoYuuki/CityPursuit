@@ -234,8 +234,10 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameClear.cpp" />
     <ClCompile Include="GameClearCamera.cpp" />
-    <ClCompile Include="GameClearSelect.cpp" />
+    <ClCompile Include="GameEndSelect.cpp" />
     <ClCompile Include="GameClearSprite.cpp" />
+    <ClCompile Include="GameOver.cpp" />
+    <ClCompile Include="GameOverSprite.cpp" />
     <ClCompile Include="GameTimeLimit.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -271,8 +273,10 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameClear.h" />
     <ClInclude Include="GameClearCamera.h" />
-    <ClInclude Include="GameClearSelect.h" />
+    <ClInclude Include="GameEndSelect.h" />
     <ClInclude Include="GameClearSprite.h" />
+    <ClInclude Include="GameOver.h" />
+    <ClInclude Include="GameOverSprite.h" />
     <ClInclude Include="GameTimeLimit.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerAnimation.h" />

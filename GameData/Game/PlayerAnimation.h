@@ -3,6 +3,7 @@
 /// プレイヤーアニメーションクラス
 /// </summary>
 class Player;
+class GameOver;
 class GameClear;
 class PlayerAnimation : public IGameObject
 {
@@ -49,6 +50,15 @@ public://メンバ関数
 	void ChangeAnimation(ModelRender& modeldata, Player* playerData);
 
 	/// <summary>
+	/// ゲームオーバークラスのポインタの設定
+	/// </summary>
+	/// <param name="gameOver">ゲームオーバークラスのポインタ</param>
+	void SetGameOverPtr(GameOver* gameOver)
+	{
+		m_gameOver = gameOver;
+	}
+
+	/// <summary>
 	/// ゲームクリアクラスのポインタの設定
 	/// </summary>
 	/// <param name="gameClear">ゲームクリアクラスのポインタ</param>
@@ -71,6 +81,7 @@ private://メンバ変数
 	EnAnimationList m_nowPlayAnimation = enAnimationList_Idle;//現在再生しているアニメーション
 	float m_animationSpeed = 0.0f;//アニメーションの再生速度
 	float m_animationInterpolateTime = 0.0f;//アニメーションの補間時間
+	GameOver* m_gameOver = nullptr;//ゲームオーバー用のインスタンス
 	GameClear* m_gameClear = nullptr;//ゲームクリア用のインスタンス
 
 private://アニメーションのファイルパス

@@ -262,6 +262,7 @@
     <ClCompile Include="CameraCollisionSolver.cpp" />
     <ClCompile Include="CollisionObject.cpp" />
     <ClCompile Include="FontRender.cpp" />
+    <ClCompile Include="GameEndPostEffect.cpp" />
     <ClCompile Include="gameObject\Gameobjectmanager.cpp" />
     <ClCompile Include="gameObject\IGameObject.cpp" />
     <ClCompile Include="geometry\AABB.cpp" />
@@ -361,6 +362,7 @@
     <ClInclude Include="dbg\MyAssert.h" />
     <ClInclude Include="dbg\MyLog.h" />
     <ClInclude Include="FontRender.h" />
+    <ClInclude Include="GameEndPostEffect.h" />
     <ClInclude Include="gameObject\GameObjectManager.h" />
     <ClInclude Include="gameObject\IGameobject.h" />
     <ClInclude Include="geometry\AABB.h" />

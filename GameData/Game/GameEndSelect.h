@@ -1,24 +1,24 @@
 #pragma once
 /// <summary>
-/// ゲームクリアのときに選択するクラス
+/// ゲーム終了したときに選択するクラス
 /// </summary>
-class GameClearSelect : public IGameObject
+class GameEndSelect : public IGameObject
 {
 public:
-	GameClearSelect() {};//コンストラクタ
-	~GameClearSelect() {};//デストラクタ
+	GameEndSelect() {};//コンストラクタ
+	~GameEndSelect() {};//デストラクタ
 
 	bool Start();//開始処理
 	void Render(RenderContext& rc);//描画処理
 
 public://列挙型
 
-	//ゲームクリアのときの選択
-	enum EnGameClearSelect
+	//ゲーム終了したのときの選択
+	enum EnGameEndSelect
 	{
-		enGameClearSelect_Retry,//リトライ
-		enGameClearSelect_ReturnTitle,//タイトルへ戻る
-		enGameClearSelect_Num//選択数
+		enGameEndSelect_Retry,//リトライ
+		enGameEndSelect_ReturnTitle,//タイトルへ戻る
+		enGameEndSelect_Num//選択数
 	};
 
 private://メンバ関数
@@ -27,7 +27,7 @@ private://メンバ関数
 	/// 選択テキストUIの初期化
 	/// </summary>
 	/// <param name="enGameClearSelect">ゲームクリアのときの選択</param>
-	void InitSelectTextUI(EnGameClearSelect enGameClearSelect);
+	void InitSelectTextUI(EnGameEndSelect enGameEndSelect);
 	
 	/// <summary>
 	/// 現在何を選択しているかを表すUIの初期化
@@ -38,7 +38,7 @@ private://メンバ関数
 	/// 現在何を選択しているかを表すUIの更新処理
 	/// </summary>
 	/// <param name="enGameClearSelect">ゲームクリアのときの選択</param>
-	void CurrentSelectUIUpdate(EnGameClearSelect enGameClearSelect);
+	void CurrentSelectUIUpdate(EnGameEndSelect enGameEndSelect);
 
 	/// <summary>
 	/// 入力の更新処理
@@ -83,17 +83,17 @@ public://メンバ関数
 	/// 現在何を選択しているかを表すための変数の取得
 	/// </summary>
 	/// <returns></returns>
-	EnGameClearSelect GetCurrentSelect()
+	EnGameEndSelect GetCurrentSelect()
 	{
-		return (EnGameClearSelect)m_currentSelect;
+		return (EnGameEndSelect)m_currentSelect;
 	}
 
 private://メンバ変数
-	SpriteRender m_selectTextUI[enGameClearSelect_Num];//選択テキストUI
+	SpriteRender m_selectTextUI[enGameEndSelect_Num];//選択テキストUI
 	SpriteRender m_currentSelectUI;//現在何を選択しているか表すUI
-	Vector3 m_selectTextUIPosition[enGameClearSelect_Num];//選択テキストUIの座標
-	Vector3 m_currentSelectUIPosition[enGameClearSelect_Num];//現在何を選択しているか表すUI
-	int m_currentSelect = enGameClearSelect_Retry;//現在何を選択しているかを表すための変数
+	Vector3 m_selectTextUIPosition[enGameEndSelect_Num];//選択テキストUIの座標
+	Vector3 m_currentSelectUIPosition[enGameEndSelect_Num];//現在何を選択しているか表すUI
+	int m_currentSelect = enGameEndSelect_Retry;//現在何を選択しているかを表すための変数
 	int m_noDrawingCurrentSelectUICount = 0;//現在何を選択しているかを表すUIを描画していない回数
 	float m_time = 0.0f;//時間
 	bool m_isDrawingCurrentSelectUI = true;//現在何を選択しているかを表すUIを描画するか?
@@ -103,7 +103,7 @@ private://メンバ変数
 private://表示するUIのファイルパス用のメンバ変数
 
 	//選択テキストUIのファイルパス
-	const std::string m_selectTextUIFilePath[enGameClearSelect_Num] = {
+	const std::string m_selectTextUIFilePath[enGameEndSelect_Num] = {
 		"Assets/sprite/text/retry.dds",
 		"Assets/sprite/text/returnTitle.dds"
 	};

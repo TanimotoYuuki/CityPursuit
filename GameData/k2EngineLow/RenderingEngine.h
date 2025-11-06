@@ -4,6 +4,7 @@
 #include "IRenderer.h"
 #include "Bloom.h"
 #include "Shadow.h"
+#include "GameEndPostEffect.h"
 
 namespace nsK2EngineLow
 {
@@ -99,6 +100,15 @@ namespace nsK2EngineLow
 		}
 
 		/// <summary>
+		/// ゲーム終了のときにするポストエフェクトの取得
+		/// </summary>
+		/// <returns>ゲーム終了のときにするポストエフェクト</returns>
+		GameEndPostEffect& GetGameEndPostEffect()
+		{
+			return m_gameEndPostEffect;
+		}
+
+		/// <summary>
 		/// シャドウマップを取得
 		/// </summary>
 		/// <returns></returns>
@@ -181,6 +191,7 @@ namespace nsK2EngineLow
 		Sprite m_copyToFrameBufferSprite;				//メインレンダリングターゲットをフレームバッファにコピーするためのスプライト
 		Bloom m_bloom;									//ブルーム
 		Shadow m_shadow;								//シャドウマップ
+		GameEndPostEffect m_gameEndPostEffect;			//ゲーム終了のときにするポストエフェクト
 		std::vector< IRenderer* > m_renderObjects;		//レンダリングオブジェクトの格納
 	};
 }

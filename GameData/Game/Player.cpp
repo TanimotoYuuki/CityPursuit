@@ -61,7 +61,7 @@ bool Player::Start()
 //更新処理
 void Player::Update()
 {
-	if (!GetGamePtr()->IsGameClear())
+	if (!GetGamePtr()->IsGameEnd())
 	{
 		//移動処理の実行
 		m_playerMove->Execute(m_position, m_charaCon);

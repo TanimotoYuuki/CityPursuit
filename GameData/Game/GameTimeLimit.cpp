@@ -16,6 +16,9 @@ namespace {
 	const Vector4 TIME_LIMIT_UI_NORMAL_MULCOLOR{ 1.0f,1.0f,1.0f,1.0f };//制限時間UIの乗算カラー
 
 	const Vector4 TIME_LIMIT_UI_HALF_TRANSPARENT_MULCOLOR{ 1.0f,1.0f,1.0f,0.5f };//制限時間UIを半透明にするための乗算カラー
+
+	//演出
+	const int NO_DIRECTION_DRAWING_TIME_LIMIT_UI_COUNT_MAX = 5;//制限時間UIを描画していない回数の上限
 }
 
 //開始処理
@@ -42,6 +45,22 @@ bool GameTimeLimit::Start()
 //制限時間の実行処理
 void GameTimeLimit::Execute()
 {
+	//一定の回数までカウントしたら処理しない
+	if (m_noDirectionDrawingTimeLimitUICount == NO_DIRECTION_DRAWING_TIME_LIMIT_UI_COUNT_MAX)
+	{
+		m_isFinishDirection = true;
+		return;
+	}
+
+	//タイムアップしたら
+	if (m_isTimeUp)
+	{
+		//時間切れの演出
+		TimeUpDirection();
+		return;
+	}
+
+	//時間が止まったらUIを半透明にする
 	if (m_isTimeStop)
 	{
 		for (int i = 0; i < m_timeLimitManage.size(); i++)
@@ -72,16 +91,13 @@ void GameTimeLimit::Execute()
 //描画処理
 void GameTimeLimit::Render(RenderContext& rc)
 {
-	//UIを描画しないなら処理しない
-	if (!m_isDrawingUI)
+	if (m_isDrawingUI)
 	{
-		return;
-	}
-
-	for (int i = 0; i < m_timeLimitManage.size(); i++)
-	{
-		//QTEイベントで成功した回数を表示するUIの描画
-		m_timeLimitUI[i][m_timeLimitManage[i]].Draw(rc);
+		for (int i = 0; i < m_timeLimitManage.size(); i++)
+		{
+			//QTEイベントで成功した回数を表示するUIの描画
+			m_timeLimitUI[i][m_timeLimitManage[i]].Draw(rc);
+		}
 	}
 }
 
@@ -158,5 +174,23 @@ void GameTimeLimit::TimeLimitUIPositionUpdate(std::vector<EnTimeLimitDisplayUI> 
 	timeLimitUI.SetMulColor(TIME_LIMIT_UI_NORMAL_MULCOLOR);
 	//制限時間UIの更新処理
 	timeLimitUI.Update();
+}
+
+//時間切れの演出
+void GameTimeLimit::TimeUpDirection()
+{
+	m_directionTime += 5.0f * g_gameTime->GetFrameDeltaTime();
+
+	if (int(m_directionTime) % 2 == 0)
+	{
+		if (m_isDrawingUI)
+		{
+			m_noDirectionDrawingTimeLimitUICount++;
+		}
+		m_isDrawingUI = false;
+		return;
+	}
+
+	m_isDrawingUI = true;
 }
 

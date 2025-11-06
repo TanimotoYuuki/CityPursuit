@@ -37,8 +37,10 @@
     <ClCompile Include="GameClearCamera.cpp" />
     <ClCompile Include="GameResult.cpp" />
     <ClCompile Include="GameTimeLimit.cpp" />
-    <ClCompile Include="GameClearSelect.cpp" />
+    <ClCompile Include="GameEndSelect.cpp" />
     <ClCompile Include="GameClearSprite.cpp" />
+    <ClCompile Include="GameOver.cpp" />
+    <ClCompile Include="GameOverSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -71,7 +73,9 @@
     <ClInclude Include="GameClearCamera.h" />
     <ClInclude Include="GameResult.h" />
     <ClInclude Include="GameTimeLimit.h" />
-    <ClInclude Include="GameClearSelect.h" />
+    <ClInclude Include="GameEndSelect.h" />
     <ClInclude Include="GameClearSprite.h" />
+    <ClInclude Include="GameOver.h" />
+    <ClInclude Include="GameOverSprite.h" />
   </ItemGroup>
 </Project>

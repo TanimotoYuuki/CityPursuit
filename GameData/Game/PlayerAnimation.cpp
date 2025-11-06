@@ -86,19 +86,27 @@ void PlayerAnimation::ChangeAnimation(ModelRender& modelData, Player* playerData
 	m_nowPlayAnimation = enAnimationList_Idle;
 	m_animationInterpolateTime = 0.1f;
 
-	if (playerData->GetGamePtr()->IsGameClear())
+	if (playerData->GetGamePtr()->IsGameEnd())
 	{
 		//ゲームクリアポインタの中身がnullptrだったら処理しない
-		if (m_gameClear == nullptr)
+		if (m_gameClear == nullptr && m_gameOver == nullptr)
 		{
 			return;
 		}
 
-		//ゲームクリアしたときの演出が終了したか?
-		if (m_gameClear->GetGameClearCamera()->IsFinishRotationCamera())
+		if (m_gameOver != nullptr)
 		{
-			//ゲームクリア用のアニメション
-			m_nowPlayAnimation = enAnimationList_GameClear;
+
+		}
+
+		if (m_gameClear != nullptr)
+		{
+			//ゲームクリアしたときの演出が終了したか?
+			if (m_gameClear->GetGameClearCamera()->IsFinishRotationCamera())
+			{
+				//ゲームクリア用のアニメション
+				m_nowPlayAnimation = enAnimationList_GameClear;
+			}
 		}
 		return;
 	}

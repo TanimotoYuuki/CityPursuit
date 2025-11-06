@@ -19,12 +19,12 @@ public:
 public://メンバ関数
 
 	/// <summary>
-	/// ゲームクリアをしたか?
+	/// ゲーム終了したか?
 	/// </summary>
-	/// <returns>trueならゲームクリアをしている</returns>
-	bool IsGameClear()
+	/// <returns>trueならゲーム終了している</returns>
+	bool IsGameEnd()
 	{
-		return m_isGameClear;
+		return m_isGameEnd;
 	}
 
 	/// <summary>
@@ -82,7 +82,7 @@ public://メンバ関数
 private://メンバ変数
 	int m_qteEventSuccessCount = 0;//QTEイベントで成功した回数
 	int m_qteEventFailedCount = 0;//QTEイベントで失敗した回数
-	bool m_isGameClear = false;//ゲームクリアをしたか?
+	bool m_isGameEnd = false;//ゲーム終了したか?
 	BackGround* m_backGround = nullptr;//背景用のインスタンス
 	Player* m_player = nullptr;//プレイヤー用のインスタンス
 	GameTimeLimit* m_gameTimeLimit = nullptr;//ゲームの制限時間を管理する用のインスタンス
