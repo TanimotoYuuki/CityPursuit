@@ -4,6 +4,7 @@
 /// QTEイベントクラス
 /// </summary>
 class QteEventInput;
+class Game;
 class Player;
 class Enemy;
 class QteEvent : public IGameObject
@@ -154,6 +155,15 @@ private://メンバ関数
 public://メンバ関数
 
 	/// <summary>
+	/// ゲーム全体を管理するクラスのポインタの設定
+	/// </summary>
+	/// <param name="game">ゲーム全体を管理するクラスのポインタ</param>
+	void SetGamePtr(Game* game)
+	{
+		m_game = game;
+	}
+
+	/// <summary>
 	/// ターゲットの敵を設定する
 	/// </summary>
 	/// <param name="target">ターゲットの敵</param>
@@ -241,6 +251,7 @@ private://メンバ変数
 	QteEventInput* m_qteEventInput = nullptr;//QTEイベントでプレイヤー側が入力する用のインスタンス
 	Player* m_player = nullptr;//プレイヤー用のインスタンス
 	Enemy* m_targetEnemy = nullptr;//ターゲットにしているエネミー用のインスタンス
+	Game* m_game = nullptr;//ゲーム全体を管理する用のインスタンス
 	std::unique_ptr<PositionSpriteAnimation> m_positionSpriteAnimation[enQteEventResult_Num][enQteEventResultUIDirection_Num];//座標を変えるアニメーション用のユニークポインタ
 	std::unique_ptr<AlphaSpriteAnimation> m_alphaSpriteAnimation[enQteEventResult_Num][enQteEventResultUIDirection_Num];//透明度を変えるアニメーション用のユニークポインタ
 	std::unique_ptr<RotationSpriteAnimation> m_rotationSpriteAnimation;//回転を変えるアニメーション用のユニークポインタ

@@ -32,7 +32,7 @@ void SceneManager::Update()
 		break;
 	case enSceneID_GameClear://ゲームクリアシーン
 		m_gameClear = NewGO<GameClear>(0, "gameclear");
-		m_gameClear->SetPlayerPtr(m_game->GetPlayerPtr());
+		m_gameClear->SetGamePtr(m_game);
 		m_game->GetPlayerPtr()->GetPlayerAnimation()->SetGameClearPtr(m_gameClear);
 		m_currentScene = enSceneID_GameClear;
 		break;

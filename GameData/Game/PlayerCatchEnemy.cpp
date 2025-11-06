@@ -6,6 +6,8 @@
 #include "SwingModel.h"
 #include "Enemy.h"
 #include "QteEvent.h"
+#include "Game.h"
+#include "GameTimeLimit.h"
 
 namespace{ 
 	const float CATCH_ENEMY_LENGTH = 1500.0f;//敵をキャッチできる距離
@@ -31,7 +33,10 @@ bool PlayerCatchEnemy::Start()
 
 	m_playerSwingAction = FindGO<PlayerSwingAction>("playerswingaction");
 
+	m_game = m_player->GetGamePtr();
+
 	m_qteEvent = NewGO<QteEvent>(0, "qteevent");
+	m_qteEvent->SetGamePtr(m_game);
 	m_qteEvent->SetPlayerPtr(m_player);
 
 	return true;
@@ -54,6 +59,7 @@ void PlayerCatchEnemy::Execute()
 		{
 			m_player->GetPlayerMove()->SetCanMove(true);
 			m_player->GetPlayerCamera().SetCanMoveCamera(true);
+			m_game->GetGameTimeLimitPtr()->DisableTimeStop();
 		}
 
 		if (m_distance.Length() < CATCH_ENEMY_LENGTH)
@@ -113,6 +119,9 @@ void PlayerCatchEnemy::Reset()
 	m_player->GetPlayerMove()->AddMoveSpeed(leaveJumpForce);
 	m_isInputCatchEnemy = false;
 	m_isQteEvent = false;
+
+	//制限時間を動かす
+	m_game->GetGameTimeLimitPtr()->EnableDrawingUI();
 }
 
 //ターゲットを探す処理
@@ -261,6 +270,9 @@ void PlayerCatchEnemy::ChangeState(const EnCatchEnemyState newState)
 		m_player->GetPlayerMove()->SetUseGravity(false);
 		//ジャンプの姿勢になるように、ちょっとジャンプさせる
 		m_player->GetPlayerMove()->AddMoveSpeed(Vector3::Up * WIREING_TO_ENEMY_JUMP_FORCE);
+
+		//制限時間を動かさない
+		m_game->GetGameTimeLimitPtr()->EnableTimeStop();
 		break;
 
 	case enGoOnEnemy:
@@ -274,6 +286,7 @@ void PlayerCatchEnemy::ChangeState(const EnCatchEnemyState newState)
 		m_qteEvent->SetTargetEnemy(m_enemy);
 		m_isCatchEnemy = false;
 		m_isQteEvent = true;
+		m_game->GetGameTimeLimitPtr()->DisableDrawingUI();
 		break;
 	}
 

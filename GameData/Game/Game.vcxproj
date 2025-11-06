@@ -234,6 +234,9 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameClear.cpp" />
     <ClCompile Include="GameClearCamera.cpp" />
+    <ClCompile Include="GameClearSelect.cpp" />
+    <ClCompile Include="GameClearSprite.cpp" />
+    <ClCompile Include="GameTimeLimit.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerAnimation.cpp" />
@@ -245,6 +248,7 @@
     <ClCompile Include="PlayerSwingAction.cpp" />
     <ClCompile Include="QteEvent.cpp" />
     <ClCompile Include="QteEventInput.cpp" />
+    <ClCompile Include="GameResult.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SpriteAnimation.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -267,6 +271,9 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameClear.h" />
     <ClInclude Include="GameClearCamera.h" />
+    <ClInclude Include="GameClearSelect.h" />
+    <ClInclude Include="GameClearSprite.h" />
+    <ClInclude Include="GameTimeLimit.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerAnimation.h" />
     <ClInclude Include="PlayerCamera.h" />
@@ -277,6 +284,7 @@
     <ClInclude Include="PlayerSwingAction.h" />
     <ClInclude Include="QteEvent.h" />
     <ClInclude Include="QteEventInput.h" />
+    <ClInclude Include="GameResult.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SpriteAnimation.h" />
     <ClInclude Include="stdafx.h" />
