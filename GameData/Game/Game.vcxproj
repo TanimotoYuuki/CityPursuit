@@ -231,6 +231,7 @@
     <ClCompile Include="DebugLog.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyAI.cpp" />
+    <ClCompile Include="FadeManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameClear.cpp" />
     <ClCompile Include="GameClearCamera.cpp" />
@@ -263,6 +264,9 @@
     <ClCompile Include="SwingModel.cpp" />
     <ClCompile Include="SwingTarget.cpp" />
     <ClCompile Include="system\system.cpp" />
+    <ClCompile Include="Title.cpp" />
+    <ClCompile Include="TitleSelect.cpp" />
+    <ClCompile Include="TitleSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackGround.h" />
@@ -270,6 +274,7 @@
     <ClInclude Include="DebugLog.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyAI.h" />
+    <ClInclude Include="FadeManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameClear.h" />
     <ClInclude Include="GameClearCamera.h" />
@@ -297,6 +302,9 @@
     <ClInclude Include="SwingModel.h" />
     <ClInclude Include="SwingTarget.h" />
     <ClInclude Include="system\system.h" />
+    <ClInclude Include="Title.h" />
+    <ClInclude Include="TitleSelect.h" />
+    <ClInclude Include="TitleSprite.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

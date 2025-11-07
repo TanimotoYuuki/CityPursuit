@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "system/system.h"
 #include "SceneManager.h"
+#include "FadeManager.h"
 
 // K2EngineLowのグローバルアクセスポイント。
 K2EngineLow* g_k2EngineLow = nullptr;
@@ -21,6 +22,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	SceneManager::CreateInstance();
 	SceneManager::GetInstance()->Start();
+
+	FadeManager::CreateInstance();
 
 	// ここからゲームループ。
 	while (DispatchWindowMessage() && g_gameLoop.m_isLoop ==true)

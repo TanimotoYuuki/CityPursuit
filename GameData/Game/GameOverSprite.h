@@ -37,7 +37,7 @@ public://メンバ関数
 	}
 
 private://メンバ変数
-	SpriteRender m_gameOverTextUI;//ゲームクリアテキストUI
+	SpriteRender m_gameOverTextUI;//ゲームオーバーテキストUI
 	std::unique_ptr<AlphaSpriteAnimation> m_alphaSpriteAnimation;//透明度を変えるアニメーションのユニークポインタ
 	std::unique_ptr<PositionSpriteAnimation> m_positionSpriteAnimation;//位置を変えるアニメーションのユニークポインタ
 

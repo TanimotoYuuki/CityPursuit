@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include "GameTimeLimit.h"
 #include "SceneManager.h"
+#include "FadeManager.h"
 #include "DebugLog.h"
 
 namespace {
@@ -18,9 +19,10 @@ bool Game::Start()
 	m_backGround = NewGO<BackGround>(0, "background");
 	m_player = NewGO<Player>(0, "player");
 	m_player->SetGamePtr(this);
-	m_gameTimeLimit = NewGO<GameTimeLimit>(1, "gametimelimit");
+	m_gameTimeLimit = NewGO<GameTimeLimit>(0, "gametimelimit");
 	m_gameTimeLimit->SetTimeLimit(GAME_TIME_LIMIT);
 	m_gameTimeLimit->EnableDrawingUI();
+	FadeManager::GetInstance()->SetFadeState(FadeManager::enFadeState_FadeIn);
 	return true;
 }
 

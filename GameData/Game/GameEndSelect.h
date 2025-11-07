@@ -26,7 +26,7 @@ private://メンバ関数
 	/// <summary>
 	/// 選択テキストUIの初期化
 	/// </summary>
-	/// <param name="enGameClearSelect">ゲームクリアのときの選択</param>
+	/// <param name="enGameClearSelect">ゲーム終了のときの選択</param>
 	void InitSelectTextUI(EnGameEndSelect enGameEndSelect);
 	
 	/// <summary>
@@ -37,7 +37,7 @@ private://メンバ関数
 	/// <summary>
 	/// 現在何を選択しているかを表すUIの更新処理
 	/// </summary>
-	/// <param name="enGameClearSelect">ゲームクリアのときの選択</param>
+	/// <param name="enGameClearSelect">ゲーム終了のときの選択</param>
 	void CurrentSelectUIUpdate(EnGameEndSelect enGameEndSelect);
 
 	/// <summary>

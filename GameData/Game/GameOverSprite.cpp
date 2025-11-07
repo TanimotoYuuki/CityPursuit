@@ -3,22 +3,22 @@
 
 namespace {
 	//ゲームオーバーテキストUI
-	const float GAME_OVER_TEXT_UI_WIDTH = 2048.0f;//ゲームクリアテキストUIの横幅
+	const float GAME_OVER_TEXT_UI_WIDTH = 2048.0f;//ゲームオーバーテキストUIの横幅
 
-	const float GAME_OVER_TEXT_UI_HEIGHT = 128.0f;//ゲームクリアテキストUIの縦幅
+	const float GAME_OVER_TEXT_UI_HEIGHT = 128.0f;//ゲームオーバーテキストUIの縦幅
 
-	const Vector3 GAME_OVER_TEXT_UI_POSITION{ 0.0f,575.0f,0.0f };//ゲームクリアテキストUIの位置
+	const Vector3 GAME_OVER_TEXT_UI_POSITION{ 0.0f,575.0f,0.0f };//ゲームオーバーテキストUIの位置
 
-	const Vector3 GAME_OVER_TEXT_UI_SCALE{ 0.7f,0.7f,0.7f };//ゲームクリアテキストUIの大きさ
+	const Vector3 GAME_OVER_TEXT_UI_SCALE{ 0.7f,0.7f,0.7f };//ゲームオーバーテキストUIの大きさ
 
-	const Vector4 GAME_OVER_TEXT_UI_MULCOLOR{ 1.0f,1.0f,1.0f,0.0f };//ゲームクリアテキストUIの乗算カラー
+	const Vector4 GAME_OVER_TEXT_UI_MULCOLOR{ 1.0f,1.0f,1.0f,0.0f };//ゲームオーバーテキストUIの乗算カラー
 
 	//アニメーション
 	const float ANIMATION_PLAY_SPEED = 1.2f;//リザルトUIのアニメーションの再生速度
 
 	const float OPAQUE_ALPHA = 1.0f;//不透明のときのα値
 
-	const Vector3 AFTER_ANIMATION_POSITION{ 0.0f,375.0f,0.0f };//ゲームクリアテキストUIの位置
+	const Vector3 AFTER_ANIMATION_POSITION{ 0.0f,375.0f,0.0f };//ゲームオーバーテキストUIの位置
 }
 
 //開始処理
@@ -53,7 +53,7 @@ bool GameOverSprite::Start()
 //描画処理
 void GameOverSprite::Render(RenderContext& renderContext)
 {
-	//ゲームクリアテキストUIの描画
+	//ゲームオーバーテキストUIの描画
 	m_gameOverTextUI.Draw(renderContext);
 }
 

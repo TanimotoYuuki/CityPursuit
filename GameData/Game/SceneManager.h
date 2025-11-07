@@ -1,5 +1,6 @@
 #pragma once
 
+class Title;
 class Game;
 class GameOver;
 class GameClear;
@@ -15,12 +16,14 @@ public:
 	//シーンID
 	enum EnSceneID
 	{
+		enSceneID_Title,
 		enSceneID_InGame,
 		enSceneID_GameOver,
 		enSceneID_GameClear,
 		enSceneID_None
 	};
 
+	Title* m_title = nullptr;//タイトル用のインスタンス
 	Game* m_game = nullptr;//ゲーム用のインスタンス
 	GameOver* m_gameOver = nullptr;//ゲームオーバー用のインスタンス
 	GameClear* m_gameClear = nullptr;//ゲームクリア用のインスタンス

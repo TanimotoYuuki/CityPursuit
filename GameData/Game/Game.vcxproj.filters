@@ -41,6 +41,10 @@
     <ClCompile Include="GameClearSprite.cpp" />
     <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="GameOverSprite.cpp" />
+    <ClCompile Include="Title.cpp" />
+    <ClCompile Include="TitleSelect.cpp" />
+    <ClCompile Include="TitleSprite.cpp" />
+    <ClCompile Include="FadeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -77,5 +81,9 @@
     <ClInclude Include="GameClearSprite.h" />
     <ClInclude Include="GameOver.h" />
     <ClInclude Include="GameOverSprite.h" />
+    <ClInclude Include="Title.h" />
+    <ClInclude Include="TitleSelect.h" />
+    <ClInclude Include="TitleSprite.h" />
+    <ClInclude Include="FadeManager.h" />
   </ItemGroup>
 </Project>

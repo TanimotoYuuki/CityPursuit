@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "SceneManager.h"
+#include "Title.h"
 #include "Game.h"
 #include "GameOver.h"
 #include "GameClear.h"
@@ -12,7 +13,7 @@ SceneManager* SceneManager::m_instance = nullptr;//初期化
 bool SceneManager::Start()
 {
 	//最初のシーンを設定
-	SceneManager::GetInstance()->CreateScene(enSceneID_InGame);
+	SceneManager::GetInstance()->CreateScene(enSceneID_Title);
 	return true;
 }
 
@@ -27,6 +28,10 @@ void SceneManager::Update()
 
 	switch (m_createScene)
 	{
+	case enSceneID_Title://タイトルシーン
+		m_title = NewGO<Title>(0, "title");
+		m_currentScene = enSceneID_Title;
+		break;
 	case enSceneID_InGame://インゲームシーン
 		m_game = NewGO<Game>(0, "game");
 		m_currentScene = enSceneID_InGame;
