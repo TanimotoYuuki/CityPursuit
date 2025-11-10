@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "BackGround.h"
+#include "Game.h"
+#include "GameMission.h"
 #include "Street.h"
 #include "Buildings.h"
 #include "Enemy.h"
@@ -208,6 +210,9 @@ void BackGround::LoadLevel()
 
 			//レベルのデータに保存されている大きさを設定
 			car->SetScale(objData.scale);
+
+			//ノルマで捕獲する敵の数の加算
+			m_game->GetGameMissionPtr()->AddQuotaCaptureEnemyNum();
 
 			return true;
 		}

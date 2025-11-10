@@ -45,6 +45,8 @@
     <ClCompile Include="TitleSelect.cpp" />
     <ClCompile Include="TitleSprite.cpp" />
     <ClCompile Include="FadeManager.cpp" />
+    <ClCompile Include="GameStartSprite.cpp" />
+    <ClCompile Include="GameMission.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -85,5 +87,7 @@
     <ClInclude Include="TitleSelect.h" />
     <ClInclude Include="TitleSprite.h" />
     <ClInclude Include="FadeManager.h" />
+    <ClInclude Include="GameStartSprite.h" />
+    <ClInclude Include="GameMission.h" />
   </ItemGroup>
 </Project>

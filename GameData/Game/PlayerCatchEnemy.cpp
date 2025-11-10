@@ -8,6 +8,7 @@
 #include "QteEvent.h"
 #include "Game.h"
 #include "GameTimeLimit.h"
+#include "GameMission.h"
 
 namespace{ 
 	const float CATCH_ENEMY_LENGTH = 1500.0f;//敵をキャッチできる距離
@@ -120,8 +121,10 @@ void PlayerCatchEnemy::Reset()
 	m_isInputCatchEnemy = false;
 	m_isQteEvent = false;
 
-	//制限時間を動かす
+	//制限時間UIを描画する
 	m_game->GetGameTimeLimitPtr()->EnableDrawingUI();
+	//ゲームミッションUIを描画する
+	m_game->GetGameMissionPtr()->EnableDrawingUI();
 }
 
 //ターゲットを探す処理
@@ -287,6 +290,7 @@ void PlayerCatchEnemy::ChangeState(const EnCatchEnemyState newState)
 		m_isCatchEnemy = false;
 		m_isQteEvent = true;
 		m_game->GetGameTimeLimitPtr()->DisableDrawingUI();
+		m_game->GetGameMissionPtr()->DisableDrawingUI();
 		break;
 	}
 

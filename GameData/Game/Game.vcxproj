@@ -231,6 +231,7 @@
     <ClCompile Include="DebugLog.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyAI.cpp" />
+    <ClCompile Include="GameMission.cpp" />
     <ClCompile Include="FadeManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameClear.cpp" />
@@ -239,6 +240,7 @@
     <ClCompile Include="GameClearSprite.cpp" />
     <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="GameOverSprite.cpp" />
+    <ClCompile Include="GameStartSprite.cpp" />
     <ClCompile Include="GameTimeLimit.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -274,6 +276,7 @@
     <ClInclude Include="DebugLog.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyAI.h" />
+    <ClInclude Include="GameMission.h" />
     <ClInclude Include="FadeManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameClear.h" />
@@ -282,6 +285,7 @@
     <ClInclude Include="GameClearSprite.h" />
     <ClInclude Include="GameOver.h" />
     <ClInclude Include="GameOverSprite.h" />
+    <ClInclude Include="GameStartSprite.h" />
     <ClInclude Include="GameTimeLimit.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerAnimation.h" />

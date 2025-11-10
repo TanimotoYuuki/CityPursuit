@@ -24,7 +24,6 @@ public://メンバ関数
 	/// <summary>
 	/// スプライトのアニメーションの再生
 	/// </summary>
-	/// <param name="enSpriteAlphaState">スプライトの透明度の状態</param>
 	void PlaySpriteAnimation();
 
 	/// <summary>
@@ -43,7 +42,7 @@ private://メンバ変数
 
 private://表示するUIのファイルパス用のメンバ変数
 
-	//ゲームクリアテキストUIのファイルパス
+	//ゲームオーバーテキストUIのファイルパス
 	const std::string m_gameOverTextUIFilePath = "Assets/sprite/text/missionFailed.dds";
 };
 
