@@ -2,6 +2,7 @@
 #include "QteEvent.h"
 #include "QteEventInput.h"
 #include "Game.h"
+#include "GameMission.h"
 #include "Player.h"
 #include "PlayerCatchEnemy.h"
 #include "Enemy.h"
@@ -220,6 +221,7 @@ void QteEvent::Update()
 			{
 				DeleteGO(m_targetEnemy);
 				m_game->QteEventSuccessCountUp();
+				m_game->GetGameMissionPtr()->AddCurrentCaptureEnemyNum();
 			}
 			else//QTEイベントで失敗したときの処理
 			{

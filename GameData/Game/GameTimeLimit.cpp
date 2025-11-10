@@ -95,7 +95,7 @@ void GameTimeLimit::Render(RenderContext& rc)
 	{
 		for (int i = 0; i < m_timeLimitManage.size(); i++)
 		{
-			//QTEイベントで成功した回数を表示するUIの描画
+			//制限時間UIの描画
 			m_timeLimitUI[i][m_timeLimitManage[i]].Draw(rc);
 		}
 	}

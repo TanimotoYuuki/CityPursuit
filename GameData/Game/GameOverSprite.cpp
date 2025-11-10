@@ -18,7 +18,7 @@ namespace {
 
 	const float OPAQUE_ALPHA = 1.0f;//不透明のときのα値
 
-	const Vector3 AFTER_ANIMATION_POSITION{ 0.0f,375.0f,0.0f };//ゲームオーバーテキストUIの位置
+	const Vector3 AFTER_ANIMATION_POSITION{ 0.0f,375.0f,0.0f };//アニメーションの再生後のゲームオーバーテキストUIの位置
 }
 
 //開始処理
