@@ -42,6 +42,7 @@ private://メンバ関数
 	void SelectUpdate();
 
 private:// メンバ変数
+	GameTime m_stopwatch;//ストップウォッチ
 	EnTitleState m_titleState = enTitleState_Fade;//タイトルの状態
 	TitleSprite* m_titleSprite = nullptr;//タイトルのスプライトを表示する用のインスタンス
 	TitleSelect* m_titleSelect = nullptr;//タイトルのときに選択する用のインスタンス
