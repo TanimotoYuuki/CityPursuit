@@ -83,4 +83,11 @@ void GameOver::GameOverTextUpdate()
 void GameOver::SelectUpdate()
 {
 	m_gameEndSelect->Execute();
+
+	//シーンを遷移するならタイトルの削除処理する
+	if (m_gameEndSelect->IsTransitionScene())
+	{
+		DeleteGO(m_game);
+		DeleteGO(this);
+	}
 }

@@ -44,6 +44,16 @@ public:
 	{
 		return m_isCompleted;
 	}
+	
+	/// <summary>
+	/// リセット処理
+	/// </summary>
+	void Reset()
+	{
+		m_elapsedTime = 0.0f;
+		m_currentStep = enAnimationStep_Min;
+		m_isCompleted = false;
+	}
 
 	virtual void Update() = 0;//更新処理
 };

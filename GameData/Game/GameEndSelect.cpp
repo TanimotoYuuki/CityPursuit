@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "GameEndSelect.h"
+#include "SceneManager.h"
+#include "FadeManager.h"
 
 namespace {
 	//選択テキストUI
@@ -213,11 +215,22 @@ void GameEndSelect::InputUpdate()
 void GameEndSelect::TransitionScene()
 {
 	//現在の選択
+	FadeManager::GetInstance()->SetFadeState(FadeManager::enFadeState_FadeOut);
 	switch (m_currentSelect)
 	{
 	case EnGameEndSelect::enGameEndSelect_Retry:
+		if (FadeManager::GetInstance()->IsFinishFade())
+		{
+			SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_InGame);//インゲームシーンの生成
+			m_isTransitionScene = true;//シーンの遷移をする
+		}
 		break;
 	case EnGameEndSelect::enGameEndSelect_ReturnTitle:
+		if (FadeManager::GetInstance()->IsFinishFade())
+		{
+			SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_Title);//タイトルシーンの生成
+			m_isTransitionScene = true;//シーンの遷移をする
+		}
 		break;
 	default:
 		break;

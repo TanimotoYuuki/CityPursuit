@@ -223,6 +223,11 @@ public://メンバ関数
 		return m_isStopTimeLimit;
 	}
 
+	/// <summary>
+	/// リセット処理
+	/// </summary>
+	void Reset();
+
 private://メンバ変数
 	SpriteRender m_gamePadInputBeforeUI[enGamePadInputList_Num];//ゲームパッドのボタンや方向キーを入力前のUI
 	SpriteRender m_gamePadInputAfterUI[enQteEventResult_Num][enGamePadInputList_Num];//ゲームパッドのボタンや方向キーを入力後のUI

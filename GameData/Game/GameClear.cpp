@@ -11,6 +11,7 @@
 GameClear::~GameClear()
 {
 	DeleteGO(m_gameClearCamera);
+	DeleteGO(m_gameClearSprite);
 	DeleteGO(m_gameResult);
 	DeleteGO(m_gameEndSelect);
 }
@@ -96,4 +97,11 @@ void GameClear::ResultUpdate()
 void GameClear::SelectUpdate()
 {
 	m_gameEndSelect->Execute();
+
+	//シーンを遷移するならタイトルの削除処理する
+	if (m_gameEndSelect->IsTransitionScene())
+	{
+		DeleteGO(m_game);
+		DeleteGO(this);
+	}
 }
