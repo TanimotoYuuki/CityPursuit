@@ -9,10 +9,10 @@ namespace {
 	const char* MODEL_FILE_EXTENSION = ".tkm";//モデルのファイル拡張子
 
 	//セグメント
-	constexpr UINT BUILDINGS_WIDTH_SEGMENTS = 5;				//幅セグメント
-	constexpr UINT BUILDINGS_HEIGHT_SEGMENTS = 10;				//高さセグメント
-	constexpr UINT BUILDINGS_LENGTH_SEGMENTS = 5;				//長さセグメント
-	constexpr float BUILDINGS_HEIGHT_LOWER_LIMIT = 1000.0f;		//高さの下限
+	constexpr UINT BUILDINGS_WIDTH_SEGMENTS = 1;				//幅セグメント
+	constexpr UINT BUILDINGS_HEIGHT_SEGMENTS = 1;				//高さセグメント
+	constexpr UINT BUILDINGS_LENGTH_SEGMENTS = 1;				//長さセグメント
+	constexpr float BUILDINGS_HEIGHT_LOWER_LIMIT = 2000.0f;		//高さの下限
 	
 }
 

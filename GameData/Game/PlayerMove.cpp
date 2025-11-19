@@ -39,7 +39,7 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 		{
 			if (m_ussSwingActionGravity)//スイングアクション用の重力
 			{
-				m_moveSpeed.y -= 19.6f / 1.5f;
+				m_moveSpeed.y -= 19.6f * 3.0f;
 			}
 			else//通常の重力
 			{

@@ -5,6 +5,12 @@
 #include "Buildings.h"
 #include "SwingTarget.h"
 
+namespace{
+	const float SWING_ACTION_SCOPE_ANGLE_MIN = 0.78533;//スイングアクション有効範囲の角度の下限(Rad単位)
+	
+	const float SWING_ACTION_SCOPE_ANGLE_MAX = 1.04719;//スイングアクション有効範囲の角度の上限(Rad単位)
+}
+
 //開始処理
 bool SwingActionManager::Start()
 {
@@ -67,6 +73,25 @@ void SwingActionManager::Execute()
 			continue;
 		}
 
+		//支点からプレイヤーへのベクトル
+		Vector3 toPlayer = playerPos - targetPos;
+		//toPlayer.x = 0.0f;
+		toPlayer.Normalize();
+
+		//支点から真下へのベクトル
+		const Vector3 verticalDown = Vector3(0.0f, -1.0f, 0.0f);
+
+		//2つのベクトルの内積を求める
+		float dotResult = verticalDown.Dot(toPlayer);
+
+		float angle = acos(dotResult);
+
+		//スイングできる有効範囲の角度ではなければ除外
+		if (angle < SWING_ACTION_SCOPE_ANGLE_MIN && angle > SWING_ACTION_SCOPE_ANGLE_MAX)
+		{
+			continue;
+		}
+
 		float distSq = toTarget.LengthSq();
 		if (distSq < shortestDistSq)
 		{
@@ -78,7 +103,6 @@ void SwingActionManager::Execute()
 	//最終的に見つかった最も近いターゲットをセットする
 	if (shortestDistSq != FLT_MAX)
 	{
-		//距離ベクトルではなく、ターゲットの絶対座標を保存する
 		m_swingActionShortestDistance = bestTarget;
 		m_isSwingTargetScopeRadiusFound = true;
 	}
