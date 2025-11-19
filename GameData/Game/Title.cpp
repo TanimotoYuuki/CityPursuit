@@ -5,7 +5,7 @@
 #include "TitleSelect.h"
 
 namespace {
-	const float DELAY_TIME = 1.0f;//待機時間
+	const float DELAY_TIME = 1.5f;//待機時間
 }
 
 //デストラクタ
@@ -22,6 +22,9 @@ bool Title::Start()
 	m_titleSprite->EnableDrawingUI();
 
 	m_titleSelect = NewGO<TitleSelect>(0, "titleselect");
+
+	FadeManager::GetInstance()->SetFadeState(FadeManager::enFadeState_FadeIn);
+	g_renderingEngine->GetGameEndPostEffect().SetDrawingGameEndPostEffect(GameEndPostEffect::enGameEndPostEffect_None);
 	return true;
 }
 
@@ -48,11 +51,6 @@ void Title::Update()
 //フェードの更新処理
 void Title::FadeUpdate()
 {
-	if (g_gameTime->StopWatch(DELAY_TIME))
-	{
-		FadeManager::GetInstance()->SetFadeState(FadeManager::enFadeState_FadeIn);
-	}
-
 	//フェード処理が終わったら次のステートに移行する
 	if (FadeManager::GetInstance()->IsFinishFade())
 	{
@@ -76,6 +74,14 @@ void Title::TitleTextUpdate()
 void Title::SelectUpdate()
 {
 	m_titleSelect->Execute();
+
+	//Bボタンを押したら前のステートに移行する
+	if (g_pad[0]->IsTrigger(enButtonB))
+	{
+		m_titleSprite->EnableDrawingUI();
+		m_titleSelect->DisableDrawingUI();
+		m_titleState = enTitleState_TitleText;
+	}
 
 	//シーンを遷移するならタイトルの削除処理する
 	if (m_titleSelect->IsTransitionScene())

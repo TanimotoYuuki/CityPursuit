@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include "GameTimeLimit.h"
 #include "GameMission.h"
+#include "MiniMap.h"
 #include "GameStartSprite.h"
 #include "SceneManager.h"
 #include "FadeManager.h"
@@ -12,6 +13,16 @@
 
 namespace {
 	const int GAME_TIME_LIMIT = 300;//ゲームの制限時間
+}
+
+//デストラクタ
+Game::~Game()
+{
+	DeleteGO(m_backGround);
+	DeleteGO(m_player);
+	DeleteGO(m_gameTimeLimit);
+	DeleteGO(m_gameMission);
+	DeleteGO(m_miniMap);
 }
 
 //開始処理
@@ -27,15 +38,21 @@ bool Game::Start()
 	m_gameTimeLimit->DisableDrawingUI();
 	m_gameMission = NewGO<GameMission>(0, "gamemission");
 	m_gameMission->DisableDrawingUI();
+	m_miniMap = NewGO<MiniMap>(0, "minimap");
+	m_miniMap->SetPlayerPtr(m_player);
+	m_miniMap->DisableDrawingUI();
 	m_gameStartSprite = NewGO<GameStartSprite>(0, "gamestartsprite");
 	m_gameStartSprite->DisableDrawingUI();
 	FadeManager::GetInstance()->SetFadeState(FadeManager::enFadeState_FadeIn);
+	g_renderingEngine->GetGameEndPostEffect().SetDrawingGameEndPostEffect(GameEndPostEffect::enGameEndPostEffect_None);
 	return true;
 }
 
 //更新処理
 void Game::Update()
 {
+	m_miniMap->Execute();//ミニマップの実行処理
+
 	if (m_isFinishGameStartDirection != true)
 	{
 		if (m_isGameStartDirection)
@@ -52,6 +69,7 @@ void Game::Update()
 				m_isFinishGameStartDirection = true;
 				m_gameTimeLimit->EnableDrawingUI();
 				m_gameMission->EnableDrawingUI();
+				m_miniMap->EnableDrawingUI();
 				m_gameStartSprite->EnableDrawingUI();
 			}
 		}
@@ -78,6 +96,7 @@ void Game::Update()
 		SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_GameClear);
 		m_gameTimeLimit->DisableDrawingUI();
 		m_gameMission->DisableDrawingUI();
+		m_miniMap->DisableDrawingUI();
 		m_isGameEnd = true;
 	}
 
@@ -87,6 +106,7 @@ void Game::Update()
 	{
 		SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_GameOver);
 		m_gameMission->DisableDrawingUI();
+		m_miniMap->DisableDrawingUI();
 		m_isGameEnd = true;
 	}
 	DebugLog::GetInstance()->Update();

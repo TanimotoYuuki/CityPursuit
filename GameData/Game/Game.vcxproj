@@ -243,6 +243,7 @@
     <ClCompile Include="GameStartSprite.cpp" />
     <ClCompile Include="GameTimeLimit.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MiniMap.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerAnimation.cpp" />
     <ClCompile Include="PlayerCamera.cpp" />
@@ -287,6 +288,7 @@
     <ClInclude Include="GameOverSprite.h" />
     <ClInclude Include="GameStartSprite.h" />
     <ClInclude Include="GameTimeLimit.h" />
+    <ClInclude Include="MiniMap.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerAnimation.h" />
     <ClInclude Include="PlayerCamera.h" />

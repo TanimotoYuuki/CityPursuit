@@ -47,6 +47,7 @@
     <ClCompile Include="FadeManager.cpp" />
     <ClCompile Include="GameStartSprite.cpp" />
     <ClCompile Include="GameMission.cpp" />
+    <ClCompile Include="MiniMap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -89,5 +90,6 @@
     <ClInclude Include="FadeManager.h" />
     <ClInclude Include="GameStartSprite.h" />
     <ClInclude Include="GameMission.h" />
+    <ClInclude Include="MiniMap.h" />
   </ItemGroup>
 </Project>

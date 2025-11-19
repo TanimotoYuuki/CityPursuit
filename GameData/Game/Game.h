@@ -6,13 +6,14 @@ class BackGround;
 class Player;
 class GameTimeLimit;
 class GameMission;
+class MiniMap;
 class GameStartSprite;
 class DebugLog;
 class Game : public IGameObject
 {
 public:
 	Game() {};//コンストラクタ
-	~Game() {};//デストラクタ
+	~Game();//デストラクタ
 
 	bool Start();//開始処理
 	void Update();//更新処理
@@ -90,6 +91,15 @@ public://メンバ関数
 		return m_gameMission;
 	}
 
+	/// <summary>
+	/// ミニマップクラスのポインタの取得
+	/// </summary>
+	/// <returns>ミニマップクラスのポインタ</returns>
+	MiniMap* GetMiniMapPtr()
+	{
+		return m_miniMap;
+	}
+
 private://メンバ変数
 	int m_qteEventSuccessCount = 0;//QTEイベントで成功した回数
 	int m_qteEventFailedCount = 0;//QTEイベントで失敗した回数
@@ -101,6 +111,7 @@ private://メンバ変数
 	GameTimeLimit* m_gameTimeLimit = nullptr;//ゲームの制限時間を管理する用のインスタンス
 	GameMission* m_gameMission = nullptr;//ゲームミッションのスプライトを表示する用のインスタンス
 	GameStartSprite* m_gameStartSprite = nullptr;//ゲームスタートのスプライトを表示する用のインスタンス
+	MiniMap* m_miniMap = nullptr;//ミニマップ用のインスタンス
 	DebugLog* m_debugLog = nullptr;//デバッグログ用のインスタンス
 };
 

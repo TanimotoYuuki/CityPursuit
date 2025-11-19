@@ -19,6 +19,11 @@ private://メンバ関数
 	/// </summary>
 	void InitTitleTextUI();
 
+	/// <summary>
+	/// スタートテキストUIの初期化
+	/// </summary>
+	void InitStartUIText();
+
 public://メンバ関数
 
 	/// <summary>
@@ -39,11 +44,15 @@ public://メンバ関数
 
 private://メンバ変数
 	SpriteRender m_titleTextUI;//タイトルテキストUI
+	SpriteRender m_startTextUI;//スタートテキストUI
 	bool m_isDrawingUI = false;//UIを描画するか?
 
 private://表示するUIのファイルパス用のメンバ変数
 
-	//ゲームクリアテキストUIのファイルパス
-	const std::string m_gameOverTextUIFilePath = "Assets/sprite/text/titleName.dds";
+	//タイトルテキストUIのファイルパス
+	const std::string m_titleTextUIFilePath = "Assets/sprite/text/titleName.dds";
+
+	//スタートテキストUIのファイルパス
+	const std::string m_startTextUIFilePath = "Assets/sprite/text/start_abutton.dds";
 };
 
