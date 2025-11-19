@@ -88,6 +88,8 @@ void PlayerSwingAction::Execute()
 			SwingEnd();//スイング終了処理
 		}
 
+		//スイングアクション用の重力を使わない
+		m_player->GetPlayerMove()->SetUseSwingActionGravity(false);
 		//スイングアクションの入力していない
 		m_isInputSwingAction = false;
 	}
@@ -226,7 +228,7 @@ void PlayerSwingAction::AirAfterSwing()
 	}
 
 	//スイング後の加速の減衰
-	m_accelerationAfterSwing *= 0.99f;
+	m_accelerationAfterSwing *= 0.995f;
 	if (m_accelerationAfterSwing < MIN_VELOCITY_OF_AFTER_SWING_ACCELERATION)
 	{
 		m_accelerationAfterSwing = MIN_VELOCITY_OF_AFTER_SWING_ACCELERATION;
@@ -274,11 +276,11 @@ void PlayerSwingAction::AirAfterSwing()
 		Vector3 inputDirXZ = forwardDirXZ * g_pad[0]->GetLStickYF();
 		inputDirXZ += rightDirXZ * g_pad[0]->GetLStickXF();
 		float radAngle = acosf(Dot(inputDirXZ, m_swingForwardDir));
-		if (radAngle <= 3.14f * 0.25f || radAngle >= 3.14f * 0.7f)
+		if (radAngle >= 3.14f * 0.7f)
 		{
 			if (radAngle >= 3.14f * 0.7f)
 			{
-				m_velocityAfterSwing -= WALK_ACCELERATION;
+				m_velocityAfterSwing -= WALK_ACCELERATION * 0.3f;
 				if (m_velocityAfterSwing <= WALK_MAX_SPEED)
 				{
 					ChangeState(enSwingState_SwingEnd);
@@ -287,7 +289,7 @@ void PlayerSwingAction::AirAfterSwing()
 		}
 		else
 		{
-			inputDirXZ *= WALK_MAX_SPEED / 5.0f;
+			inputDirXZ *= WALK_MAX_SPEED / 2.5f;
 			m_inputMoveDirXZ.Lerp(0.2f, m_inputMoveDirXZ, inputDirXZ);
 		}
 
@@ -443,7 +445,7 @@ void PlayerSwingAction::SwingPlayerMove()
 		//手前側
 
 		//プレイヤーが最低スイング高度より上にいるか？
-		if (m_player->GetModelData().GetPosition().y > 100.0f)
+		if (m_player->GetModelData().GetPosition().y > 250.0f)
 		{
 			//上にいる
 
@@ -522,8 +524,8 @@ void PlayerSwingAction::SwingPlayerMove()
 	//cosΘ上 = 一番上の時の角度（一番上の時の角度は90度）
 	float highestCos = 0.0f;
 	//g = 重力加速度
-	m_g += 980.0f * g_gameTime->GetFrameDeltaTime() * 0.25f;
-	const float maxG = 2500.0f;
+	m_g += 980.0f * g_gameTime->GetFrameDeltaTime() * 0.45f;
+	const float maxG = 3500.0f;
 	if (m_g > maxG)
 	{
 		m_g = maxG;
@@ -554,7 +556,7 @@ void PlayerSwingAction::SwingPlayerMove()
 	Vector3 rightDirXZ = g_camera3D->GetRight();
 	rightDirXZ.y = 0.0f;
 	rightDirXZ.Normalize();
-	float rightPower = g_pad[0]->GetLStickXF() / 7.0f;
+	float rightPower = g_pad[0]->GetLStickXF() / 4.5f;
 	rightDirXZ.Scale(rightPower);
 	m_inputMoveDirXZ.Lerp(0.2f, m_inputMoveDirXZ, rightDirXZ);
 	addMoveDir += m_inputMoveDirXZ;
@@ -602,7 +604,7 @@ void PlayerSwingAction::CameraEasing()
 			return;
 		}
 
-		m_cameraEasingTime += 3.0f * g_gameTime->GetFrameDeltaTime();
+		m_cameraEasingTime += 1.75f * g_gameTime->GetFrameDeltaTime();
 		m_player->GetPlayerCamera().LerpDampingRate(m_cameraEasingTime * m_cameraEasingTime);
 		m_player->GetPlayerCamera().LerpTargetOffsetUp(m_cameraEasingTime * m_cameraEasingTime);
 		m_player->GetPlayerCamera().LerpTargetOffsetForward(m_cameraEasingTime * m_cameraEasingTime);
@@ -655,7 +657,7 @@ void PlayerSwingAction::IsSwingingEvent()
 		m_g = Math::Lerp<float>(
 			min(1.0f, fabsf(m_player->GetPlayerMove()->GetMoveSpeed().y) / 5000.0f),
 			700.0f,
-			1200.0f
+			1800.0f
 		);
 
 		//早期リターン
@@ -663,7 +665,7 @@ void PlayerSwingAction::IsSwingingEvent()
 	}
 	m_g = m_player->GetPlayerMove()->GetXZSpeed();
 	//スイングスピードが最大速度を超えているか？
-	const float maxG = 2000.0f;
+	const float maxG = 3500.0f;
 	if (m_g > maxG)
 	{
 		// 超えている。最大速度に設定する。

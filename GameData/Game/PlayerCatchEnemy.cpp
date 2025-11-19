@@ -9,9 +9,12 @@
 #include "Game.h"
 #include "GameTimeLimit.h"
 #include "GameMission.h"
+#include "MiniMap.h"
 
 namespace{ 
 	const float CATCH_ENEMY_LENGTH = 1500.0f;//敵をキャッチできる距離
+
+	const float CATCH_ENEMY_ANGLE_DIFF = 3.14f * 0.25f;//敵をキャッチできる角度差
 	
 	const float ON_ENEMY_HEIGHT = 150.0f;//敵の上に乗る時の高さ
 
@@ -26,6 +29,11 @@ namespace{
 	const float LEAVE_ENEMY_JUMP_FORCE_FRONT = 100.0f;//敵の上から離れるときの、ジャンプの力の、前方向
 
 	const float LEAVE_ENEMY_JUMP_FORCE_UP = 1500.0f;//敵の上から離れるときの、ジャンプの力の、上方向
+}
+
+PlayerCatchEnemy::~PlayerCatchEnemy()
+{
+	DeleteGO(m_qteEvent);
 }
 
 bool PlayerCatchEnemy::Start()
@@ -45,14 +53,6 @@ bool PlayerCatchEnemy::Start()
 
 void PlayerCatchEnemy::Execute()
 {
-	m_enemy = FindGO<Enemy>("enemy");
-	if (m_enemy == nullptr)
-	{
-		return;
-	}
-
-	FindTarget();//ターゲットを探す処理
-
 	//敵をキャッチする入力していないとき
 	if (m_isInputCatchEnemy != true)
 	{
@@ -63,7 +63,9 @@ void PlayerCatchEnemy::Execute()
 			m_game->GetGameTimeLimitPtr()->DisableTimeStop();
 		}
 
-		if (m_distance.Length() < CATCH_ENEMY_LENGTH)
+		FindTarget();//ターゲットを探す処理
+		
+		if (m_catchEnemy != nullptr)
 		{
 			if (g_pad[0]->IsTrigger(enButtonY))
 			{
@@ -74,26 +76,30 @@ void PlayerCatchEnemy::Execute()
 				{
 					m_swingModel = FindGO<SwingModel>("swingmodel");
 				}
+				return;
 			}
 		}
-		return;
 	}
 
-	// ステートによって処理を振り分ける
-	switch (m_catchEnemyState)
+	//敵をキャッチする入力しているとき
+	if (m_isInputCatchEnemy == true)
 	{
-	case enStartWireToEnemy:
-		StartWireToEnemy();//敵に向かってワイヤーを伸ばし始める処理
-		break;
-	case enWireingToEnemy:
-		WireingToEnemy();//敵に向かって糸を伸ばす処理
-		break;
-	case enGoOnEnemy:
-		GoOnEnemy();//敵の上に行く処理
-		break;
-	case enOnEnemy:
-		OnEnemy();//敵の上にいる処理
-		break;
+		// ステートによって処理を振り分ける
+		switch (m_catchEnemyState)
+		{
+		case enStartWireToEnemy:
+			StartWireToEnemy(m_catchEnemy);//敵に向かってワイヤーを伸ばし始める処理
+			break;
+		case enWireingToEnemy:
+			WireingToEnemy(m_catchEnemy);//敵に向かって糸を伸ばす処理
+			break;
+		case enGoOnEnemy:
+			GoOnEnemy(m_catchEnemy);//敵の上に行く処理
+			break;
+		case enOnEnemy:
+			OnEnemy(m_catchEnemy);//敵の上にいる処理
+			break;
+		}
 	}
 }
 
@@ -121,21 +127,60 @@ void PlayerCatchEnemy::Reset()
 	m_isInputCatchEnemy = false;
 	m_isQteEvent = false;
 
+	m_catchEnemy = nullptr;
+
+	FinishQteEvent();
+
+	m_qteEvent->Reset();
+
 	//制限時間UIを描画する
 	m_game->GetGameTimeLimitPtr()->EnableDrawingUI();
 	//ゲームミッションUIを描画する
 	m_game->GetGameMissionPtr()->EnableDrawingUI();
+	//ミニマップを描画する
+	m_game->GetMiniMapPtr()->EnableDrawingUI();
 }
 
 //ターゲットを探す処理
 void PlayerCatchEnemy::FindTarget()
 {
-	//プレイヤーから敵の距離を求める
-	m_distance = m_enemy->GetPosition() - m_player->GetModelData().GetPosition();
+	auto& enemys = FindGOs<Enemy>("enemy");
+	for (const auto& enemy : enemys)
+	{
+		//プレイヤーから敵の距離を求める
+		Vector3 playerToEnemyDis = enemy->GetPosition() - m_player->GetModelData().GetPosition();
+		const float playerToEnemyLen = playerToEnemyDis.Length();
+
+		//距離が一定以上離れているか?
+		if (playerToEnemyLen >= CATCH_ENEMY_LENGTH)
+		{
+			//一定以上離れていたら処理しない
+			m_catchEnemy = nullptr;
+			continue;
+		}
+
+		//カメラから敵の角度差を求める
+		Vector3 cameraToEnemyDis = enemy->GetPosition() - g_camera3D->GetPosition();
+		Vector3 cameraToEnemyNorm = cameraToEnemyDis;
+		cameraToEnemyNorm.Normalize();
+		float angleDiff = Dot(cameraToEnemyNorm, g_camera3D->GetForward());
+		angleDiff = acos(angleDiff);
+
+		//角度差が一定以上の大きさか?
+		if (angleDiff >= CATCH_ENEMY_ANGLE_DIFF)
+		{
+			//一定以上大きさのため処理しない
+			m_catchEnemy = nullptr;
+			continue;
+		}
+
+		m_catchEnemy = enemy;
+		return;
+	}
 }
 
 //敵に向かってワイヤーを伸ばし始める処理
-void PlayerCatchEnemy::StartWireToEnemy()
+void PlayerCatchEnemy::StartWireToEnemy(Enemy* enemy)
 {
 	//プレイヤーが移動できないようにする
 	m_player->GetPlayerMove()->SetCanMove(false);
@@ -145,20 +190,20 @@ void PlayerCatchEnemy::StartWireToEnemy()
 	m_player->GetPlayerMove()->SetUseSwingActionGravity(false);
 
 	//敵の方を向かせる
-	LookAtEnemy();
+	LookAtEnemy(enemy);
 
 	//敵をキャッチしているか?
 	m_isCatchEnemy = true;
 
 	//敵がいれば、ステートを遷移する。
-	ChangeState(enWireingToEnemy);
+	ChangeState(enemy, enWireingToEnemy);
 }
 
 //敵の方を向かせる
-void PlayerCatchEnemy::LookAtEnemy()
+void PlayerCatchEnemy::LookAtEnemy(Enemy* enemy)
 {
 	// プレイヤーから敵への方向ベクトル
-	Vector3 playerToEnemyNorm = m_enemy->GetPosition() - m_player->GetModelData().GetPosition();
+	Vector3 playerToEnemyNorm = enemy->GetPosition() - m_player->GetModelData().GetPosition();
 	playerToEnemyNorm.y = 0.0f;
 	playerToEnemyNorm.Normalize();	// 正規化する
 	// 回転
@@ -171,10 +216,10 @@ void PlayerCatchEnemy::LookAtEnemy()
 }
 
 //敵に向かって糸を伸ばす処理
-void PlayerCatchEnemy::WireingToEnemy()
+void PlayerCatchEnemy::WireingToEnemy(Enemy* enemy)
 {
 	// ターゲット座標は、敵の座標
-	Vector3 targetPos = m_enemy->GetPosition();
+	Vector3 targetPos = enemy->GetPosition();
 	// 高さをちょっと上げる
 	targetPos.y += ON_ENEMY_HEIGHT;
 
@@ -184,15 +229,15 @@ void PlayerCatchEnemy::WireingToEnemy()
 	if (m_swingModel->IsWireStretched())
 	{
 		// 伸ばし切ったら、ステート遷移。
-		ChangeState(enGoOnEnemy);
+		ChangeState(enemy, enGoOnEnemy);
 	}
 }
 
 //敵の上に行く処理
-void PlayerCatchEnemy::GoOnEnemy()
+void PlayerCatchEnemy::GoOnEnemy(Enemy* enemy)
 {
 	//ターゲット座標は、敵の座標
-	Vector3 targetPos = m_enemy->GetPosition();
+	Vector3 targetPos = enemy->GetPosition();
 	//高さをちょっと上げる
 	targetPos.y += ON_ENEMY_HEIGHT;
 
@@ -213,7 +258,7 @@ void PlayerCatchEnemy::GoOnEnemy()
 	m_player->SetDirectPosition(pos);
 
 	// 敵の方を向ける
-	LookAtEnemy();
+	LookAtEnemy(enemy);
 
 	//補間率を進める
 	m_goOnEnemyTimer += g_gameTime->GetFrameDeltaTime();
@@ -221,18 +266,18 @@ void PlayerCatchEnemy::GoOnEnemy()
 	if (m_goOnEnemyTimer >= GO_ON_ENEMY_TIME)
 	{
 		// 敵の上まで着いたら、ステートを遷移する。
-		ChangeState(enOnEnemy);
+		ChangeState(enemy, enOnEnemy);
 	}
 }
 
 //敵の上にいる処理
-void PlayerCatchEnemy::OnEnemy()
+void PlayerCatchEnemy::OnEnemy(Enemy* enemy)
 {
 	//乗っている敵と同じ回転にする
-	Quaternion qRot = m_enemy->GetRotation();
+	Quaternion qRot = enemy->GetRotation();
 
 	//ターゲット座標は、敵の座標
-	Vector3 targetPos = m_enemy->GetPosition();
+	Vector3 targetPos = enemy->GetPosition();
 	//高さをちょっと上げる
 	targetPos.y += ON_ENEMY_HEIGHT;
 	targetPos.z += ON_ENEMY_CENTER;
@@ -249,7 +294,7 @@ void PlayerCatchEnemy::OnEnemy()
 }
 
 //ステートを変更する
-void PlayerCatchEnemy::ChangeState(const EnCatchEnemyState newState)
+void PlayerCatchEnemy::ChangeState(Enemy* enemy, const EnCatchEnemyState newState)
 {
 	if (m_catchEnemyState == newState)
 	{
@@ -269,7 +314,7 @@ void PlayerCatchEnemy::ChangeState(const EnCatchEnemyState newState)
 	case enWireingToEnemy:
 		//糸を伸ばし始めて、重力を切って、敵の上に乗っているカメラにする。
 		m_player->GetPlayerCamera().SetIsOnEnemyCamera(true);
-		m_swingModel->StartWireStretchToPos(m_enemy->GetPosition());
+		m_swingModel->StartWireStretchToPos(enemy->GetPosition());
 		m_player->GetPlayerMove()->SetUseGravity(false);
 		//ジャンプの姿勢になるように、ちょっとジャンプさせる
 		m_player->GetPlayerMove()->AddMoveSpeed(Vector3::Up * WIREING_TO_ENEMY_JUMP_FORCE);
@@ -286,11 +331,12 @@ void PlayerCatchEnemy::ChangeState(const EnCatchEnemyState newState)
 		//補完率をリセットして、糸の伸ばしを終える。
 		m_goOnEnemyTimer = 0.0f;
 		m_swingModel->EndWireStretchToPos();
-		m_qteEvent->SetTargetEnemy(m_enemy);
+		m_qteEvent->SetTargetEnemy(enemy);
 		m_isCatchEnemy = false;
-		m_isQteEvent = true;
+		StartQteEvent();
 		m_game->GetGameTimeLimitPtr()->DisableDrawingUI();
 		m_game->GetGameMissionPtr()->DisableDrawingUI();
+		m_game->GetMiniMapPtr()->DisableDrawingUI();
 		break;
 	}
 

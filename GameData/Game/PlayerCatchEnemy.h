@@ -12,7 +12,7 @@ class PlayerCatchEnemy : public IGameObject
 {
 public:
 	PlayerCatchEnemy() {};
-	~PlayerCatchEnemy() {};
+	~PlayerCatchEnemy();
 
 	bool Start();
 
@@ -37,33 +37,38 @@ private://メンバ関数
 	/// <summary>
 	/// 敵に向かってワイヤーを伸ばし始める処理
 	/// </summary>
-	void StartWireToEnemy();
+	/// <param name="enemy">敵</param>
+	void StartWireToEnemy(Enemy* enemy);
 
 	/// <summary>
 	/// 敵の方を向かせる
 	/// </summary>
-	void LookAtEnemy();
+	/// <param name="enemy">敵</param>
+	void LookAtEnemy(Enemy* enemy);
 
 	/// <summary>
 	/// 敵に向かって糸を伸ばす処理
 	/// </summary>
-	void WireingToEnemy();
+	/// <param name="enemy">敵</param>
+	void WireingToEnemy(Enemy* enemy);
 
 	/// <summary>
 	/// 敵の上に行く処理
 	/// </summary>
-	void GoOnEnemy();
+	/// <param name="enemy">敵</param>
+	void GoOnEnemy(Enemy* enemy);
 
 	/// <summary>
 	/// 敵の上にいる処理
 	/// </summary>
-	void OnEnemy();
+	/// <param name="enemy">敵</param>
+	void OnEnemy(Enemy* enemy);
 
 	/// <summary>
 	/// ステートを変更する
 	/// </summary>
 	/// <param name="newState">新しいステート</param>
-	void ChangeState(const EnCatchEnemyState newState);
+	void ChangeState(Enemy* enemy, const EnCatchEnemyState newState);
 
 public://メンバ関数
 
@@ -76,6 +81,22 @@ public://メンバ関数
 	/// リセット処理
 	/// </summary>
 	void Reset();
+
+	/// <summary>
+	/// QTEイベント開始
+	/// </summary>
+	void StartQteEvent()
+	{
+		m_isQteEvent = true;
+	}
+
+	/// <summary>
+	/// QTEイベント終了
+	/// </summary>
+	void FinishQteEvent()
+	{
+		m_isQteEvent = false;
+	}
 
 	/// <summary>
 	/// 敵をキャッチしているか
@@ -101,12 +122,11 @@ public://メンバ関数
 	/// <returns>キャッチした敵</returns>
 	Enemy* GetCatchEnemy()
 	{
-		return m_enemy;
+		return m_catchEnemy;
 	}
 
 private://メンバ変数
 	EnCatchEnemyState m_catchEnemyState = enStartWireToEnemy;//敵をキャッチする状態
-	Vector3 m_distance = Vector3::Zero;//距離
 	Vector3 m_startGoOnEnemyPos = Vector3::Zero;//敵の上に行くときの最初の座標
 	float m_goOnEnemyTimer = 0.0f;//敵の上に行くまでのタイマー
 	bool m_isInputCatchEnemy = false;//敵をキャッチする入力しているか?
@@ -116,7 +136,7 @@ private://メンバ変数
 	PlayerSwingAction* m_playerSwingAction = nullptr;//プレイヤースイングアクション用のインスタンス
 	SwingModel* m_swingModel = nullptr;//スイングモデル用のインスタンス
 	QteEvent* m_qteEvent = nullptr;//QTEイベント用のインスタンス
-	Enemy* m_enemy = nullptr;//敵用のインスタンス
+	Enemy* m_catchEnemy = nullptr;//キャッチした敵用のインスタンス
 	Game* m_game = nullptr;//ゲーム全体を管理する用のインスタンス
 };
 
