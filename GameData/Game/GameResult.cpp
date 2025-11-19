@@ -84,61 +84,68 @@ bool GameResult::Start()
 		RESULT_ALL_UI_AFTER_ANIMATION_ALPHA//ターゲットの透明度
 	);
 
-
-	//QTEイベントで成功と失敗した回数を表示するUIの初期化と
-	//アニメーションさせるユニークポインタの初期化
-	for (int i = 0; i < enPlace_Num; i++)
-	{
-		for (int j = 0; j < enResultDisplayUI_Num; j++)
-		{
-			InitQteEventSuccessCountUI((EnPlace)i,(EnResultDisplayUI)j);//QTEイベントで成功した回数を表示するUIの初期化
-
-			//透明度(不透明から透明)
-			m_qteEventSuccessCountUINoneAlphaAnimation[(EnPlace)i][(EnResultDisplayUI)j] = std::make_unique<AlphaSpriteAnimation>(
-				&m_qteEventSuccessCountUI[(EnPlace)i][(EnResultDisplayUI)j], //アニメーションをさせるスプライト
-				1.0f, //ターゲットの割合
-				ANIMATION_PLAY_SPEED,//アニメーションの再生速度
-				false, //ループするか?
-				RESULT_ALL_UI_BEFORE_ANIMATION_ALPHA, //元の透明度
-				RESULT_ALL_UI_AFTER_ANIMATION_ALPHA//ターゲットの透明度
-			);
-
-			InitQteEventFailedCountUI((EnPlace)i,(EnResultDisplayUI)j);//QTEイベントで失敗した回数を表示するUIの初期化
-
-			//透明度(不透明から透明)
-			m_qteEventFailedCountUINoneAlphaAnimation[(EnPlace)i][(EnResultDisplayUI)j] = std::make_unique<AlphaSpriteAnimation>(
-				&m_qteEventFailedCountUI[(EnPlace)i][(EnResultDisplayUI)j], //アニメーションをさせるスプライト
-				1.0f, //ターゲットの割合
-				ANIMATION_PLAY_SPEED,//アニメーションの再生速度
-				false, //ループするか?
-				RESULT_ALL_UI_BEFORE_ANIMATION_ALPHA, //元の透明度
-				RESULT_ALL_UI_AFTER_ANIMATION_ALPHA//ターゲットの透明度
-			);
-		}
-	}
-
-	//ゲームクリアしたときの残り時間を表示するの初期化と
-	//アニメーションさせるユニークポインタの初期化
-	for (int k = 0; k < enTime_Num; k++)
-	{
-		for (int l = 0; l < enResultDisplayUI_Num; l++)
-		{
-			InitGameClearTimeLimitUI((EnTime)k, (EnResultDisplayUI)l);//ゲームクリアしたときの残り時間を表示するUIの初期化
-
-			//透明度(不透明から透明)
-			m_gameClearTimeLimitUINoneAlphaAnimation[(EnTime)k][(EnResultDisplayUI)l] = std::make_unique<AlphaSpriteAnimation>(
-				&m_gameClearTimeLimitUI[(EnTime)k][(EnResultDisplayUI)l], //アニメーションをさせるスプライト
-				1.0f, //ターゲットの割合
-				ANIMATION_PLAY_SPEED,//アニメーションの再生速度
-				false, //ループするか?
-				RESULT_ALL_UI_BEFORE_ANIMATION_ALPHA, //元の透明度
-				RESULT_ALL_UI_AFTER_ANIMATION_ALPHA//ターゲットの透明度
-			);
-		}
-	}
-
 	//リザルトで描画するUIの準備処理
 	PreResultDrawingUI();
+
+	//QTEイベントで失敗した回数を表示するUIの初期化と
+	//アニメーションさせるユニークポインタの初期化
+	for (int i = 0; i < m_qteEventSuccessCountManage.size(); i++)
+	{
+		InitQteEventSuccessCountUI((EnPlace)i, m_qteEventSuccessCountManage[i]);//QTEイベントで成功した回数を表示するUIの初期化
+
+		//リザルトで描画するUIの位置の更新処理
+		ResultDrawingUIPositionUpdate(m_qteEventSuccessCountManage, i, m_qteEventSuccessCountUI[(EnPlace)i][m_qteEventSuccessCountManage[i]], QTE_COUNT_UI_INTERVAL_POSITION);
+
+		//透明度(不透明から透明)
+		m_qteEventSuccessCountUINoneAlphaAnimation[(EnPlace)i][m_qteEventSuccessCountManage[i]] = std::make_unique<AlphaSpriteAnimation>(
+			&m_qteEventSuccessCountUI[(EnPlace)i][m_qteEventSuccessCountManage[i]], //アニメーションをさせるスプライト
+			1.0f, //ターゲットの割合
+			ANIMATION_PLAY_SPEED,//アニメーションの再生速度
+			false, //ループするか?
+			RESULT_ALL_UI_BEFORE_ANIMATION_ALPHA, //元の透明度
+			RESULT_ALL_UI_AFTER_ANIMATION_ALPHA//ターゲットの透明度
+		);
+	}
+
+	//QTEイベントで成功した回数を表示するUIの初期化と
+	//アニメーションさせるユニークポインタの初期化
+	for (int j = 0; j < m_qteEventFailedCountManage.size(); j++)
+	{
+		InitQteEventFailedCountUI((EnPlace)j, m_qteEventFailedCountManage[j]);//QTEイベントで失敗した回数を表示するUIの初期化
+
+		//リザルトで描画するUIの位置の更新処理
+		ResultDrawingUIPositionUpdate(m_qteEventFailedCountManage, j, m_qteEventFailedCountUI[(EnPlace)j][m_qteEventFailedCountManage[j]], QTE_COUNT_UI_INTERVAL_POSITION);
+
+		//透明度(不透明から透明)
+		m_qteEventFailedCountUINoneAlphaAnimation[(EnPlace)j][m_qteEventFailedCountManage[j]] = std::make_unique<AlphaSpriteAnimation>(
+			&m_qteEventFailedCountUI[(EnPlace)j][m_qteEventFailedCountManage[j]], //アニメーションをさせるスプライト
+			1.0f, //ターゲットの割合
+			ANIMATION_PLAY_SPEED,//アニメーションの再生速度
+			false, //ループするか?
+			RESULT_ALL_UI_BEFORE_ANIMATION_ALPHA, //元の透明度
+			RESULT_ALL_UI_AFTER_ANIMATION_ALPHA//ターゲットの透明度
+		);
+	}
+
+	//ゲームクリアしたときの残り時間を表示するUIの初期化と
+	//アニメーションさせるユニークポインタの初期化
+	for (int k = 0; k < m_gameClearTimeLimitManage.size(); k++)
+	{
+		InitGameClearTimeLimitUI((EnTime)k, m_gameClearTimeLimitManage[k]);//ゲームクリアしたときの残り時間を表示するUIの初期化
+
+		//リザルトで描画するUIの位置の更新処理
+		ResultDrawingUIPositionUpdate(m_gameClearTimeLimitManage, k, m_gameClearTimeLimitUI[(EnTime)k][m_gameClearTimeLimitManage[k]], GAME_CLEAR_TIME_LIMIT_UI_INTERVAL_POSITION);
+
+		//透明度(不透明から透明)
+		m_gameClearTimeLimitUINoneAlphaAnimation[(EnTime)k][m_gameClearTimeLimitManage[k]] = std::make_unique<AlphaSpriteAnimation>(
+			&m_gameClearTimeLimitUI[(EnTime)k][m_gameClearTimeLimitManage[k]], //アニメーションをさせるスプライト
+			1.0f, //ターゲットの割合
+			ANIMATION_PLAY_SPEED,//アニメーションの再生速度
+			false, //ループするか?
+			RESULT_ALL_UI_BEFORE_ANIMATION_ALPHA, //元の透明度
+			RESULT_ALL_UI_AFTER_ANIMATION_ALPHA//ターゲットの透明度
+		);
+	}
 
 	return true;
 }
@@ -289,20 +296,8 @@ void GameResult::PreQteEventResultUI()
 	//QTEイベントで成功と失敗の回数のUIを表示するための計算
 	CalcDrawingQteEventResultUI(m_qteEventSuccessCount, m_qteEventSuccessCountManage);
 
-	for (int i = 0; i < m_qteEventSuccessCountManage.size(); i++)
-	{
-		//リザルトで描画するUIの位置の更新処理
-		ResultDrawingUIPositionUpdate(m_qteEventSuccessCountManage, i, m_qteEventSuccessCountUI[(EnPlace)i][m_qteEventSuccessCountManage[i]], QTE_COUNT_UI_INTERVAL_POSITION);
-	}
-
 	//QTEイベントで成功と失敗の回数のUIを表示するための計算
 	CalcDrawingQteEventResultUI(m_qteEventFaileCount, m_qteEventFailedCountManage);
-
-	for (int j= 0; j < m_qteEventFailedCountManage.size(); j++)
-	{
-		//リザルトで描画するUIの位置の更新処理
-		ResultDrawingUIPositionUpdate(m_qteEventFailedCountManage, j, m_qteEventFailedCountUI[(EnPlace)j][m_qteEventFailedCountManage[j]], QTE_COUNT_UI_INTERVAL_POSITION);
-	}
 }
 
 //リザルトでクリアしたときの残り時間を表示するUIの準備処理
@@ -310,12 +305,6 @@ void GameResult::PreGameClearTimeLimitUI()
 {
 	//ゲームクリアしたときの残り時間UIを表示するための計算
 	CalcDrawingGameClearTimeLimitUI();
-
-	for (int i = 0; i < m_gameClearTimeLimitManage.size(); i++)
-	{
-		//リザルトで描画するUIの位置の更新処理
-		ResultDrawingUIPositionUpdate(m_gameClearTimeLimitManage, i, m_gameClearTimeLimitUI[(EnTime)i][m_gameClearTimeLimitManage[i]], GAME_CLEAR_TIME_LIMIT_UI_INTERVAL_POSITION);
-	}
 }
 
 //QTEイベントで成功と失敗の回数のUIを表示するための計算
