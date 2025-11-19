@@ -80,6 +80,15 @@ public://メンバ関数
 	}
 
 	/// <summary>
+	/// シーンの遷移をするか?
+	/// </summary>
+	/// <returns>trueならシーンの遷移をする</returns>
+	bool IsTransitionScene() const
+	{
+		return m_isTransitionScene;
+	}
+
+	/// <summary>
 	/// 現在何を選択しているかを表すための変数の取得
 	/// </summary>
 	/// <returns></returns>
@@ -98,6 +107,7 @@ private://メンバ変数
 	float m_time = 0.0f;//時間
 	bool m_isDrawingCurrentSelectUI = true;//現在何を選択しているかを表すUIを描画するか?
 	bool m_isSelect = false;//選択できたか?
+	bool m_isTransitionScene = false;//シーンの遷移をするか?
 	bool m_isDrawingUI = false;//UIを描画するか?
 
 private://表示するUIのファイルパス用のメンバ変数

@@ -3,6 +3,7 @@
 #include "QteEventInput.h"
 #include "Game.h"
 #include "GameMission.h"
+#include "MiniMap.h"
 #include "Player.h"
 #include "PlayerCatchEnemy.h"
 #include "Enemy.h"
@@ -216,9 +217,9 @@ void QteEvent::Update()
 		if (m_positionSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_End]->IsCompleted())//アニメーションが終わったか?
 		{
 			//QTEイベントを終了する処理
-			DeleteGO(this);
 			if (m_isQteEventResult[enQteEventResult_Success] == true)//QTEイベントで成功したときの処理
 			{
+				m_game->GetMiniMapPtr()->DeleteEnemyPtr(m_targetEnemy);
 				DeleteGO(m_targetEnemy);
 				m_game->QteEventSuccessCountUp();
 				m_game->GetGameMissionPtr()->AddCurrentCaptureEnemyNum();
@@ -679,6 +680,36 @@ void QteEvent::InputFailed()
 		m_isGamePadUIEasingStart[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] = false;
 		m_isGamePadUIEasingEnd[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] = false;
 		m_qteEventInput->ResetInputFailed();
+	}
+}
+
+//リセット処理
+void QteEvent::Reset()
+{
+	m_succesInputCommandCount = 0;
+	m_timeLimit = 15.0f;
+	m_isStopTimeLimit = false;
+
+	m_positionSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_Start]->Reset();
+	m_positionSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_End]->Reset();
+
+	m_alphaSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_Start]->Reset();
+	m_alphaSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_End]->Reset();
+
+	m_rotationSpriteAnimation->Reset();
+
+	m_qteEventResult = enQteEventResult_Num;
+
+	m_isQteEventResult[enQteEventResult_Success] = false;
+	m_isQteEventResult[enQteEventResult_Failed] = false;
+
+	m_qteEventResultUIDirection = enQteEventResultUIDirection_Start;
+
+	for (int i = 0; i < enQteEventResult_Num; i++)
+	{
+		m_qteEventResultUI[i].SetPosition(QTE_EVENT_RESULT_UI_INIT_POSITION);
+		m_qteEventResultUI[i].SetMulColor(QTE_EVENT_RESULT_UI_MULCOLOR);
+		m_qteEventResultUI[i].Update();
 	}
 }
 
