@@ -2,7 +2,7 @@
 #include "EnemyAI.h"
 
 namespace {
-	const float MOVE_SPEED = 650.0f;//移動速度
+	const float MOVE_SPEED = 1200.0f;//移動速度
 }
 
 //開始処理

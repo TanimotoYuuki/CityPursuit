@@ -4,6 +4,7 @@
 #include "GameMission.h"
 #include "Street.h"
 #include "Buildings.h"
+#include "MiniMap.h"
 #include "Enemy.h"
 
 namespace {
@@ -15,6 +16,26 @@ namespace {
 	const Vector3 SKYCUBE_SCALE(2000.0f, 2000.0f, 2000.0f);//スカイキューブの大きさ
 
 	const float SKYCUBE_LUMINANCE = 1.0f;//スカイキューブの輝度
+}
+
+//デストラクタ
+BackGround::~BackGround()
+{
+	DeleteGO(m_street);
+
+	auto& buildings = FindGOs<Buildings>("buildings");
+	for (const auto& building : buildings)
+	{
+		DeleteGO(building);
+	}
+
+	auto& enemys = FindGOs<Enemy>("enemy");
+	for (const auto& enemy : enemys)
+	{
+		DeleteGO(enemy);
+	}
+
+	DeleteGO(m_skyCube);
 }
 
 //開始処理
@@ -61,22 +82,22 @@ void BackGround::InitSkyCube()
 //レベルの読み込み処理
 void BackGround::LoadLevel()
 {
-	m_level3dRender.Init("Assets/level/test.tkl", [&](LevelObjectData& objData)
+	m_level3dRender.Init("Assets/level/stage.tkl", [&](LevelObjectData& objData)
 	{
 		//オブジェの名前がstreetだったら
 		if (objData.EqualObjectName(L"street") == true)
 		{
 			//道クラスのインスタンスの生成
-			auto street = NewGO<Street>(0, "street");
+			m_street = NewGO<Street>(0, "street");
 
 			//レベルのデータに保存されている座標を設定
-			street->SetPosition(objData.position);
+			m_street->SetPosition(objData.position);
 
 			//レベルのデータに保存されている回転を設定
-			street->SetRotation(objData.rotation);
+			m_street->SetRotation(objData.rotation);
 
 			//レベルのデータに保存されている大きさを設定
-			street->SetScale(objData.scale);
+			m_street->SetScale(objData.scale);
 
 			return true;
 		}
@@ -213,6 +234,9 @@ void BackGround::LoadLevel()
 
 			//ノルマで捕獲する敵の数の加算
 			m_game->GetGameMissionPtr()->AddQuotaCaptureEnemyNum();
+
+			//ミニマップに表示する用の敵クラスのポインタの設定
+			m_game->GetMiniMapPtr()->SetEnemyPtr(car);
 
 			return true;
 		}
