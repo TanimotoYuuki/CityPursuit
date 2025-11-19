@@ -101,9 +101,9 @@ public://メンバ関数
 private://メンバ変数
 	ModelRender m_playerModel;//プレイヤークラス
 	CharacterController m_charaCon;//キャラクターコントローラ
-	//Vector3 m_position = Vector3::Zero;//プレイヤーの位置
+	Vector3 m_position = Vector3::Zero;//プレイヤーの位置
 	//Vector3 m_position = Vector3{ -11242.1758,-0.00112915039,-9552.204110 };//プレイヤーの位置(デバッグ用)
-	Vector3 m_position = Vector3{ 0.0,-0.00112915039,-11284.0f };//プレイヤーの位置(デバッグ用)
+	//Vector3 m_position = Vector3{ 0.0,-0.00112915039,-11284.0f };//プレイヤーの位置(デバッグ用)
 	Quaternion m_rotation = Quaternion::Identity;//プレイヤーの回転
 	Vector3 m_scale = Vector3::One;//プレイヤーの大きさ
 	PlayerAnimation* m_playerAnimation = nullptr;//プレイヤーアニメーション用のインスタンス

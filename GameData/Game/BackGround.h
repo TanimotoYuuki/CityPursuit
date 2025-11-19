@@ -4,11 +4,12 @@
 /// 背景クラス
 /// </summary>
 class Game;
+class Street;
 class BackGround : public IGameObject
 {
 public:
 	BackGround() {};//コンストラクタ
-	~BackGround() {};//デストラクタ
+	~BackGround();//デストラクタ
 
 	bool Start();//開始処理
 	void Update();//開始処理
@@ -40,6 +41,7 @@ public://メンバ関数
 private://メンバ変数
 	Level3DRender m_level3dRender;//レベル3Dレンダラー
 	Game* m_game = nullptr;//ゲーム全体を管理する用のインスタンス
+	Street* m_street = nullptr;//道用のインスタンス
 	SkyCube* m_skyCube;//スカイキューブ用のインスタンス
 };
 

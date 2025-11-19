@@ -5,8 +5,8 @@
 bool Street::Start()
 {
 	//道モデルの初期化
-	//m_streetModel.Init("Assets/modelData/street/street.tkm");
-	m_streetModel.Init("Assets/modelData/street/street_test.tkm");//デバッグ用
+	m_streetModel.Init("Assets/modelData/street/street.tkm", nullptr, 0, enModelUpAxisZ, false, true);
+	//m_streetModel.Init("Assets/modelData/street/street_test.tkm");//デバッグ用
 
 	//道モデルの位置設定
 	m_streetModel.SetPosition(m_position);
