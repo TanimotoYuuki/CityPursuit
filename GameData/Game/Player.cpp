@@ -25,7 +25,7 @@ bool Player::Start()
 	m_playerAnimation->Init();
 
 	//プレイヤーモデルの初期化
-	m_playerModel.Init("Assets/modelData/player/player.tkm", m_playerAnimation->GetAnimationClips(), PlayerAnimation::enAnimationList_Num);
+	m_playerModel.Init("Assets/modelData/player/player.tkm", m_playerAnimation->GetAnimationClips(), PlayerAnimation::enAnimationList_Num, enModelUpAxisZ, true);
 
 	//プレイヤーモデルの初期位置の設定
 	m_playerModel.SetPosition(m_position);

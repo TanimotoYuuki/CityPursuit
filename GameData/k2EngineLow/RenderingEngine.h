@@ -118,6 +118,15 @@ namespace nsK2EngineLow
 		}
 
 		/// <summary>
+		/// シャドウマップ用のガウシアンブラーを取得
+		/// </summary>
+		/// <returns></returns>
+		GaussianBlur& GetShadowBlur()
+		{
+			return m_shadow.GetShadowBlur();
+		}
+
+		/// <summary>
 		/// ライトを取得
 		/// </summary>
 		/// <returns></returns>
@@ -142,9 +151,24 @@ namespace nsK2EngineLow
 		void InitMainRenderTarget();
 
 		/// <summary>
-		/// 背景の初期化
+		/// 深度値用レンダリングターゲットの初期化
 		/// </summary>
-		void InitBackGround();
+		void InitDepthRenderTarget();
+
+		/// <summary>
+		/// 法線用レンダリングターゲットの初期化
+		/// </summary>
+		void InitNormalRenderTarget();
+
+		/// <summary>
+		/// スペキュラ用レンダリングターゲットの初期化
+		/// </summary>
+		void InitSpecularRenderTarget();
+
+		///// <summary>
+		///// 背景の初期化
+		///// </summary>
+		//void InitBackGround();
 
 		/// <summary>
 		/// 2D(フォントとスプライト)の初期化
@@ -183,7 +207,10 @@ namespace nsK2EngineLow
 
 		SceneLight m_sceneLight;						//シーンライト
 		RenderTarget m_mainRenderTarget;				//メインレンダリングターゲット
-		RenderTarget m_backGroundRenderTarget;			//背景用レンダリングターゲット
+		RenderTarget m_depthRenderTarget;				//深度値用レンダリングターゲット
+		RenderTarget m_normalRenderTarget;				//法線用レンダリングターゲット
+		RenderTarget m_specularRenderTarget;			//スペキュラ用レンダリングターゲット
+		//RenderTarget m_backGroundRenderTarget;		//背景用レンダリングターゲット
 		RenderTarget m_2DRenderTarget;					//2D用レンダリングターゲット
 		Sprite m_backGroundSprite;						//背景用スプライト
 		Sprite m_2DSprite;								//2D(フォントとスプライト)用スクリプト

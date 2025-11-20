@@ -9,8 +9,17 @@ namespace nsK2EngineLow
 		//メインレンダリングターゲットの初期化
 		InitMainRenderTarget();
 
-		//背景の初期化
-		InitBackGround();
+		//深度値用レンダリングターゲットの初期化
+		InitDepthRenderTarget();
+
+		//法線用レンダリングターゲットの初期化
+		InitNormalRenderTarget();
+
+		//スペキュラ用レンダリングターゲットの初期化
+		InitSpecularRenderTarget();
+
+		////背景の初期化
+		//InitBackGround();
 
 		//2D(フォントとスプライト)の初期化
 		Init2DSprite();
@@ -24,6 +33,9 @@ namespace nsK2EngineLow
 
 		//ブルームの初期化
 		m_bloom.Init(m_mainRenderTarget);
+
+		//SSRの初期化
+		//m_ssr.Init(m_mainRenderTarget, m_depthRenderTarget, m_normalRenderTarget, m_specularRenderTarget);
 
 		//シャドウの初期化
 		m_shadow.Init();
@@ -48,39 +60,78 @@ namespace nsK2EngineLow
 		);
 	}
 
-	//背景の初期化
-	void RenderingEngine::InitBackGround()
+	//深度値用レンダリングターゲットの初期化
+	void RenderingEngine::InitDepthRenderTarget()
 	{
-		//背景用レンダリングターゲットの作成
-		float clearColor[4] = { 0.0f,0.0f,0.0f,1.0f };
-		m_backGroundRenderTarget.Create(
-			g_graphicsEngine->GetFrameBufferWidth(),
-			g_graphicsEngine->GetFrameBufferHeight(),
+		m_depthRenderTarget.Create(
+			m_mainRenderTarget.GetWidth(),
+			m_mainRenderTarget.GetHeight(),
 			1,
 			1,
-			DXGI_FORMAT_R8G8B8A8_UNORM,
-			DXGI_FORMAT_UNKNOWN,
-			clearColor
+			DXGI_FORMAT_R32_FLOAT,
+			DXGI_FORMAT_UNKNOWN
 		);
-
-		//最終合成用のスプライトを初期化する
-		SpriteInitData spriteInitData;
-		//テクスチャは背景用レンダリングターゲット
-		spriteInitData.m_textures[0] = &m_backGroundRenderTarget.GetRenderTargetTexture();
-		//解像度はメインレンダリングターゲットの幅と高さ
-		spriteInitData.m_width = m_mainRenderTarget.GetWidth();
-		spriteInitData.m_height = m_mainRenderTarget.GetHeight();
-		//背景用のシェーダーを使用する
-		spriteInitData.m_fxFilePath = "Assets/shader/backGround.fx";
-		spriteInitData.m_vsEntryPointFunc = "VSMain";
-		spriteInitData.m_psEntryPoinFunc = "PSMain";
-		//上書き
-		spriteInitData.m_alphaBlendMode = AlphaBlendMode_None;
-		//レンダリングターゲットのフォーマット
-		spriteInitData.m_colorBufferFormat[0] = m_mainRenderTarget.GetColorBufferFormat();
-		//初期化
-		m_backGroundSprite.Init(spriteInitData);
 	}
+
+	//法線用レンダリングターゲットの初期化
+	void RenderingEngine::InitNormalRenderTarget()
+	{
+		m_normalRenderTarget.Create(
+			m_mainRenderTarget.GetWidth(),
+			m_mainRenderTarget.GetHeight(),
+			1,
+			1,
+			DXGI_FORMAT_R32G32B32A32_FLOAT,
+			DXGI_FORMAT_UNKNOWN
+		);
+	}
+
+	//スペキュラ用レンダリングターゲットの初期化
+	void RenderingEngine::InitSpecularRenderTarget()
+	{
+		m_specularRenderTarget.Create(
+			m_mainRenderTarget.GetWidth(),
+			m_mainRenderTarget.GetHeight(),
+			1,
+			1,
+			DXGI_FORMAT_R32_FLOAT,
+			DXGI_FORMAT_UNKNOWN
+		);
+	}
+
+	////背景の初期化
+	//void RenderingEngine::InitBackGround()
+	//{
+	//	//背景用レンダリングターゲットの作成
+	//	float clearColor[4] = { 0.5f,0.5f,0.5f,1.0f };
+	//	m_backGroundRenderTarget.Create(
+	//		g_graphicsEngine->GetFrameBufferWidth(),
+	//		g_graphicsEngine->GetFrameBufferHeight(),
+	//		1,
+	//		1,
+	//		DXGI_FORMAT_R8G8B8A8_UNORM,
+	//		DXGI_FORMAT_UNKNOWN,
+	//		clearColor
+	//	);
+
+	//	//最終合成用のスプライトを初期化する
+	//	SpriteInitData spriteInitData;
+	//	//テクスチャは背景用レンダリングターゲット
+	//	spriteInitData.m_textures[0] = &m_backGroundRenderTarget.GetRenderTargetTexture();
+	//	//解像度はメインレンダリングターゲットの幅と高さ
+	//	spriteInitData.m_width = m_mainRenderTarget.GetWidth();
+	//	spriteInitData.m_height = m_mainRenderTarget.GetHeight();
+	//	//背景用のシェーダーを使用する
+	//	spriteInitData.m_fxFilePath = "Assets/shader/backGround.fx";
+	//	spriteInitData.m_vsEntryPointFunc = "VSMain";
+	//	spriteInitData.m_psEntryPoinFunc = "PSMain";
+	//	//上書き
+	//	spriteInitData.m_alphaBlendMode = AlphaBlendMode_None;
+	//	//レンダリングターゲットのフォーマット
+	//	spriteInitData.m_colorBufferFormat[0] = m_mainRenderTarget.GetColorBufferFormat();
+	//	//初期化
+	//	m_backGroundSprite.Init(spriteInitData);
+	//}
 
 	//2D(フォントとスプライト)の初期化
 	void RenderingEngine::Init2DSprite()
@@ -156,14 +207,17 @@ namespace nsK2EngineLow
 		//シャドウの描画処理を実行
 		m_shadow.Execute(rc, m_renderObjects);
 
-		//背景の描画
-		BackGroundDraw(rc);
+		////背景の描画
+		//BackGroundDraw(rc);
 
 		//モデルの描画
 		ModelDraw(rc);
 
 		//ブルームの描画処理を実行
 		m_bloom.Execute(rc, m_mainRenderTarget);
+
+		//SSRの描画処理を実行
+		//m_ssr.Execute(rc, m_mainRenderTarget);
 
 		//エフェクトの描画
 		EffectEngine::GetInstance()->Draw();
@@ -181,46 +235,55 @@ namespace nsK2EngineLow
 		m_renderObjects.clear();
 	}
 
-	//背景の描画
-	void RenderingEngine::BackGroundDraw(RenderContext& rc)
-	{
-		//レンダリングターゲットとして利用できるまで待つ
-		rc.WaitUntilToPossibleSetRenderTarget(m_backGroundRenderTarget);
-		//レンダリングターゲットを設定
-		rc.SetRenderTargetAndViewport(m_backGroundRenderTarget);
-		//レンダリングターゲットをクリア
-		rc.ClearRenderTargetView(m_backGroundRenderTarget);
+	////背景の描画
+	//void RenderingEngine::BackGroundDraw(RenderContext& rc)
+	//{
+	//	//レンダリングターゲットとして利用できるまで待つ
+	//	rc.WaitUntilToPossibleSetRenderTarget(m_backGroundRenderTarget);
+	//	//レンダリングターゲットを設定
+	//	rc.SetRenderTargetAndViewport(m_backGroundRenderTarget);
+	//	//レンダリングターゲットをクリア
+	//	rc.ClearRenderTargetView(m_backGroundRenderTarget);
 
-		for (auto renderObj : m_renderObjects)
-		{
-			//背景の描画
-			renderObj->OnRenderBackGround(rc);
-		}
+	//	for (auto renderObj : m_renderObjects)
+	//	{
+	//		//背景の描画
+	//		renderObj->OnRenderBackGround(rc);
+	//	}
 
-		//レンダリングターゲットへの書き込み終了待ち
-		rc.WaitUntilFinishDrawingToRenderTarget(m_backGroundRenderTarget);
+	//	//レンダリングターゲットへの書き込み終了待ち
+	//	rc.WaitUntilFinishDrawingToRenderTarget(m_backGroundRenderTarget);
 
-		//ターゲットをメインに戻す
-		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
-		//レンダリングターゲットを設定
-		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
-		//レンダリングターゲットをクリア
-		rc.ClearRenderTargetView(m_mainRenderTarget);
+	//	//ターゲットをメインに戻す
+	//	rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+	//	//レンダリングターゲットを設定
+	//	rc.SetRenderTargetAndViewport(m_mainRenderTarget);
+	//	//レンダリングターゲットをクリア
+	//	rc.ClearRenderTargetView(m_mainRenderTarget);
 
-		//背景用スプライトの描画
-		m_backGroundSprite.Draw(rc);
+	//	//背景用スプライトの描画
+	//	m_backGroundSprite.Draw(rc);
 
-		//メインレンダリングターゲットへの書き込み終了待ち
-		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
-	}
+	//	//メインレンダリングターゲットへの書き込み終了待ち
+	//	rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+	//}
 
 	//モデルの描画
 	void RenderingEngine::ModelDraw(RenderContext& rc)
 	{
+		RenderTarget* rts[] = {
+			&m_mainRenderTarget,
+			&m_depthRenderTarget,
+			&m_normalRenderTarget,
+			&m_specularRenderTarget
+		};
+
 		//レンダリングターゲットとして利用できるまで待つ
-		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
+		rc.WaitUntilToPossibleSetRenderTargets(4,rts);
 		//レンダリングターゲットを設定
-		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
+		rc.SetRenderTargetsAndViewport(4,rts);
+		//レンダリングターゲットをクリア
+		rc.ClearRenderTargetViews(4,rts);
 
 		for (auto renderObj : m_renderObjects)
 		{
@@ -229,7 +292,7 @@ namespace nsK2EngineLow
 		}
 
 		//レンダリングターゲットへの書き込み終了待ち
-		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
+		rc.WaitUntilFinishDrawingToRenderTargets(4,rts);
 	}
 
 	//2D(フォントとスプライト)の描画

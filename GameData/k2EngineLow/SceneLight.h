@@ -53,6 +53,7 @@ namespace nsK2EngineLow
 		HemLight hemLight;				 //半球ライト
 		float pad2;						 //パディング
 		Matrix mLVP;					 //ライトビュープロジェクション行列
+		Vector3 lightPos;				 //ライトの座標
 	};
 
 	/// <summary>

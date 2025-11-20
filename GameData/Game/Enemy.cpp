@@ -12,7 +12,7 @@ Enemy::~Enemy()
 bool Enemy::Start()
 {
 	//敵モデルの初期化
-	m_enemyModel.Init("Assets/modelData/car/car.tkm");
+	m_enemyModel.Init("Assets/modelData/car/car.tkm", nullptr, 0, enModelUpAxisZ, true, true);
 	//敵モデルの位置の設定
 	m_enemyModel.SetPosition(m_position);
 	//敵モデルの向きの設定

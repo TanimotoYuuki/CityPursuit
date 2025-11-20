@@ -40,6 +40,7 @@ namespace nsK2EngineLow
 		//ライトビュープロジェクション行列の計算
 		m_lightCamera.Update();
 		m_light.mLVP = m_lightCamera.GetViewProjectionMatrix();
+		m_light.lightPos.Set(m_lightCamera.GetPosition());
 	}
 
 	//ライトカメラの更新処理

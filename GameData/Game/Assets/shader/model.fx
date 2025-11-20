@@ -26,10 +26,14 @@ struct SPSIn{
     float3 worldPos : TEXCOORD1;        //ワールド空間座標
     float3 normalInView : TEXCOORD2;    //カメラ空間の法線
     float4 posInLVP : TEXCOORD3;        //ライトビュースクリーン空間でのピクセルの座標
+    float3 depthInView : TEXCOORD4;     //カメラ空間でのピクセルの深度
 };
 
 struct SPSOut{
     float4 color : SV_Target0;
+    float depth : SV_Target1;
+    float3 normal : SV_Target2;
+    float specular : SV_Target3;
 };
 
 //ディレクションライト
@@ -86,6 +90,7 @@ cbuffer LightCb : register(b1)
     SpotLight spotLight[10];        //スポットライト
     HemLight hemLight;              //半球ライト
     float4x4 mLVP;                  //ライトビュースクリーン
+    float3 lightPos;                //ライトの座標
 };
 
 ////////////////////////////////////////////////
@@ -149,6 +154,7 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin)
     psIn.worldPos = psIn.pos;
     float4 worldPos = psIn.pos;
 	psIn.pos = mul(mView, psIn.pos);
+    psIn.depthInView = psIn.pos.z;
 	psIn.pos = mul(mProj, psIn.pos);
 
     psIn.normal = normalize(mul(m, vsIn.normal));
@@ -164,6 +170,7 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin)
     psIn.normalInView = mul(mView, psIn.normal);
     
     psIn.posInLVP = mul(mLVP, worldPos);
+    psIn.posInLVP.z = length(worldPos.xyz - lightPos) / 1000.0f;
     
 	return psIn;
 }
@@ -232,7 +239,11 @@ SPSOut PSMain(SPSIn psIn, int isShadowReceiver) : SV_Target0
     lig += limLig;
     
 	float4 albedoColor = g_albedo.Sample(g_sampler, psIn.uv);
-	
+    
+    psOut.depth = psIn.depthInView;
+    psOut.normal = normalize(mul(mView, normalMap));
+    psOut.specular = specularMap;
+    
     ///最終出力カラーに光を乗算する
     albedoColor.xyz *= lig;
     
@@ -249,7 +260,7 @@ SPSOut PSMain(SPSIn psIn, int isShadowReceiver) : SV_Target0
     
     albedoColor.a *= alphaColor;
     psOut.color = albedoColor;
-	
+    	
 	return psOut;
 }
 
@@ -490,17 +501,36 @@ float CalcShadowMap(SPSIn psIn)
     shadowMapUV *= float2(0.5f, -0.5f);
     shadowMapUV += 0.5f;
     
-    float shadowMap = 1.0f;
+    float4 shadowMap = 1.0f;
     //ライトビュースクリーン空間でのZ値を計算する
-    float zInLVP = psIn.posInLVP.z / psIn.posInLVP.w;
+    float zInLVP = psIn.posInLVP.z;
     if(shadowMapUV.x>0.0f&&shadowMapUV.x<1.0f
         && shadowMapUV.y>0.0f&&shadowMapUV.y<1.0f)
     {
-        //シャドウマップに描き込まれているZ値と比較する
-        float zInShadowMap = g_shadowMap.Sample(g_sampler, shadowMapUV).r;
-        if(zInLVP>zInShadowMap)
+        //シャドウマップから値をサンプリング
+        float2 shadowValue = g_shadowMap.Sample(g_sampler, shadowMapUV).xy;
+        
+        //まずこのピクセルが遮蔽されているか調べる。これは通常のデプスシャドウと同じ
+        if (zInLVP > shadowValue.r && zInLVP <= 1.0f)
         {
-            shadowMap = 0.5f;
+            //遮蔽されているなら、チェビシェフの不等式を利用して光が当たる確率を求める
+            float depth_sq = shadowValue.x * shadowValue.x;
+
+            //このグループの分散具合を求める
+            //分散が大きいほど、varianceの数値は大きくなる
+            float variance = min(max(shadowValue.y - depth_sq, 0.0001f), 1.0f);
+
+            //このピクセルのライトから見た深度値とシャドウマップの平均の深度値の差を求める
+            float md = zInLVP - shadowValue.x;
+
+            //光が届く確率を求める
+            float lit_factor = variance / (variance + md * md);
+
+            //シャドウカラーを求める
+            float3 shadowColor = shadowMap.xyz * 0.5f;
+
+            //光が当たる確率を使って通常カラーとシャドウカラーを線形補完
+            shadowMap.xyz = lerp(shadowColor, shadowMap.xyz, lit_factor);
         }
     }
     
