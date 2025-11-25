@@ -25,12 +25,14 @@ struct SVSIn
 struct SPSIn
 {
     float4 pos      : SV_POSITION;  //スクリーン空間でのピクセルの座標。
-    float2 uv       : TEXCOORD0;    // UV座標
+    float2 uv       : TEXCOORD0;    //UV座標
+    float2 depth    : TEXCOORD1;    //ライト空間での座標
 };
 
 //シャドウマップの定数バッファ
 cbuffer ShadowMapCb : register(b1)
 {
+    float3 lightPos;  //ライトの座標
     float alphaColor; //透明度
 }
 
@@ -69,8 +71,13 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin)
         m = mWorld;
     }
     psIn.pos = mul(m, vsIn.pos);
+    float3 worldPos = psIn.pos;
     psIn.pos = mul(mView, psIn.pos);
     psIn.pos = mul(mProj, psIn.pos);
+    
+    psIn.depth.x = length(worldPos - lightPos) / 1000.0f;
+    psIn.depth.y = psIn.depth.x * psIn.depth.x;
+    
     psIn.uv = vsIn.uv;
 
     return psIn;
@@ -96,8 +103,8 @@ float4 PSShadowCaster(SPSIn psIn) : SV_Target0
     //モデルが透明なら影を描画しない
     if(alphaColor<=0.0f)
     {
-        return float4(psIn.pos.z, psIn.pos.z, psIn.pos.z, 0.0f);
+        return float4(psIn.depth.x, psIn.depth.y, 0.0f, 0.0f);
     }
     
-    return float4(psIn.pos.z, psIn.pos.z, psIn.pos.z, 1.0f);
+    return float4(psIn.depth.x, psIn.depth.y, 0.0f, 1.0f);
 }

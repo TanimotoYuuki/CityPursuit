@@ -101,7 +101,9 @@ namespace nsK2EngineLow
 		}
 
 		//モデルの初期化
-		shadowInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32_FLOAT;
+		shadowInitData.m_colorBufferFormat[0] = DXGI_FORMAT_R32G32_FLOAT;
+		shadowInitData.m_expandConstantBuffer = &g_renderingEngine->GetLight().lightPos;
+		shadowInitData.m_expandConstantBufferSize = sizeof(g_renderingEngine->GetLight().lightPos);
 		shadowInitData.m_expandConstantBuffer = &m_alpha;
 		shadowInitData.m_expandConstantBufferSize = sizeof(m_alpha);
 
@@ -131,7 +133,7 @@ namespace nsK2EngineLow
 			//影描画用のピクセルシェーダーのエントリーポイントの設定
 			modelInitData.m_psEntryPointFunc = "PSShadowReceiverMain";
 			//シャドウマップを取得
-			modelInitData.m_expandShaderResoruceView[0] = &(g_renderingEngine->GetShadow().GetRenderTargetTexture());
+			modelInitData.m_expandShaderResoruceView[0] = &(g_renderingEngine->GetShadowBlur().GetBokeTexture());
 		}
 		else
 		{

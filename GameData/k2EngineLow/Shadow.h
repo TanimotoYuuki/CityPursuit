@@ -29,8 +29,18 @@ namespace nsK2EngineLow
 			return m_shadowMap;
 		}
 
-	private:
+		/// <summary>
+		/// シャドウマップ用のガウシアンブラーを取得
+		/// </summary>
+		/// <returns></returns>
+		GaussianBlur& GetShadowBlur()
+		{
+			return m_shadowBlur;
+		}
+
+	private: 
 		RenderTarget m_shadowMap; //シャドウマップ用のレンダリングターゲット
+		GaussianBlur m_shadowBlur; //シャドウマップ用のガウシアンブラー
 	};
 }
 

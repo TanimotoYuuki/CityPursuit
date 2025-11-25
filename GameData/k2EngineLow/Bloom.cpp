@@ -38,7 +38,7 @@ namespace nsK2EngineLow
 		//スプライトの初期化
 		SpriteInitData luminanceSpriteInitData;
 		//輝度抽出用のシェーダーを使用する
-		luminanceSpriteInitData.m_fxFilePath = "Assets/shader/postEffect.fx";
+		luminanceSpriteInitData.m_fxFilePath = "Assets/shader/bloom.fx";
 		luminanceSpriteInitData.m_vsEntryPointFunc = "VSMain";
 		luminanceSpriteInitData.m_psEntryPoinFunc = "PSLuminance";
 		//解像度はメインレンダリングターゲットの幅と高さ
@@ -76,7 +76,7 @@ namespace nsK2EngineLow
 		finalSpriteInitData.m_width = rt.GetWidth();
 		finalSpriteInitData.m_height = rt.GetHeight();
 		//2D用のシェーダーを使用する
-		finalSpriteInitData.m_fxFilePath = "Assets/shader/postEffect.fx";
+		finalSpriteInitData.m_fxFilePath = "Assets/shader/bloom.fx";
 		finalSpriteInitData.m_psEntryPoinFunc = "PSBloomFinal";
 		//加算描画
 		finalSpriteInitData.m_alphaBlendMode = AlphaBlendMode_Add;

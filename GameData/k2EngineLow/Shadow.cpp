@@ -9,14 +9,17 @@ namespace nsK2EngineLow
 		//シャドウマップ用のレンダリングターゲットの作成
 		float clearColor[4] = { 1.0f,1.0f,1.0f,1.0f };
 		m_shadowMap.Create(
-			1024,
-			1024,
+			2048,
+			2048,
 			1,
 			1,
-			DXGI_FORMAT_R32_FLOAT,
+			DXGI_FORMAT_R32G32_FLOAT,
 			DXGI_FORMAT_D32_FLOAT,
 			clearColor
 		);
+
+		//シャドウマップ用のガウシアンブラー
+		m_shadowBlur.Init(&m_shadowMap.GetRenderTargetTexture());
 	}
 
 	//描画処理を実行
@@ -37,5 +40,7 @@ namespace nsK2EngineLow
 
 		//レンダリングターゲットへの書き込み終了待ち
 		rc.WaitUntilFinishDrawingToRenderTarget(m_shadowMap);
+
+		m_shadowBlur.ExecuteOnGPU(rc, 5.0f);
 	}
 }
