@@ -43,7 +43,7 @@ bool GameClearCamera::Start()
 	m_gameClearCamera.Update();
 
 	//カメラからプレイヤーまでの距離を求める
-	m_playerPosition = m_player->GetModelData().GetPosition();
+	m_playerPosition = m_player->GetPosition();
 	m_cameraToPlayer = m_cameraTarget - m_cameraPosition;
 
 	//ゲームクリア時にカメラがプレイヤーに向かって回転する角度を求める
@@ -141,10 +141,18 @@ void GameClearCamera::CameraMove()
 	Vector3 currentTarget = m_gameClearCamera.GetTarget();
 	Vector3 currentPosition = m_gameClearCamera.GetPosition();
 
-	currentTarget.x -= CAMERA_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();
-	currentPosition.x -= CAMERA_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();
+	//プレイヤーの向きを基準に右方向のベクトルを計算
+	Vector3 playerForward = m_player->GetPlayerMove()->GetMoveDirection();
+	Vector3 rightDirection;
+	rightDirection.Cross(Vector3::AxisY, playerForward);
+	rightDirection.Normalize();
 
-	float moveAmount = fabsf(m_afterRotationCameraPosition.x - currentPosition.x);
+	currentTarget.x -= rightDirection.x * CAMERA_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();
+	currentTarget.z -= rightDirection.z * CAMERA_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();
+	currentPosition.x -= rightDirection.x * CAMERA_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();
+	currentPosition.z -= rightDirection.z * CAMERA_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();
+
+	float moveAmount = fabsf((currentPosition - m_afterRotationCameraPosition).Length());
 	if (moveAmount >= CAMERA_MOVE_AMOUNT_LIMIT)
 	{
 		m_isFinishMoveCamera = true;

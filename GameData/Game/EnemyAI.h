@@ -8,6 +8,8 @@
 /// <summary>
 /// 敵AIを制御するクラス
 /// </summary>
+class Enemy;
+class QteEvent;
 class EnemyAI : public IGameObject
 {
 public:
@@ -29,6 +31,18 @@ private://メンバ関数
 	/// <param name="position">敵の位置</param>
 	void PathUpdate(const Vector3& position);
 
+	/// <summary>
+	/// QTEイベントで失敗したときの敵の動作
+	/// </summary>
+	/// <param name="rotation">敵の回転</param>
+	void QteEventFailedEnemyMove(Quaternion& rotation);
+
+	/// <summary>
+	/// QTEイベントで成功したときの敵の動作
+	/// </summary>
+	/// <param name="position">敵の位置</param>
+	void QteEventSuccessEnemyMove(const Vector3& position);
+
 public://メンバ関数
 
 	/// <summary>
@@ -38,14 +52,39 @@ public://メンバ関数
 	/// <param name="rotation">敵の回転</param>
 	void Execute(Vector3& position, Quaternion& rotation);
 
+	/// <summary>
+	/// 敵クラスのポインタの設定
+	/// </summary>
+	/// <param name="enemy">敵クラスのポインタ</param>
+	void SetEnemyPtr(Enemy* enemy)
+	{
+		m_enemy = enemy;
+	}
+
+	/// <summary>
+	/// 急加速しているか?
+	/// </summary>
+	/// <returns>trueなら急加速している</returns>
+	bool IsSpeedUp() const
+	{
+		return m_isSpeedUp;
+	}
+
 private://メンバ変数
 	Vector3 m_targetPos = Vector3::Zero;//目標位置
 	Quaternion m_rotation = Quaternion::Identity;//回転
+	int m_qteFailedRotationCount = 0;//QTEイベントで失敗したときに敵が回転した回数
+	float m_moveSpeed = 0.0f;//移動速度
+	Vector3 m_buildingCollisionShortDistance = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);//ビルに衝突する最短距離
 	bool m_isSetTargetPos = false;//目標位置を設定するかどうか?
+	bool m_isSetBuildingCollisionTargetPos = false;//ビルに衝突する位置を設定したか?
+	bool m_isSpeedUp = false;//急加速しているか?
 	nsAI::NaviMesh m_navMesh;//ナビメッシュ
 	nsAI::Path m_path;//パス
 	nsAI::PathFinding m_pathFiding;//パス検索
 	std::mt19937 m_randomEngine;//乱数生成器
 	std::uniform_int_distribution<int> m_cellDistribution;//セル番号を均一に選ぶための分布
+	Enemy* m_enemy = nullptr;//敵用のインスタンス
+	QteEvent* m_qteEvent = nullptr;//QTEイベント用のインスタンス
 };
 

@@ -3,8 +3,10 @@
 #include "Player.h"
 #include "PlayerMove.h"
 #include "PlayerSwingAction.h"
+#include "PlayerEffect.h"
 #include "SwingModel.h"
 #include "Enemy.h"
+#include "EnemyEffect.h"
 #include "QteEvent.h"
 #include "Game.h"
 #include "GameTimeLimit.h"
@@ -28,7 +30,7 @@ namespace{
 
 	const float LEAVE_ENEMY_JUMP_FORCE_FRONT = 100.0f;//敵の上から離れるときの、ジャンプの力の、前方向
 
-	const float LEAVE_ENEMY_JUMP_FORCE_UP = 1500.0f;//敵の上から離れるときの、ジャンプの力の、上方向
+	const float LEAVE_ENEMY_JUMP_FORCE_UP = 1000.0f;//敵の上から離れるときの、ジャンプの力の、上方向
 }
 
 PlayerCatchEnemy::~PlayerCatchEnemy()
@@ -42,25 +44,38 @@ bool PlayerCatchEnemy::Start()
 
 	m_playerSwingAction = FindGO<PlayerSwingAction>("playerswingaction");
 
-	m_game = m_player->GetGamePtr();
-
 	m_qteEvent = NewGO<QteEvent>(0, "qteevent");
-	m_qteEvent->SetGamePtr(m_game);
 	m_qteEvent->SetPlayerPtr(m_player);
-
 	return true;
 }
 
 void PlayerCatchEnemy::Execute()
 {
+	//ゲーム全体を管理するクラスのポインタがnullptrだったら
+	//現在のシーンはタイトル画面
+	if (m_game == nullptr)
+	{
+		m_game = m_player->GetGamePtr();
+		return;
+	}
+	//ゲーム全体を管理するクラスのポインタがnullptrではなかったら
+	//現在のシーンはインゲーム画面・ゲームオーバー画面・ゲームクリア画面
+	else
+	{
+		m_qteEvent->SetGamePtr(m_game);
+	}
+
 	//敵をキャッチする入力していないとき
 	if (m_isInputCatchEnemy != true)
 	{
 		if (m_player->GetCharacterController().IsOnGround())
 		{
-			m_player->GetPlayerMove()->SetCanMove(true);
-			m_player->GetPlayerCamera().SetCanMoveCamera(true);
-			m_game->GetGameTimeLimitPtr()->DisableTimeStop();
+			if (!m_isQteEvent)
+			{
+				m_player->GetPlayerMove()->SetCanMove(true);
+				m_player->GetPlayerCamera().SetCanMoveCamera(true);
+				m_game->GetGameTimeLimitPtr()->DisableTimeStop();
+			}
 		}
 
 		FindTarget();//ターゲットを探す処理
@@ -84,21 +99,25 @@ void PlayerCatchEnemy::Execute()
 	//敵をキャッチする入力しているとき
 	if (m_isInputCatchEnemy == true)
 	{
-		// ステートによって処理を振り分ける
-		switch (m_catchEnemyState)
+		if (!m_qteEvent->IsQteEventResult(QteEvent::enQteEventResult_Success) &&
+			m_catchEnemy->GetEnemyEffectPtr()->IsPlayEffect() != EnemyEffect::enEnemyEffectList_EngineSmoke_Large)
 		{
-		case enStartWireToEnemy:
-			StartWireToEnemy(m_catchEnemy);//敵に向かってワイヤーを伸ばし始める処理
-			break;
-		case enWireingToEnemy:
-			WireingToEnemy(m_catchEnemy);//敵に向かって糸を伸ばす処理
-			break;
-		case enGoOnEnemy:
-			GoOnEnemy(m_catchEnemy);//敵の上に行く処理
-			break;
-		case enOnEnemy:
-			OnEnemy(m_catchEnemy);//敵の上にいる処理
-			break;
+			// ステートによって処理を振り分ける
+			switch (m_catchEnemyState)
+			{
+			case enStartWireToEnemy:
+				StartWireToEnemy(m_catchEnemy);//敵に向かってワイヤーを伸ばし始める処理
+				break;
+			case enWireingToEnemy:
+				WireingToEnemy(m_catchEnemy);//敵に向かって糸を伸ばす処理
+				break;
+			case enGoOnEnemy:
+				GoOnEnemy(m_catchEnemy);//敵の上に行く処理
+				break;
+			case enOnEnemy:
+				OnEnemy(m_catchEnemy);//敵の上にいる処理
+				break;
+			}
 		}
 	}
 }
@@ -108,30 +127,22 @@ void PlayerCatchEnemy::Reset()
 {
 	m_catchEnemyState = enStartWireToEnemy;
 
-	//移動ベクトルをリセットする
-	m_player->GetPlayerMove()->ResetMoveSpeedX();
-	m_player->GetPlayerMove()->ResetMoveSpeedY();
-	m_player->GetPlayerMove()->ResetMoveSpeedZ();
+	m_isInputCatchEnemy = false;
+	m_isQteEventMove = false;
 
 	m_player->GetPlayerCamera().SetIsOnEnemyCamera(false);
-	m_player->GetPlayerMove()->SetUseGravity(true);
+	m_player->GetPlayerCamera().Reset(m_player);
 
-	m_player->GetPlayerCamera().Reset();
-
-	Vector3 leaveJumpForce = Vector3::Front;
-	m_player->GetModelData().GetRotation().Apply(leaveJumpForce);
-	leaveJumpForce.Scale(LEAVE_ENEMY_JUMP_FORCE_FRONT);
-	leaveJumpForce.y = LEAVE_ENEMY_JUMP_FORCE_UP;
-
-	m_player->GetPlayerMove()->AddMoveSpeed(leaveJumpForce);
-	m_isInputCatchEnemy = false;
-	m_isQteEvent = false;
-
+	if (!m_catchEnemy->IsDead())
+	{
+		m_catchEnemy->SetOnPlayer(false);
+	}
 	m_catchEnemy = nullptr;
 
 	FinishQteEvent();
 
 	m_qteEvent->Reset();
+	m_qteEvent->FinishResultDirection();
 
 	//制限時間UIを描画する
 	m_game->GetGameTimeLimitPtr()->EnableDrawingUI();
@@ -141,6 +152,68 @@ void PlayerCatchEnemy::Reset()
 	m_game->GetMiniMapPtr()->EnableDrawingUI();
 }
 
+//QTEイベントで成功した時のプレイヤーの挙動
+void PlayerCatchEnemy::QteEventSuccessMove()
+{
+	//QTEイベントで成功した時のプレイヤーの挙動していたら処理しない
+	if (m_isQteEventMove)
+	{
+		return;
+	}
+
+	//移動ベクトルをリセットする
+	m_player->GetPlayerMove()->ResetMoveSpeedX();
+	m_player->GetPlayerMove()->ResetMoveSpeedY();
+	m_player->GetPlayerMove()->ResetMoveSpeedZ();
+
+	//入力情報のリセット
+	m_player->GetPlayerMove()->ResetInput();
+
+	//移動状態のリセット
+	m_player->GetPlayerMove()->ResetMoveState();
+
+	m_player->GetPlayerMove()->SetUseGravity(true);
+
+	Vector3 leaveJumpForce = Vector3::Front;
+	m_player->GetRotation().Apply(leaveJumpForce);
+	leaveJumpForce.Scale(LEAVE_ENEMY_JUMP_FORCE_FRONT);
+	leaveJumpForce.y = LEAVE_ENEMY_JUMP_FORCE_UP;
+
+	m_player->GetPlayerMove()->AddMoveSpeed(leaveJumpForce);
+	m_isQteEventMove = true;
+}
+
+//QTEイベントで失敗した時のプレイヤーの挙動
+void PlayerCatchEnemy::QteEventFailedMove()
+{
+	//QTEイベントで失敗した時のプレイヤーの挙動していたら処理しない
+	if (m_isQteEventMove)
+	{
+		return;
+	}
+
+	//移動ベクトルをリセットする
+	m_player->GetPlayerMove()->ResetMoveSpeedX();
+	m_player->GetPlayerMove()->ResetMoveSpeedY();
+	m_player->GetPlayerMove()->ResetMoveSpeedZ();
+
+	//入力情報のリセット
+	m_player->GetPlayerMove()->ResetInput();
+
+	//移動状態のリセット
+	m_player->GetPlayerMove()->ResetMoveState();
+
+	m_player->GetPlayerMove()->SetUseGravity(true);
+
+	Vector3 leaveJumpForce = Vector3::Front;
+	m_player->GetRotation().Apply(leaveJumpForce);
+	leaveJumpForce.Scale(LEAVE_ENEMY_JUMP_FORCE_FRONT);
+	leaveJumpForce.y = LEAVE_ENEMY_JUMP_FORCE_UP;
+
+	m_player->GetPlayerMove()->AddMoveSpeed(leaveJumpForce);
+	m_isQteEventMove = true;
+}
+
 //ターゲットを探す処理
 void PlayerCatchEnemy::FindTarget()
 {
@@ -148,7 +221,7 @@ void PlayerCatchEnemy::FindTarget()
 	for (const auto& enemy : enemys)
 	{
 		//プレイヤーから敵の距離を求める
-		Vector3 playerToEnemyDis = enemy->GetPosition() - m_player->GetModelData().GetPosition();
+		Vector3 playerToEnemyDis = enemy->GetPosition() - m_player->GetPosition();
 		const float playerToEnemyLen = playerToEnemyDis.Length();
 
 		//距離が一定以上離れているか?
@@ -195,6 +268,9 @@ void PlayerCatchEnemy::StartWireToEnemy(Enemy* enemy)
 	//敵をキャッチしているか?
 	m_isCatchEnemy = true;
 
+	//エフェクトを消す
+	m_player->GetPlayerEffect()->ChangeEffect(PlayerEffect::enPlayerEffectList_None);
+
 	//敵がいれば、ステートを遷移する。
 	ChangeState(enemy, enWireingToEnemy);
 }
@@ -203,14 +279,14 @@ void PlayerCatchEnemy::StartWireToEnemy(Enemy* enemy)
 void PlayerCatchEnemy::LookAtEnemy(Enemy* enemy)
 {
 	// プレイヤーから敵への方向ベクトル
-	Vector3 playerToEnemyNorm = enemy->GetPosition() - m_player->GetModelData().GetPosition();
+	Vector3 playerToEnemyNorm = enemy->GetPosition() - m_player->GetPosition();
 	playerToEnemyNorm.y = 0.0f;
 	playerToEnemyNorm.Normalize();	// 正規化する
 	// 回転
 	Quaternion qRot;
 	qRot.SetRotation(Vector3::Front, playerToEnemyNorm);
 	// プレイヤーに回転を設定する
-	m_player->GetModelData().SetRotation(qRot);
+	m_player->SetRotation(qRot);
 
 	return;
 }
@@ -290,7 +366,7 @@ void PlayerCatchEnemy::OnEnemy(Enemy* enemy)
 	targetPos += targetBackVec;
 
 	m_player->SetDirectPosition(targetPos);
-	m_player->GetModelData().SetRotation(qRot);
+	m_player->SetRotation(qRot);
 }
 
 //ステートを変更する
@@ -324,7 +400,7 @@ void PlayerCatchEnemy::ChangeState(Enemy* enemy, const EnCatchEnemyState newStat
 		break;
 
 	case enGoOnEnemy:
-		m_startGoOnEnemyPos = m_player->GetModelData().GetPosition();
+		m_startGoOnEnemyPos = m_player->GetPosition();
 		break;
 
 	case enOnEnemy:
@@ -332,6 +408,7 @@ void PlayerCatchEnemy::ChangeState(Enemy* enemy, const EnCatchEnemyState newStat
 		m_goOnEnemyTimer = 0.0f;
 		m_swingModel->EndWireStretchToPos();
 		m_qteEvent->SetTargetEnemy(enemy);
+		enemy->SetOnPlayer(true);
 		m_isCatchEnemy = false;
 		StartQteEvent();
 		m_game->GetGameTimeLimitPtr()->DisableDrawingUI();

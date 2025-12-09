@@ -1,20 +1,20 @@
 #include "stdafx.h"
 #include "PlayerCamera.h"
 #include "Player.h"
+#include "PlayerMove.h"
 #include "PlayerCatchEnemy.h"
 #include "Enemy.h"
+#include "DebugLog.h"
 
 namespace {
 	//カメラ。
 	const float TARGET_OFFSET_UP = 120.0f;//注視点のオフセット
 
-	const float CAMERA_NEAR(1.0f);//カメラの近平面。
-
-	const float CAMERA_FAR(1000000000.0f);//カメラの遠平面。
-
 	const float ON_ENEMY_CAMERA_VERTICAL_ANGLE = -45.0f;
 
 	const float NEAR_TO_CAMERA_DISTANCE = 500.0f;
+
+	const Vector3 DEFAULT_TO_CAMERA_POS{0.0f, 10.0f, -300.0f};//デフォルトの注視点から視点までのベクトル
 }
 
 //初期化
@@ -23,11 +23,7 @@ void PlayerCamera::Init()
 	m_targetOffsetUp = TARGET_OFFSET_UP;
 
 	//注視点から視点までのベクトルを設定。
-	m_toCameraPos.Set(0.0f, 10.0f, -300.0f);
-
-	//カメラのニアクリップとファークリップを設定する。
-	g_camera3D->SetNear(CAMERA_NEAR);
-	g_camera3D->SetFar(CAMERA_FAR);
+	m_toCameraPos.Set(DEFAULT_TO_CAMERA_POS);
 
 	//バネカメラの初期化
 	m_springCamera.Init(
@@ -98,19 +94,16 @@ void PlayerCamera::Execute(Player* playerData, const Vector3& position)
 
 	//カメラの更新
 	m_springCamera.Update();
+
+	DebugLog::GetInstance()->SetDebugLogData("toCameraPos", m_toCameraPos);
 }
 
 //敵の上に乗っている用のカメラ
 void PlayerCamera::OnEnemyCamera(Player* playerData, const Vector3& position)
 {
-	const auto& enemy = playerData->GetPlayerCatchEnemy()->GetCatchEnemy();
-	if (enemy == nullptr)
-	{
-		return;
-	}
-	const Quaternion& enemyRot = enemy->GetRotation();
-	m_toCameraPos = Vector3{ 0.0f, 10.0f, -300.0f };
-	enemyRot.Apply(m_toCameraPos);
+	const Quaternion& playerRot = playerData->GetRotation();
+	m_toCameraPos = Vector3::Back;
+	playerRot.Apply(m_toCameraPos);
 
 	// 垂直方向のカメラの回転を計算する
 	// 水平な軸
@@ -132,4 +125,20 @@ void PlayerCamera::OnEnemyCamera(Player* playerData, const Vector3& position)
 	m_toCameraPos.Normalize();
 	// 伸ばす
 	m_toCameraPos.Scale(NEAR_TO_CAMERA_DISTANCE);
+}
+
+//プレイヤーの向きを基準にカメラをリセット
+void PlayerCamera::ResetToPlayerView(Player* playerData)
+{
+	//プレイヤーの位置を設定
+	const Vector3& playerPosition = playerData->GetPosition();
+
+	//プレイヤーの回転を設定
+	const Quaternion& playerRotation = playerData->GetRotation();
+
+	//カメラの支点をプレイヤーの位置に設定
+	Vector3 target = playerPosition;
+
+	m_toCameraPos.Set(DEFAULT_TO_CAMERA_POS);
+	playerRotation.Apply(m_toCameraPos);
 }

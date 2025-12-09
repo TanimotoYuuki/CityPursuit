@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Enemy.h"
 #include "EnemyAI.h"
+#include "EnemyEffect.h"
 
 //デストラクタ
 Enemy::~Enemy()
@@ -24,6 +25,11 @@ bool Enemy::Start()
 
 	//敵AIクラスのインスタンスの生成
 	m_enemyAI = NewGO<EnemyAI>(0, "enemyai");
+	m_enemyAI->SetEnemyPtr(this);
+
+	//敵のエフェクトクラスのインスタンスの生成
+	m_enemyEffect = NewGO<EnemyEffect>(0, "enemyeffect");
+
 	return true;
 }
 
@@ -36,6 +42,9 @@ void Enemy::Update()
 	////検証用のステージは直進のみなので
 	////敵を真っすぐ移動させる
 	//m_position.z += 900.0f * g_gameTime->GetFrameDeltaTime();
+
+	//敵のエフェクトの実行処理
+	m_enemyEffect->Execute(m_position, m_rotation);
 
 	//敵モデルの位置の設定
 	m_enemyModel.SetPosition(m_position);

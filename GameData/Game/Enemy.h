@@ -3,6 +3,7 @@
 /// 敵クラス
 /// </summary>
 class EnemyAI;
+class EnemyEffect;
 class Enemy : public IGameObject
 {
 public:
@@ -12,6 +13,8 @@ public:
 	bool Start();//開始処理
 	void Update();//更新処理
 	void Render(RenderContext& rc);//描画処理
+
+public://メンバ関数
 
 	/// <summary>
 	/// 敵の位置の設定
@@ -67,11 +70,49 @@ public:
 		return m_scale;
 	}
 
+	/// <summary>
+	/// プレイヤーが乗っているかの設定
+	/// </summary>
+	/// <param name="isOnEnemy">trueならプレイヤーが乗っている</param>
+	void SetOnPlayer(bool isOnPlayer)
+	{
+		m_isOnPlayer = isOnPlayer;
+	}
+
+	/// <summary>
+	/// プレイヤーが乗っているか?
+	/// </summary>
+	/// <returns>trueならプレイヤーが乗っている</returns>
+	bool IsOnPlayer() const
+	{
+		return m_isOnPlayer;
+	}
+
+	/// <summary>
+	/// 敵AIクラスのポインタの取得
+	/// </summary>
+	/// <returns></returns>
+	EnemyAI* GetEnemyAIPtr() const
+	{
+		return m_enemyAI;
+	}
+
+	/// <summary>
+	/// 敵のエフェクトクラスの取得
+	/// </summary>
+	/// <returns></returns>
+	EnemyEffect* GetEnemyEffectPtr() const
+	{
+		return m_enemyEffect;
+	}
+
 public://メンバ変数
 	ModelRender m_enemyModel;//敵モデル
 	Vector3 m_position = Vector3::Zero;//敵の位置
 	Quaternion m_rotation = Quaternion::Identity;//敵の回転
 	Vector3 m_scale = Vector3::Zero;//敵の大きさ
+	bool m_isOnPlayer = false;//プレイヤーに乗っているか
 	EnemyAI* m_enemyAI = nullptr;//敵AI用のインスタンス
+	EnemyEffect* m_enemyEffect = nullptr;//敵のエフェクトのインスタンス
 };
 

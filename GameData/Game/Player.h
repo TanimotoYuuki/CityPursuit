@@ -7,6 +7,7 @@ class PlayerAnimation;
 class PlayerMove;
 class PlayerRotation;
 class PlayerCatchEnemy;
+class PlayerEffect;
 class Game;
 class Player : public IGameObject
 {
@@ -19,6 +20,60 @@ public:
 	void Render(RenderContext& rc);//描画処理
 
 public://メンバ関数
+
+	/// <summary>
+	/// プレイヤーの位置の設定
+	/// </summary>
+	/// <param name="position">プレイヤーの位置</param>
+	void SetPosition(const Vector3& position)
+	{
+		m_position = position;
+	}
+
+	/// <summary>
+	/// プレイヤーの位置の取得
+	/// </summary>
+	/// <returns>プレイヤーの位置</returns>
+	const Vector3& GetPosition() const
+	{
+		return m_position;
+	}
+
+	/// <summary>
+	/// プレイヤーの回転の設定
+	/// </summary>
+	/// <param name="rotation">プレイヤーの回転</param>
+	void SetRotation(const Quaternion& rotation)
+	{
+		m_rotation = rotation;
+	}
+
+	/// <summary>
+	/// プレイヤーの回転の取得
+	/// </summary>
+	/// <returns>プレイヤーの回転</returns>
+	const Quaternion GetRotation() const
+	{
+		return m_rotation;
+	}
+
+	/// <summary>
+	/// プレイヤーの大きさの設定
+	/// </summary>
+	/// <param name="scale">プレイヤーの大きさ</param>
+	void SetScale(const Vector3& scale)
+	{
+		m_scale = scale;
+	}
+
+	/// <summary>
+	/// プレイヤーの大きさの取得
+	/// </summary>
+	/// <returns>プレイヤーの大きさ</returns>
+	const Vector3& GetScale() const
+	{
+		return m_scale;
+	}
 
 	/// <summary>
 	/// ゲーム全体を管理するクラスのポインタの取得
@@ -81,6 +136,15 @@ public://メンバ関数
 	}
 
 	/// <summary>
+	/// プレイヤーのエフェクト用のインスタンスの取得
+	/// </summary>
+	/// <returns>プレイヤーのエフェクト用のインスタンス</returns>
+	PlayerEffect* GetPlayerEffect()
+	{
+		return m_playerEffect;
+	}
+
+	/// <summary>
 	/// プレイヤーカメラの取得
 	/// </summary>
 	/// <returns>プレイヤーカメラ</returns>
@@ -110,6 +174,7 @@ private://メンバ変数
 	PlayerMove* m_playerMove = nullptr;//プレイヤー移動用のインスタンス
 	PlayerRotation* m_playerRotation = nullptr;//プレイヤー回転用のインスタンス
 	PlayerCatchEnemy* m_playerCatchEnemy = nullptr;//プレイヤーが敵をキャッチする用のインスタンス
+	PlayerEffect* m_playerEffect = nullptr;//プレイヤーのエフェクト用のインスタンス
 	PlayerCamera m_playerCamera;//プレイヤーカメラクラス
 	Game* m_game = nullptr;//ゲーム全体を管理する用のインスタンス
 };

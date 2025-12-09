@@ -12,7 +12,7 @@
       <Filter>system</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="BackGround.cpp" />
+    <ClCompile Include="GameBackGround.cpp" />
     <ClCompile Include="Buildings.cpp" />
     <ClCompile Include="Street.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -48,6 +48,11 @@
     <ClCompile Include="GameStartSprite.cpp" />
     <ClCompile Include="GameMission.cpp" />
     <ClCompile Include="MiniMap.cpp" />
+    <ClCompile Include="EnemyEffect.cpp" />
+    <ClCompile Include="PlayerEffect.cpp" />
+    <ClCompile Include="Loading.cpp" />
+    <ClCompile Include="TitleBackGround.cpp" />
+    <ClCompile Include="TitleCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -55,7 +60,7 @@
       <Filter>system</Filter>
     </ClInclude>
     <ClInclude Include="Game.h" />
-    <ClInclude Include="BackGround.h" />
+    <ClInclude Include="GameBackGround.h" />
     <ClInclude Include="Buildings.h" />
     <ClInclude Include="Street.h" />
     <ClInclude Include="Player.h" />
@@ -91,5 +96,17 @@
     <ClInclude Include="GameStartSprite.h" />
     <ClInclude Include="GameMission.h" />
     <ClInclude Include="MiniMap.h" />
+    <ClInclude Include="EnemyEffect.h" />
+    <ClInclude Include="PlayerEffect.h" />
+    <ClInclude Include="Loading.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="TitleBackGround.h" />
+    <ClInclude Include="TitleCamera.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Game.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Assets\icon\icon.ico" />
   </ItemGroup>
 </Project>

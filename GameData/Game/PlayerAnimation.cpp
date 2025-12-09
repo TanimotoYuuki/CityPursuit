@@ -8,6 +8,9 @@
 #include "Game.h"
 #include "GameClear.h"
 #include "GameClearCamera.h"
+#include "Enemy.h"
+#include "EnemyEffect.h"
+#include "QteEvent.h"
 
 namespace{
 	const float INIT_PLAY_ANIMATION_SPEED = 1.0f;//初期のアニメーション再生速度
@@ -25,7 +28,9 @@ void PlayerAnimation::Init()
 		}
 
 		m_animationClips[i].Load(m_animationFilePath[i].c_str());
-		if (i != enAnimationList_Jumping)//ジャンプ中アニメーション以外はループ再生する
+		if (i != enAnimationList_Jumping &&//ジャンプ中アニメーション
+			i != enAnimationList_ToFall &&//倒れるアニメーション
+			i != enAnimationList_StandUp)//立ち上がるアニメーション以外はループ再生する
 		{
 			m_animationClips[i].SetLoopFlag(true);
 		}
@@ -71,6 +76,14 @@ void PlayerAnimation::Execute(ModelRender& modelData, Player* playerData)
 	case PlayerAnimation::enAnimationList_QteEvent://QTEイベント用アニメーション
 		modelData.PlayAnimation(enAnimationList_QteEvent, m_animationInterpolateTime);
 		break;
+	case PlayerAnimation::enAnimationList_ToFall://倒れる用アニメーション
+		modelData.SetAnimationSpeed(m_animationSpeed);
+		modelData.PlayAnimation(enAnimationList_ToFall, m_animationInterpolateTime);
+		break;
+	case PlayerAnimation::enAnimationList_StandUp://立ち上がる用アニメーション
+		modelData.SetAnimationSpeed(m_animationSpeed);
+		modelData.PlayAnimation(enAnimationList_StandUp, m_animationInterpolateTime);
+		break;
 	case PlayerAnimation::enAnimationList_GameClear://ゲームクリア用アニメション
 		modelData.PlayAnimation(enAnimationList_GameClear, m_animationInterpolateTime);
 		break;
@@ -82,36 +95,71 @@ void PlayerAnimation::Execute(ModelRender& modelData, Player* playerData)
 //アニメーションの切り替え
 void PlayerAnimation::ChangeAnimation(ModelRender& modelData, Player* playerData)
 {
-	//待機アニメーション
-	m_nowPlayAnimation = enAnimationList_Idle;
-	m_animationInterpolateTime = 0.1f;
-
-	if (playerData->GetGamePtr()->IsGameEnd())
+	if (playerData->GetPlayerCatchEnemy()->GetQteEventPtr()->IsQteEventResult(QteEvent::enQteEventResult_Failed))
 	{
-		//ゲームクリアポインタの中身がnullptrだったら処理しない
-		if (m_gameClear == nullptr && m_gameOver == nullptr)
+		if (m_nowPlayAnimation != enAnimationList_StandUp)//倒れるアニメーション
 		{
-			return;
-		}
-
-		if (m_gameOver != nullptr)
-		{
-
-		}
-
-		if (m_gameClear != nullptr)
-		{
-			//ゲームクリアしたときの演出が終了したか?
-			if (m_gameClear->GetGameClearCamera()->IsFinishRotationCamera())
+			auto* targetEnemy = playerData->GetPlayerCatchEnemy()->GetCatchEnemy();
+			if (targetEnemy->GetEnemyEffectPtr()->IsPlayEffect() == EnemyEffect::enEnemyEffectList_EngineSmoke_Large)
 			{
-				//ゲームクリア用のアニメション
-				m_nowPlayAnimation = enAnimationList_GameClear;
+				m_nowPlayAnimation = enAnimationList_ToFall;
+				m_animationSpeed = 0.8f;
+				m_animationInterpolateTime = 0.2f;
 			}
+
+			if (m_nowPlayAnimation == enAnimationList_ToFall)
+			{
+				//倒れるアニメーションが再生終わったら立ち上がるアニメーションを再生する
+				if (!modelData.IsPlayingAnimation())
+				{
+					m_nowPlayAnimation = enAnimationList_StandUp;
+				}
+			}
+		}
+		else//立ち上がりアニメーション
+		{
+			m_nowPlayAnimation = enAnimationList_StandUp;
+			m_animationSpeed = 0.8f;
+			m_animationInterpolateTime = 0.2f;
 		}
 		return;
 	}
 
-	if (playerData->GetPlayerCatchEnemy()->IsQteEvent())
+	//待機アニメーション
+	m_nowPlayAnimation = enAnimationList_Idle;
+	m_animationInterpolateTime = 0.1f;
+
+	if (playerData->GetGamePtr() != nullptr)
+	{
+		if (playerData->GetGamePtr()->IsGameEnd())
+		{
+			//ゲームクリアポインタの中身がnullptrだったら処理しない
+			if (m_gameClear == nullptr && m_gameOver == nullptr)
+			{
+				return;
+			}
+
+			if (m_gameOver != nullptr)
+			{
+
+			}
+
+			if (m_gameClear != nullptr)
+			{
+				//ゲームクリアしたときの演出が終了したか?
+				if (m_gameClear->GetGameClearCamera()->IsFinishRotationCamera())
+				{
+					//ゲームクリア用のアニメション
+					m_nowPlayAnimation = enAnimationList_GameClear;
+				}
+			}
+			return;
+		}
+	}
+
+	if (playerData->GetPlayerCatchEnemy()->IsQteEvent() &&
+		!playerData->GetPlayerCatchEnemy()->GetQteEventPtr()->IsQteEventResult(QteEvent::enQteEventResult_Success)&&
+		!playerData->GetPlayerCatchEnemy()->GetQteEventPtr()->IsQteEventResult(QteEvent::enQteEventResult_Failed))
 	{
 		//QTEイベント用のアニメーション
 		m_nowPlayAnimation = enAnimationList_QteEvent;

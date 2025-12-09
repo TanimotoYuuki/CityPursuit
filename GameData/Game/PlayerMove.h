@@ -105,6 +105,24 @@ public:
 	}
 
 	/// <summary>
+	/// 入力情報のリセット
+	/// </summary>
+	void ResetInput()
+	{
+		m_inputLStick = Vector3::Zero;
+		m_inputLStickMemory = Vector3::Zero;
+	}
+
+	/// <summary>
+	/// 移動状態のリセット
+	/// </summary>
+	void ResetMoveState()
+	{
+		m_isWalk = false;
+		m_isRun = false;
+	}
+
+	/// <summary>
 	/// 左スティックの入力量の取得
 	/// </summary>
 	/// <returns>Lスティックの入力量</returns>
