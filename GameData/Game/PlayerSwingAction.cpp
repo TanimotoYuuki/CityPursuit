@@ -5,6 +5,8 @@
 #include "SwingTarget.h"
 #include "Player.h"
 #include "PlayerMove.h"
+#include "PlayerCatchEnemy.h"
+#include "PlayerEffect.h"
 
 namespace{ 
 //スイング
@@ -60,6 +62,12 @@ void PlayerSwingAction::Execute()
 	//プレイヤーモデルが地面に付いていないときに処理する
 	if (!m_player->GetCharacterController().IsOnGround())
 	{
+		//敵をキャッチする入力していたら処理しない
+		if (m_player->GetPlayerCatchEnemy()->IsInputCatchEnemy())
+		{
+			return;
+		}
+
 		//RB2ボタンが長押ししているときの処理
 		if (g_pad[0]->IsPress(enButtonRB2))
 		{
@@ -90,6 +98,10 @@ void PlayerSwingAction::Execute()
 
 		//スイングアクション用の重力を使わない
 		m_player->GetPlayerMove()->SetUseSwingActionGravity(false);
+
+		//エフェクトを消す
+		m_player->GetPlayerEffect()->ChangeEffect(PlayerEffect::enPlayerEffectList_None);
+
 		//スイングアクションの入力していない
 		m_isInputSwingAction = false;
 	}
@@ -216,11 +228,14 @@ void PlayerSwingAction::AirAfterSwing()
 	//カメラのイージング処理
 	CameraEasing();
 
-	//スイングアクションの入力があるとき
-	if (m_isInputSwingAction == true)
+
+	//落下速度がマイナスになっていたらスイングターゲットを探す状態に戻る
+	if (m_player->GetPlayerMove()->GetMoveSpeed().y < CAN_START_SWING_FALL_SPEED)
 	{
-		//落下速度がマイナスになっていたらスイングターゲットを探す状態に戻る
-		if (m_player->GetPlayerMove()->GetMoveSpeed().y < CAN_START_SWING_FALL_SPEED)
+		//エフェクトを消す
+		m_player->GetPlayerEffect()->ChangeEffect(PlayerEffect::enPlayerEffectList_None);
+		//スイングアクションの入力があるとき
+		if (m_isInputSwingAction == true)
 		{
 			ChangeState(enSwingState_FindSwingTarget);
 			return;
@@ -295,6 +310,9 @@ void PlayerSwingAction::AirAfterSwing()
 
 		addMoveVec += m_inputMoveDirXZ;
 	}
+
+	m_player->GetPlayerMove()->ResetMoveSpeedX();
+	m_player->GetPlayerMove()->ResetMoveSpeedZ();
 
 	m_player->GetPlayerMove()->AddMoveSpeed(addMoveVec);
 }
@@ -386,7 +404,7 @@ void PlayerSwingAction::SwingPlayerMove()
 
 	//1.必要なベクトルを用意
 	//プレイヤーからスイングターゲットまでのXZ平面でのベクトル
-	Vector3 playerToTargetVecXZ = m_swingActionManager->GetSwingActionShortestDistance() - m_player->GetModelData().GetPosition();
+	Vector3 playerToTargetVecXZ = m_swingActionManager->GetSwingActionShortestDistance() - m_player->GetPosition();
 	//Y成分を消去
 	playerToTargetVecXZ.y = 0.0f;
 
@@ -399,7 +417,7 @@ void PlayerSwingAction::SwingPlayerMove()
 	toTargetFowardVecXZ.Scale(projectToTargetVecXZToSwingForwardDir);
 
 	//XZ平面での、前方向のみの、スイングターゲットの座標
-	const Vector3 toTargetForwardPosXZ = m_player->GetModelData().GetPosition() + toTargetFowardVecXZ;
+	const Vector3 toTargetForwardPosXZ = m_player->GetPosition() + toTargetFowardVecXZ;
 
 	//前方向と上方向のみの、スイングターゲットの座標
 	Vector3 toTargetForwardUpPos = toTargetForwardPosXZ;
@@ -407,7 +425,7 @@ void PlayerSwingAction::SwingPlayerMove()
 	toTargetForwardUpPos.y = m_swingActionManager->GetSwingActionShortestDistance().y;
 
 	//前方向と上方向のみのスイングターゲットの座標からプレイヤーへのベクトル
-	const Vector3 toTargetForwardUpToPlayerVec = m_player->GetModelData().GetPosition() - toTargetForwardUpPos;
+	const Vector3 toTargetForwardUpToPlayerVec = m_player->GetPosition() - toTargetForwardUpPos;
 
 	//前方向と上方向のみのスイングターゲットの座標からプレイヤーへの方向
 	Vector3 targetUptoPlayerDir = toTargetForwardUpToPlayerVec;
@@ -428,7 +446,7 @@ void PlayerSwingAction::SwingPlayerMove()
 	Vector3 rotAxisForAddMoveDir = Cross(targetUptoPlayerDir, m_swingForwardDir);
 
 	//プレイヤーがスイングターゲットより上にいるか？
-	if (m_player->GetModelData().GetPosition().y >= m_swingActionManager->GetSwingActionShortestDistance().y)
+	if (m_player->GetPosition().y >= m_swingActionManager->GetSwingActionShortestDistance().y)
 	{
 		//上にいるとき、回転軸の求め方を変える
 		rotAxisForAddMoveDir = Cross(Vector3::Down, m_swingForwardDir);
@@ -445,7 +463,7 @@ void PlayerSwingAction::SwingPlayerMove()
 		//手前側
 
 		//プレイヤーが最低スイング高度より上にいるか？
-		if (m_player->GetModelData().GetPosition().y > 250.0f)
+		if (m_player->GetPosition().y > 250.0f)
 		{
 			//上にいる
 
@@ -490,7 +508,7 @@ void PlayerSwingAction::SwingPlayerMove()
 		float radAngle = 3.14f * 0.5f;
 
 		//プレイヤーの高さがスイングターゲットより高くなったら。
-		if (m_player->GetModelData().GetPosition().y >= m_swingActionManager->GetSwingActionShortestDistance().y)
+		if (m_player->GetPosition().y >= m_swingActionManager->GetSwingActionShortestDistance().y)
 		{
 			//初回ループだけ減速し始めるスピードを設定
 			if (m_startDecelerateSwingSpeed <= -50.0f)
@@ -649,6 +667,9 @@ void PlayerSwingAction::IsSwingingEvent()
 
 	//スイングアクションしている
 	m_isSwingAction = true;
+
+	//スイングのエフェクトを出す
+	m_player->GetPlayerEffect()->ChangeEffect(PlayerEffect::enPlayerEffectList_Swing);
 
 	//スイングスピードが初期速度より遅いか？
 	if (m_swingSpeed <= INIT_SWING_SPEED)

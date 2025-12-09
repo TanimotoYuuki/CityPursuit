@@ -23,7 +23,7 @@ void SwingActionManager::Execute()
 {
 	// 毎フレーム候補リストをクリアする
 	std::vector<Vector3> allTargets;
-	Vector3 playerPos = m_player->GetModelData().GetPosition();
+	Vector3 playerPos = m_player->GetPosition();
 
 	//ビルから、有効範囲内のスイングターゲットを探す
 	auto& buildingDatas = FindGOs<Buildings>("buildings");

@@ -16,6 +16,12 @@ private:
 	/// </summary>
 	void OnEnemyCamera(Player* playerData, const Vector3& position);
 
+	/// <summary>
+	/// プレイヤーの向きを基準にカメラをリセット
+	/// </summary>
+	/// <param name="playerData">プレイヤーの情報</param>
+	void ResetToPlayerView(Player* playerData);
+
 public://メンバ関数
 
 	/// <summary>
@@ -49,9 +55,11 @@ public://メンバ関数
 	/// <summary>
 	/// リセット処理
 	/// </summary>
-	void Reset()
+	/// <param name="playerData">プレイヤーの情報</param>
+	void Reset(Player* playerData)
 	{
-		m_toCameraPos.Set(0.0f, 10.0f, -300.0f);
+		ResetToPlayerView(playerData);
+		m_inputRStick = Vector2::Zero;
 	}
 
 	/// <summary>
@@ -97,6 +105,24 @@ public://メンバ関数
 	const Vector3& GetToCameraPos() const
 	{
 		return m_toCameraPos;
+	}
+
+	/// <summary>
+	/// カメラの回転の取得
+	/// </summary>
+	/// <returns>カメラの回転</returns>
+	Quaternion GetCameraRotation()
+	{
+		if (m_springCamera.GetCamera() == nullptr)
+		{
+			return Quaternion::Identity;
+		}
+
+		//カメラの回転行列を取得
+		const Matrix& rotMatrix = m_springCamera.GetCamera()->GetCameraRotation();
+		Quaternion rot;
+		rot.SetRotation(rotMatrix); 
+		return rot;
 	}
 
 private://メンバ変数

@@ -78,6 +78,16 @@ public://メンバ関数
 	void Execute();
 
 	/// <summary>
+	/// QTEイベントで成功した時のプレイヤーの挙動
+	/// </summary>
+	void QteEventSuccessMove();
+
+	/// <summary>
+	/// QTEイベントで失敗した時のプレイヤーの挙動
+	/// </summary>
+	void QteEventFailedMove();
+
+	/// <summary>
 	/// リセット処理
 	/// </summary>
 	void Reset();
@@ -96,6 +106,15 @@ public://メンバ関数
 	void FinishQteEvent()
 	{
 		m_isQteEvent = false;
+	}
+
+	/// <summary>
+	/// 敵をキャッチする入力しているか?
+	/// </summary>
+	/// <returns>trueなら敵をキャッチする入力している</returns>
+	bool IsInputCatchEnemy()
+	{
+		return m_isInputCatchEnemy;
 	}
 
 	/// <summary>
@@ -125,6 +144,15 @@ public://メンバ関数
 		return m_catchEnemy;
 	}
 
+	/// <summary>
+	/// QTEイベントクラスのポインタの取得
+	/// </summary>
+	/// <returns>QTEイベントクラスのポインタ</returns>
+	QteEvent* GetQteEventPtr()
+	{
+		return m_qteEvent;
+	}
+
 private://メンバ変数
 	EnCatchEnemyState m_catchEnemyState = enStartWireToEnemy;//敵をキャッチする状態
 	Vector3 m_startGoOnEnemyPos = Vector3::Zero;//敵の上に行くときの最初の座標
@@ -132,6 +160,7 @@ private://メンバ変数
 	bool m_isInputCatchEnemy = false;//敵をキャッチする入力しているか?
 	bool m_isCatchEnemy = false;//敵をキャッチしているか？
 	bool m_isQteEvent = false;//QTEイベント中か?
+	bool m_isQteEventMove = false;//QTEイベントで成功・失敗した時のプレイヤーの動作をしたか?
 	Player* m_player = nullptr;//プレイヤー用のインスタンス
 	PlayerSwingAction* m_playerSwingAction = nullptr;//プレイヤースイングアクション用のインスタンス
 	SwingModel* m_swingModel = nullptr;//スイングモデル用のインスタンス

@@ -215,12 +215,30 @@ public://メンバ関数
 	}
 
 	/// <summary>
+	/// リザルト結果に対しての演出の終了
+	/// </summary>
+	void FinishResultDirection()
+	{
+		m_isResultDirection = false;
+	}
+
+	/// <summary>
 	/// 時間が止まっているか?
 	/// </summary>
 	/// <returns>trueなら止まっている</returns>
 	bool IsStopTimeLimit()
 	{
 		return m_isStopTimeLimit;
+	}
+
+	/// <summary>
+	/// QTEイベントの結果の取得
+	/// </summary>
+	/// <param name="enQteEventResult">QTEイベントの結果</param>
+	/// <returns>どれかがtrueならQTEイベントの結果</returns>
+	bool IsQteEventResult(EnQteEventResult enQteEventResult)
+	{
+		return m_isQteEventResult[enQteEventResult];
 	}
 
 	/// <summary>
@@ -252,6 +270,7 @@ private://メンバ変数
 	bool m_isStopTimeLimit = false;//制限時間を止めるかどうか？
 	bool m_isQteEventResult[enQteEventResult_Num] = { false,false };//QTEイベントの結果
 	bool m_isAddSuccessInputCommandCount = false;//コマンド入力成功回数を増やしたかどうか?
+	bool m_isResultDirection = false;//リザルト結果に対しての演出しているか?
 	std::vector<EnGamePadInputList> m_inputCommandList;//コマンド入力リスト
 	QteEventInput* m_qteEventInput = nullptr;//QTEイベントでプレイヤー側が入力する用のインスタンス
 	Player* m_player = nullptr;//プレイヤー用のインスタンス

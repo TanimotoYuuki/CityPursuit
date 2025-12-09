@@ -6,7 +6,10 @@
 #include "MiniMap.h"
 #include "Player.h"
 #include "PlayerCatchEnemy.h"
+#include "PlayerAnimation.h"
 #include "Enemy.h"
+#include "EnemyAI.h"
+#include "EnemyEffect.h"
 
 namespace {
 	//ゲームパッドUI
@@ -174,7 +177,7 @@ bool QteEvent::Start()
 //更新処理
 void QteEvent::Update()
 {
-	if (!m_player->GetPlayerCatchEnemy()->IsQteEvent())
+	if (!m_player->GetPlayerCatchEnemy()->IsQteEvent() || !m_player->GetGamePtr())
 	{
 		return;
 	}
@@ -203,10 +206,26 @@ void QteEvent::Update()
 	//QTEイベントの結果が出たら処理する
 	if (m_isQteEventResult[enQteEventResult_Success] == true || m_isQteEventResult[enQteEventResult_Failed] == true)
 	{
+		//演出が流れている
+		m_isResultDirection = true;
 		//スプライトのアニメーションの更新処理
 		m_positionSpriteAnimation[m_qteEventResult][m_qteEventResultUIDirection]->Update();
 		m_alphaSpriteAnimation[m_qteEventResult][m_qteEventResultUIDirection]->Update();
 		
+		//QTEイベントで成功したとき
+		if (m_qteEventResult == enQteEventResult_Success)
+		{
+			m_player->GetPlayerCatchEnemy()->QteEventSuccessMove();
+		}
+		//QTEイベントで失敗したとき
+		else if (m_qteEventResult == enQteEventResult_Failed)
+		{
+			if (m_targetEnemy->GetEnemyAIPtr()->IsSpeedUp())
+			{
+				m_player->GetPlayerCatchEnemy()->QteEventFailedMove();
+			}
+		}
+
 		//QTEイベントの結果が失敗　かつ
 		//QTEイベントの演出が終了演出なら処理する
 		if (m_qteEventResult == enQteEventResult_Failed && m_qteEventResultUIDirection == enQteEventResultUIDirection_End)
@@ -216,24 +235,30 @@ void QteEvent::Update()
 
 		if (m_positionSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_End]->IsCompleted())//アニメーションが終わったか?
 		{
-			//QTEイベントを終了する処理
-			if (m_isQteEventResult[enQteEventResult_Success] == true)//QTEイベントで成功したときの処理
+			if (m_player->GetPlayerAnimation()->IsPlayAnimation() == PlayerAnimation::enAnimationList_Idle ||
+				(m_player->GetPlayerAnimation()->IsPlayAnimation() == PlayerAnimation::enAnimationList_StandUp &&
+				!m_player->GetModelData().IsPlayingAnimation()))
 			{
-				m_game->GetMiniMapPtr()->DeleteEnemyPtr(m_targetEnemy);
-				DeleteGO(m_targetEnemy);
-				m_game->QteEventSuccessCountUp();
-				m_game->GetGameMissionPtr()->AddCurrentCaptureEnemyNum();
+				//QTEイベントを終了する処理
+				if (m_isQteEventResult[enQteEventResult_Success] == true)//QTEイベントで成功したときの処理
+				{
+					m_game->GetMiniMapPtr()->DeleteEnemyPtr(m_targetEnemy);
+					DeleteGO(m_targetEnemy);
+					m_game->QteEventSuccessCountUp();
+					m_game->GetGameMissionPtr()->AddCurrentCaptureEnemyNum();
+				}
+				else//QTEイベントで失敗したときの処理
+				{
+					m_game->QteEventFailedCountUp();
+				}
+				m_player->GetPlayerCatchEnemy()->Reset();
 			}
-			else//QTEイベントで失敗したときの処理
-			{
-				m_game->QteEventFailedCountUp();
-			}
-			m_player->GetPlayerCatchEnemy()->Reset();
 		}
 		else if (m_positionSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_Start]->IsCompleted())//アニメーションが終わったか?
 		{
-			//結果を表示して待機時間まで待ったら終了演出のアニメーションを再生する
-			if (g_gameTime->StopWatch(DELAY_TIME))
+			//結果を表示して特定のエフェクトを再生したら終了演出のアニメーションを再生する
+			if (m_targetEnemy->GetEnemyEffectPtr()->IsPlayEffect() == EnemyEffect::enEnemyEffectList_EngineSmoke_Large ||
+				m_targetEnemy->GetEnemyEffectPtr()->IsPlayEffect() == EnemyEffect::enEnemyEffectList_Explosion)
 			{
 				m_qteEventResultUIDirection = enQteEventResultUIDirection_End;
 			}
@@ -729,6 +754,11 @@ void QteEvent::Render(RenderContext& rc)
 			//QTE結果UIの描画処理
 			m_qteEventResultUI[i].Draw(rc);
 		}
+	}
+
+	if (m_isResultDirection)
+	{
+		return;
 	}
 
 	for (int i = 0; i < m_inputCommandList.size(); i++)

@@ -4,6 +4,7 @@
 #include "PlayerMove.h"
 #include "PlayerRotation.h"
 #include "PlayerCatchEnemy.h"
+#include "PlayerEffect.h"
 #include "Game.h"
 
 //デストラクタ
@@ -13,6 +14,7 @@ Player::~Player()
 	DeleteGO(m_playerMove);//プレイヤー移動
 	DeleteGO(m_playerRotation);//プレイヤー回転
 	DeleteGO(m_playerCatchEnemy);//プレイヤーが敵をキャッチする
+	DeleteGO(m_playerEffect);//プレイヤーのエフェクト
 }
 
 //開始処理
@@ -31,7 +33,7 @@ bool Player::Start()
 	m_playerModel.SetPosition(m_position);
 
 	//プレイヤーモデルの大きさの設定
-	m_playerModel.SetScale(m_scale * 2.0f);
+	m_playerModel.SetScale(m_scale);
 
 	//プレイヤーモデルの回転の設定
 	m_rotation.SetRotationDegY(0.0f);
@@ -52,6 +54,9 @@ bool Player::Start()
 	//プレイヤーが敵をキャッチするクラスのインスタンス生成
 	m_playerCatchEnemy = NewGO<PlayerCatchEnemy>(0, "playercatchenemy");
 
+	//プレイヤーのエフェクトクラスのインスタンスの生成
+	m_playerEffect = NewGO<PlayerEffect>(0, "playereffect");
+
 	//プレイヤーカメラクラスの初期化
 	m_playerCamera.Init();
 
@@ -61,19 +66,30 @@ bool Player::Start()
 //更新処理
 void Player::Update()
 {
-	if (!GetGamePtr()->IsGameEnd())
+	if (GetGamePtr() != nullptr)
 	{
-		//移動処理の実行
-		m_playerMove->Execute(m_position, m_charaCon);
+		if (!GetGamePtr()->IsGameEnd())
+		{
+			//移動処理の実行
+			m_playerMove->Execute(m_position, m_charaCon);
 
-		//プレイヤー回転クラスの実行
-		m_playerRotation->Execute(m_rotation);
+			//プレイヤー回転クラスの実行
+			m_playerRotation->Execute(m_rotation);
 
-		//カメラ追従処理の実行
-		m_playerCamera.Execute(this, m_position);
+			//プレイヤーが敵をキャッチする処理の実行
+			m_playerCatchEnemy->Execute();
 
-		//プレイヤーが敵をキャッチする処理の実行
-		m_playerCatchEnemy->Execute();
+			//カメラ追従処理の実行
+			m_playerCamera.Execute(this, m_position);
+
+			Vector3 effectPos = m_playerCamera.GetSpringCamera().GetRealPosition();
+			effectPos += m_playerCamera.GetSpringCamera().GetCamera()->GetForward() * 300.0f;
+
+			Quaternion cameraRot = m_playerCamera.GetCameraRotation();
+
+			//プレイヤーのエフェクトの実行
+			m_playerEffect->Execute(effectPos, cameraRot);
+		}
 	}
 
 	//アニメーションの実行
@@ -84,6 +100,9 @@ void Player::Update()
 
 	//プレイヤーの回転の更新
 	m_playerModel.SetRotation(m_rotation);
+
+	//プレイヤーの大きさの設定
+	m_playerModel.SetScale(m_scale);
 
 	//プレイヤーモデルの更新
 	m_playerModel.Update();

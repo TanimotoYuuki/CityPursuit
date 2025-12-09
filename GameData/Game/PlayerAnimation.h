@@ -24,6 +24,8 @@ public://列挙型
 		enAnimationList_SwingLeft,//スイング(左側)アニメーション
 		enAnimationList_SwingRight,//スイング(右側)アニメーション
 		enAnimationList_QteEvent,//QTEイベント用のアニメーション
+		enAnimationList_ToFall,//倒れる用のアニメーション
+		enAnimationList_StandUp,//立ち上がる用のアニメーション
 		enAnimationList_GameClear,//ゲームクリア用のアニメーション
 		enAnimationList_Num//アニメーション数
 	};
@@ -68,6 +70,15 @@ public://メンバ関数
 	}
 
 	/// <summary>
+	/// 現在再生しているアニメーションの取得
+	/// </summary>
+	/// <returns>現在再生しているアニメーション</returns>
+	EnAnimationList IsPlayAnimation() const
+	{
+		return m_nowPlayAnimation;
+	}
+
+	/// <summary>
 	/// アニメーションクリップの取得
 	/// </summary>
 	/// <returns>アニメーションクリップの取得</returns>
@@ -94,6 +105,8 @@ private://アニメーションのファイルパス
 		"Assets/animData/playerSwingLeft.tka",//スイング(左側)アニメーション
 		"Assets/animData/playerSwingRight.tka",//ジャンプ(右側)アニメーション
 		"Assets/animData/qteEvent.tka",//QTEイベント用のアニメーション
+		"Assets/animData/playerToFall.tka",//倒れる用のアニメーション
+		"Assets/animData/playerStandUp.tka",//立ち上がる用のアニメーション
 		"Assets/animData/gameClear.tka",////ゲームクリア用のアニメーション
 	};
 };
