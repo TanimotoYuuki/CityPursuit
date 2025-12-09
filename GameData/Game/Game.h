@@ -2,7 +2,7 @@
 /// <summary>
 /// ゲーム全体を管理するクラス
 /// </summary>
-class BackGround;
+class GameBackGround;
 class Player;
 class GameTimeLimit;
 class GameMission;
@@ -106,7 +106,8 @@ private://メンバ変数
 	bool m_isGameEnd = false;//ゲーム終了したか?
 	bool m_isGameStartDirection = false;//ゲームスタート演出しているか?
 	bool m_isFinishGameStartDirection = false;//ゲームスタート演出が終了しているか?
-	BackGround* m_backGround = nullptr;//背景用のインスタンス
+	bool m_isLoadComplete = false;//ロードが完了したか?
+	GameBackGround* m_gameBackGround = nullptr;//ゲーム背景用のインスタンス
 	Player* m_player = nullptr;//プレイヤー用のインスタンス
 	GameTimeLimit* m_gameTimeLimit = nullptr;//ゲームの制限時間を管理する用のインスタンス
 	GameMission* m_gameMission = nullptr;//ゲームミッションのスプライトを表示する用のインスタンス
