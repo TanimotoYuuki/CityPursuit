@@ -9,7 +9,7 @@ namespace nsK2EngineLow {
 
 	EffectEmitter::~EffectEmitter()
 	{
-
+		m_effect.Stop();
 	}
 
 	void EffectEmitter::Init(const int number)
@@ -21,9 +21,12 @@ namespace nsK2EngineLow {
 	{
 		m_effect.Update();
 
-		if (!IsPlay())
+		if (!m_isLoop)
 		{
-			DeleteGO(this);
+			if (!IsPlay())
+			{
+				DeleteGO(this);
+			}
 		}
 	}
 }

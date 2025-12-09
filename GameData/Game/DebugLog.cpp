@@ -10,7 +10,7 @@ DebugLog* DebugLog::m_instance = nullptr;
 
 bool DebugLog::Start()
 {
-	m_debugLogName.reserve(100);
+	m_debugLogName.reserve(DEBUG_LOG_DRAWING__MAX);
 	return true;
 }
 

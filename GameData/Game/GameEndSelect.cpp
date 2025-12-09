@@ -2,6 +2,7 @@
 #include "GameEndSelect.h"
 #include "SceneManager.h"
 #include "FadeManager.h"
+#include "Loading.h"
 
 namespace {
 	//選択テキストUI
@@ -221,8 +222,13 @@ void GameEndSelect::TransitionScene()
 	case EnGameEndSelect::enGameEndSelect_Retry:
 		if (FadeManager::GetInstance()->IsFinishFade())
 		{
-			SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_InGame);//インゲームシーンの生成
-			m_isTransitionScene = true;//シーンの遷移をする
+			Loading::GetInstance()->StartLoading();
+			//3秒経過したらインゲームシーンへ遷移する
+			if (g_gameTime->StopWatch(3.0f))
+			{
+				SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_InGame);//インゲームシーンの生成
+				m_isTransitionScene = true;//シーンの遷移をする
+			}
 		}
 		break;
 	case EnGameEndSelect::enGameEndSelect_ReturnTitle:
