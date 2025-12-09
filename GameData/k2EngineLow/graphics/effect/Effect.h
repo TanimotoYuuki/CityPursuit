@@ -4,12 +4,14 @@
 
 #pragma once
 
+//エフェクト一覧
 enum EffectList
 {
-	EffectList_EnemyHit,		//敵を踏んだ時のエフェクト
-	EffectList_ItemGet,			//アイテムを取得した時のエフェクト
-	EffectList_CheckPointGet,	//チェックポイントを取得した時のエフェクト
-	EffectList_Num				//エフェクト数
+	EffectList_EngineSmoke,		 //エンジンの煙
+	EffectList_EngineSmoke_Large,//エンジンの煙（大）
+	EffectList_Swing,			 //スイング
+	EffectList_Explosion,		 //爆発
+	EffectList_Num				 //エフェクト数
 };
 
 namespace nsK2EngineLow {

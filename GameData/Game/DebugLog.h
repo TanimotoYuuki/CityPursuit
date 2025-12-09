@@ -2,56 +2,59 @@
 /// <summary>
 /// デバッグ用のクラス
 /// </summary>
-class DebugLog
+class DebugLog : public IGameObject
 {
-private:
+public:
 	DebugLog() {};//コンストラクタ
 	~DebugLog() {};//デストラクタ
 
-public:
 	bool Start();//開始処理
 	void Update();//更新処理
 	void Render(RenderContext& rc);//描画処理
+
+private://メンバ関数
 
 	/// <summary>
 	/// デバッグログの更新処理
 	/// </summary>
 	void DebugLogUpdate();
 
+public://メンバ関数
+
 	/// <summary>
-	/// デバッグする名前の設定
+	/// デバッグログの出力に必要なデータの設定
 	/// </summary>
-	/// <param name="name">デバッグする名前</param>
-	void SetDebugName(std::string name)
+	/// <param name="debugName">デバッグする名前</param>
+	/// <param name="value">int型のデータ</param>
+	void SetDebugLogData(std::string debugName, int value)
 	{
-		m_debugLogName.push_back(name);
+		auto debugNameIt = std::find(m_debugLogName.begin(), m_debugLogName.end(), debugName);
+		if (debugNameIt == m_debugLogName.end()) { m_debugLogName.push_back(debugName); }
+		m_intDebugLogData[debugName] = value;
 	}
 
 	/// <summary>
 	/// デバッグログの出力に必要なデータの設定
 	/// </summary>
+	/// <param name="debugName">デバッグする名前</param>
 	/// <param name="value">int型のデータ</param>
-	void SetDebugLogData(std::string name, int value)
+	void SetDebugLogData(std::string debugName, float value)
 	{
-		m_intDebugLogData[name] = value;
+		auto debugNameIt = std::find(m_debugLogName.begin(), m_debugLogName.end(), debugName);
+		if (debugNameIt == m_debugLogName.end()) { m_debugLogName.push_back(debugName); }
+		m_floatDebugLogData[debugName] = value;
 	}
 
 	/// <summary>
 	/// デバッグログの出力に必要なデータの設定
 	/// </summary>
+	/// <param name="debugName">デバッグする名前</param>
 	/// <param name="value">int型のデータ</param>
-	void SetDebugLogData(std::string name, float value)
+	void SetDebugLogData(std::string debugName, const Vector3& value)
 	{
-		m_floatDebugLogData[name] = value;
-	}
-
-	/// <summary>
-	/// デバッグログの出力に必要なデータの設定
-	/// </summary>
-	/// <param name="value">int型のデータ</param>
-	void SetDebugLogData(std::string name, const Vector3& value)
-	{
-		m_vector3DebugLogData[name] = value;
+		auto debugNameIt = std::find(m_debugLogName.begin(), m_debugLogName.end(), debugName);
+		if (debugNameIt == m_debugLogName.end()) { m_debugLogName.push_back(debugName); }
+		m_vector3DebugLogData[debugName] = value;
 	}
 
 private://メンバ変数
@@ -67,12 +70,15 @@ private:
 	static DebugLog* m_instance;//シングルトンインスタンス
 
 public:
-	static DebugLog* GetInstance()//シングルトンインスタンスの取得
+	static void CreateInstance()//シングルトンインスタンスの生成
 	{
 		if (m_instance == nullptr)
 		{
-			m_instance = new DebugLog();
+			m_instance = NewGO<DebugLog>(0, "debuglog");
 		}
+	}
+	static DebugLog* GetInstance()//シングルトンインスタンスの取得
+	{
 		return m_instance;
 	}
 	static void DeleteInstance()//シングルトンインスタンスの削除

@@ -37,7 +37,7 @@ bool MiniMap::Start()
 //実行処理
 void MiniMap::Execute()
 {
-	Vector3 playerPosition = m_player->GetModelData().GetPosition();
+	Vector3 playerPosition = m_player->GetPosition();
 	Vector3 mapPosition;
 
 	for (int i = 0; i < m_enemy.size(); i++)

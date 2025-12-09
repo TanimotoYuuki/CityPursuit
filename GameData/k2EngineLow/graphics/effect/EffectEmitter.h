@@ -80,6 +80,14 @@ namespace nsK2EngineLow {
 			m_effect.SetRotation(rotation);
 		}
 		/// <summary>
+		/// ループ再生するかどうかを設定。
+		/// </summary>
+		/// <param name="isLoop">trueならループ再生</param>
+		void SetLoop(const bool isLoop)
+		{
+			m_isLoop = isLoop;
+		}
+		/// <summary>
 		/// 回転を取得。
 		/// </summary>
 		/// <returns>回転。</returns>
@@ -97,5 +105,6 @@ namespace nsK2EngineLow {
 		}
 	private:
 		Effect m_effect;					//エフェクト。
+		bool m_isLoop;						//ループ再生するかどうか。
 	};
 }

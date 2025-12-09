@@ -14,9 +14,6 @@ bool PlayerMove::Start()
 {
 	//プレイヤースイングアクションクラスのインスタンスの生成
 	m_playerSwingAction = NewGO<PlayerSwingAction>(0, "playerswingaction");
-	//m_debugLog = FindGO<DebugLog>("debuglog");
-	//m_debugLog->SetDebugName("MoveSpeed");
-	//m_debugLog->SetDebugName("Position");
 	return true;
 }
 
@@ -127,8 +124,6 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 	//スイングアクションの更新処理
 	m_playerSwingAction->Execute();
 	
-	//m_debugLog->SetDebugLogData("MoveSpeed", m_moveSpeed);
-
 	//プレイヤーのが移動しているときに処理する
 	if (m_moveSpeed.x != 0.0f ||
 		m_moveSpeed.z != 0.0f)
@@ -142,7 +137,6 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 	position = characterController.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
 	characterController.SetPosition(position);
 
-	//m_debugLog->SetDebugLogData("Position", position);
 }
 
 //移動速度の制限
