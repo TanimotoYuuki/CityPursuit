@@ -1,16 +1,25 @@
 #include "stdafx.h"
 #include "Title.h"
 #include "FadeManager.h"
+#include "TitleBackGround.h"
+#include "Player.h"
+#include "TitleCamera.h"
 #include "TitleSprite.h"
 #include "TitleSelect.h"
 
 namespace {
 	const float DELAY_TIME = 1.5f;//待機時間
+
+	const Vector3 PLAYER_TITLE_INIT_POSISION{ 500.0f,4500.0f,-16250.0f };//プレイヤーのタイトル画面での初期位置
+
+	const Vector3 PLAYER_TITLE_SCALE{ 8.0f,8.0f,8.0f };//プレイヤーのタイトル画面での大きさ
 }
 
 //デストラクタ
 Title::~Title()
 {
+	DeleteGO(m_titleBackGround->GetTitleBuildingPtr());
+	DeleteGO(m_titleCamera);
 	DeleteGO(m_titleSprite);
 	DeleteGO(m_titleSelect);
 }
@@ -18,6 +27,26 @@ Title::~Title()
 //開始処理
 bool Title::Start()
 {
+	m_titleBackGround = FindGO<TitleBackGround>("titlebackground");
+	if (m_titleBackGround == nullptr)
+	{
+		m_titleBackGround = NewGO<TitleBackGround>(0, "titlebackground");
+	}
+	else
+	{
+		m_titleBackGround->CreateTitleBuilding();
+	}
+
+	m_player = FindGO<Player>("player");
+	if (m_player == nullptr)
+	{
+		m_player = NewGO<Player>(0, "player");
+	}
+	m_player->SetPosition(PLAYER_TITLE_INIT_POSISION);
+	m_player->SetScale(PLAYER_TITLE_SCALE);
+
+	m_titleCamera = NewGO<TitleCamera>(0, "titlecamera");
+
 	m_titleSprite = NewGO<TitleSprite>(0, "titlesprite");
 	m_titleSprite->EnableDrawingUI();
 

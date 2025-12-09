@@ -2,6 +2,9 @@
 /// <summary>
 /// タイトルクラス
 /// </summary>
+class TitleBackGround;
+class Player;
+class TitleCamera;
 class TitleSprite;
 class TitleSelect;
 class Title : public IGameObject
@@ -44,6 +47,9 @@ private://メンバ関数
 private:// メンバ変数
 	GameTime m_stopwatch;//ストップウォッチ
 	EnTitleState m_titleState = enTitleState_Fade;//タイトルの状態
+	TitleBackGround* m_titleBackGround = nullptr;//タイトル背景用のインスタンス
+	Player* m_player = nullptr;//プレイヤー用のインスタンス
+	TitleCamera* m_titleCamera = nullptr;//タイトルカメラ用のインスタンス
 	TitleSprite* m_titleSprite = nullptr;//タイトルのスプライトを表示する用のインスタンス
 	TitleSelect* m_titleSelect = nullptr;//タイトルのときに選択する用のインスタンス
 };

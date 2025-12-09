@@ -2,6 +2,7 @@
 #include "system.h"
 #include "graphics/GraphicsEngine.h"
 #include "sound/SoundEngine.h"
+#include "../resource.h"
 
 HWND			g_hWnd = NULL;				//ウィンドウハンドル。
 
@@ -33,6 +34,12 @@ LRESULT CALLBACK MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 ///////////////////////////////////////////////////////////////////
 void InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow, const TCHAR* appName)
 {
+	//背景色を黒に変更
+	HBRUSH hBlackBraush = CreateSolidBrush(RGB(0, 0, 0));
+
+	//アイコンを読み込む
+	HICON hAppIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
+
 	//ウィンドウクラスのパラメータを設定(単なる構造体の変数の初期化です。)
 	WNDCLASSEX wc =
 	{
@@ -44,9 +51,9 @@ void InitWindow(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, 
 		0,						//0でいい。
 		GetModuleHandle(NULL),	//このクラスのためのウインドウプロシージャがあるインスタンスハンドル。
 								//何も気にしなくてよい。
-		NULL,					//アイコンのハンドル。アイコンを変えたい場合ここを変更する。とりあえずこれでいい。
+		hAppIcon,					//アイコンのハンドル。アイコンを変えたい場合ここを変更する。とりあえずこれでいい。
 		NULL,					//マウスカーソルのハンドル。NULLの場合はデフォルト。
-		NULL,					//ウィンドウの背景色。NULLの場合はデフォルト。
+		hBlackBraush,			//ウィンドウの背景色。NULLの場合はデフォルト。
 		NULL,					//メニュー名。NULLでいい。
 		appName,				//ウィンドウクラスに付ける名前。
 		NULL					//NULLでいい。
