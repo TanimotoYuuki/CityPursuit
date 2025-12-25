@@ -1,8 +1,5 @@
 #include "stdafx.h"
 #include "GameEndSelect.h"
-#include "SceneManager.h"
-#include "FadeManager.h"
-#include "Loading.h"
 
 namespace {
 	//選択テキストUI
@@ -37,6 +34,10 @@ namespace {
 
 	//カウント
 	const int NO_DRAWING_CURRENT_SELECT_UI_COUNT_MAX = 5;//現在何を選択しているかを表すUIを描画していない回数の上限
+
+	//時間
+	const float DELAY_TIME = 0.2f;//待機時間
+
 }
 
 //開始処理
@@ -71,13 +72,12 @@ void GameEndSelect::Execute()
 	//一定の回数までカウントしたら処理しない
 	if (m_noDrawingCurrentSelectUICount == NO_DRAWING_CURRENT_SELECT_UI_COUNT_MAX)
 	{
-		//シーンの遷移処理
-		TransitionScene();
+		if (g_gameTime->StopWatch(DELAY_TIME))
+		{
+			m_isFinishSelectDecisionDirection = true;
+		}
 		return;
 	}
-
-	//現在何を選択しているかを表すUIの更新処理
-	CurrentSelectUIUpdate((EnGameEndSelect)m_currentSelect);
 
 	//選択できていないとき処理する
 	if (!m_isSelect)
@@ -85,6 +85,9 @@ void GameEndSelect::Execute()
 		//入力の更新処理
 		InputUpdate();
 	}
+
+	//現在何を選択しているかを表すUIの更新処理
+	CurrentSelectUIUpdate((EnGameEndSelect)m_currentSelect);
 }
 
 //描画処理
@@ -184,6 +187,10 @@ void GameEndSelect::InputUpdate()
 	//左スティックを上に倒したとき
 	if (g_pad[0]->IsTrigger(enButtonUp) || g_pad[0]->IsTriggerLStickUp())
 	{
+		m_isDrawingCurrentSelectUI = true;
+		m_time = 0.0f;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Select, 1.2f);
+
 		if (m_currentSelect == enGameEndSelect_Retry)
 		{
 			m_currentSelect = enGameEndSelect_ReturnTitle;
@@ -196,6 +203,10 @@ void GameEndSelect::InputUpdate()
 	//左スティックを下に倒したとき
 	else if (g_pad[0]->IsTrigger(enButtonDown) || g_pad[0]->IsTriggerLStickDown())
 	{
+		m_isDrawingCurrentSelectUI = true;
+		m_time = 0.0f;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Select, 1.2f);
+
 		if (m_currentSelect == enGameEndSelect_ReturnTitle)
 		{
 			m_currentSelect = enGameEndSelect_Retry;
@@ -208,37 +219,9 @@ void GameEndSelect::InputUpdate()
 	//Aボタンを押したとき
 	if (g_pad[0]->IsTrigger(enButtonA))
 	{
+		m_isDrawingCurrentSelectUI = true;
+		m_time = 0.0f;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Decision, 1.2f);
 		m_isSelect = true;
-	}
-}
-
-//シーンの遷移処理
-void GameEndSelect::TransitionScene()
-{
-	//現在の選択
-	FadeManager::GetInstance()->SetFadeState(FadeManager::enFadeState_FadeOut);
-	switch (m_currentSelect)
-	{
-	case EnGameEndSelect::enGameEndSelect_Retry:
-		if (FadeManager::GetInstance()->IsFinishFade())
-		{
-			Loading::GetInstance()->StartLoading();
-			//3秒経過したらインゲームシーンへ遷移する
-			if (g_gameTime->StopWatch(3.0f))
-			{
-				SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_InGame);//インゲームシーンの生成
-				m_isTransitionScene = true;//シーンの遷移をする
-			}
-		}
-		break;
-	case EnGameEndSelect::enGameEndSelect_ReturnTitle:
-		if (FadeManager::GetInstance()->IsFinishFade())
-		{
-			SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_Title);//タイトルシーンの生成
-			m_isTransitionScene = true;//シーンの遷移をする
-		}
-		break;
-	default:
-		break;
 	}
 }

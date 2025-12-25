@@ -215,11 +215,21 @@ void QteEvent::Update()
 		//QTEイベントで成功したとき
 		if (m_qteEventResult == enQteEventResult_Success)
 		{
+			if (!m_isPlayQteEventResultSe)
+			{
+				GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_QteEventSuccess, 1.0f);
+				m_isPlayQteEventResultSe = true;
+			}
 			m_player->GetPlayerCatchEnemy()->QteEventSuccessMove();
 		}
 		//QTEイベントで失敗したとき
 		else if (m_qteEventResult == enQteEventResult_Failed)
 		{
+			if (!m_isPlayQteEventResultSe)
+			{
+				GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_QteEventFailed, 2.0f);
+				m_isPlayQteEventResultSe = true;
+			}
 			if (m_targetEnemy->GetEnemyAIPtr()->IsSpeedUp())
 			{
 				m_player->GetPlayerCatchEnemy()->QteEventFailedMove();
@@ -239,6 +249,11 @@ void QteEvent::Update()
 				(m_player->GetPlayerAnimation()->IsPlayAnimation() == PlayerAnimation::enAnimationList_StandUp &&
 				!m_player->GetModelData().IsPlayingAnimation()))
 			{
+				if (!m_targetEnemy->GetEnemyEffectPtr()->IsPlayEffect())
+				{
+					return;
+				}
+
 				//QTEイベントを終了する処理
 				if (m_isQteEventResult[enQteEventResult_Success] == true)//QTEイベントで成功したときの処理
 				{
@@ -729,6 +744,8 @@ void QteEvent::Reset()
 	m_isQteEventResult[enQteEventResult_Failed] = false;
 
 	m_qteEventResultUIDirection = enQteEventResultUIDirection_Start;
+
+	m_isPlayQteEventResultSe = false;
 
 	for (int i = 0; i < enQteEventResult_Num; i++)
 	{

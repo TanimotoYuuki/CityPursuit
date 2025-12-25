@@ -5,7 +5,9 @@
 #include "PlayerJump.h"
 #include "PlayerSwingAction.h"
 #include "PlayerCatchEnemy.h"
+#include "Title.h"
 #include "Game.h"
+#include "GameTimeLimit.h"
 #include "GameClear.h"
 #include "GameClearCamera.h"
 #include "Enemy.h"
@@ -14,10 +16,12 @@
 
 namespace{
 	const float INIT_PLAY_ANIMATION_SPEED = 1.0f;//初期のアニメーション再生速度
+
+	const float STOP_PLAY_ANIMATION_SPEED = 0.0f;//再生停止時のアニメーション再生速度
 }
 
 //初期化処理
-void PlayerAnimation::Init()
+void PlayerAnimation::Init(ModelRender& modeldata)
 {
 	for (int i = 0; i < enAnimationList_Num; i++)
 	{
@@ -39,6 +43,11 @@ void PlayerAnimation::Init()
 			m_animationClips[i].SetLoopFlag(false);
 		}
 	}
+
+	modeldata.AddAnimationEvent([&](const wchar_t* clipName, const wchar_t* eventName)
+		{
+			OnAnimationEvent(clipName, eventName);
+		});
 }
 
 //アニメーションの実行処理
@@ -48,6 +57,14 @@ void PlayerAnimation::Execute(ModelRender& modelData, Player* playerData)
 	ChangeAnimation(modelData, playerData);
 
 	modelData.SetAnimationSpeed(INIT_PLAY_ANIMATION_SPEED);
+
+	if (playerData->GetGamePtr() != nullptr)
+	{
+		if (playerData->GetGamePtr()->GetGameTimeLimitPtr()->IsTimeUp())
+		{
+			modelData.SetAnimationSpeed(STOP_PLAY_ANIMATION_SPEED);
+		}
+	}
 	//今再生しているアニメーション
 	switch (m_nowPlayAnimation)
 	{
@@ -127,7 +144,7 @@ void PlayerAnimation::ChangeAnimation(ModelRender& modelData, Player* playerData
 
 	//待機アニメーション
 	m_nowPlayAnimation = enAnimationList_Idle;
-	m_animationInterpolateTime = 0.1f;
+	m_animationInterpolateTime = 0.05f;
 
 	if (playerData->GetGamePtr() != nullptr)
 	{
@@ -192,7 +209,7 @@ void PlayerAnimation::ChangeAnimation(ModelRender& modelData, Player* playerData
 		return;
 	}
 
-	if (!playerData->GetCharacterController().IsOnGround())
+	if (!playerData->GetCharacterController().IsOnGround() || playerData->GetTitlePtr()->GetTitleState() == Title::enTitleState_GameStartDirection)
 	{
 		if (playerData->GetPlayerMove()->GetPlayerJump().IsJump())//ジャンプしているか?
 		{
@@ -229,5 +246,21 @@ void PlayerAnimation::ChangeAnimation(ModelRender& modelData, Player* playerData
 		m_nowPlayAnimation = enAnimationList_Walk;
 		m_animationInterpolateTime = 0.2f;
 		return;
+	}
+}
+
+//アニメーションイベント処理
+void PlayerAnimation::OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName)
+{
+	(void)clipName;
+	//キーの名前が一致していたら処理をする
+	if (wcscmp(eventName, L"walkFootStep") == 0)
+	{
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Walk, 5.0f);
+	}
+
+	if (wcscmp(eventName, L"runFootStep") == 0)
+	{
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Run, 5.0f);
 	}
 }

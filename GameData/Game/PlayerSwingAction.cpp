@@ -145,6 +145,8 @@ void PlayerSwingAction::PreSwingAction()
 	{
 		m_swingRollFlag = true;
 
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_AfterSwing, 1.0f);
+
 		//ステートをスイング後の空中状態に遷移する
 		ChangeState(enSwingState_AirAfterSwing);
 
@@ -610,6 +612,11 @@ void PlayerSwingAction::SwingPlayerMove()
 	// Y成分を消去
 	m_swingForwardDir.y = 0.0f;
 	m_swingForwardDir.Normalize();
+
+	if (!GameSoundEngine::GetInstance()->IsPlayingSound(GameSoundList_SE_Swing))
+	{
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Swing,1.0f);
+	}
 }
 
 //カメラのイージング処理

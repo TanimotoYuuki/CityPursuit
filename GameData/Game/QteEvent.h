@@ -271,6 +271,7 @@ private://メンバ変数
 	bool m_isQteEventResult[enQteEventResult_Num] = { false,false };//QTEイベントの結果
 	bool m_isAddSuccessInputCommandCount = false;//コマンド入力成功回数を増やしたかどうか?
 	bool m_isResultDirection = false;//リザルト結果に対しての演出しているか?
+	bool m_isPlayQteEventResultSe = false;//QTEイベントの結果SEが再生されているか?
 	std::vector<EnGamePadInputList> m_inputCommandList;//コマンド入力リスト
 	QteEventInput* m_qteEventInput = nullptr;//QTEイベントでプレイヤー側が入力する用のインスタンス
 	Player* m_player = nullptr;//プレイヤー用のインスタンス

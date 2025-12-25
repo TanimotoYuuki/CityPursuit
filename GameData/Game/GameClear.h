@@ -24,6 +24,7 @@ public://列挙型
 		enGameClearState_GameClearDirection,//ゲームクリア演出
 		enGameClearState_Result,//リザルト
 		enGameClearState_Select,//選択
+		enGameClearState_TransitionScene,//シーン遷移
 		enGameClearState_Num//ゲームクリアの状態数
 	};
 
@@ -43,6 +44,11 @@ private://メンバ変数
 	/// 選択の更新処理
 	/// </summary>
 	void SelectUpdate();
+
+	/// <summary>
+	/// シーンの遷移の更新処理
+	/// </summary>
+	void TransitionSceneUpdate();
 
 public://メンバ関数
 

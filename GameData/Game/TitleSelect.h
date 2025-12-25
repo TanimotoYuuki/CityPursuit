@@ -52,11 +52,6 @@ private://メンバ関数
 	/// <param name="speed">再生速度</param>
 	void CurrentSelectUIAnimationUpdate(float speed = 1.0f);
 
-	/// <summary>
-	/// シーンの遷移処理
-	/// </summary>
-	void TransitionScene();
-
 public://メンバ関数
 
 	/// <summary>
@@ -81,12 +76,26 @@ public://メンバ関数
 	}
 
 	/// <summary>
-	/// シーンの遷移をするか?
+	/// リセット処理
 	/// </summary>
-	/// <returns>trueならシーンの遷移をする</returns>
-	bool IsTransitionScene() const
+	void Reset();
+
+	/// <summary>
+	/// 選択できたか?
+	/// </summary>
+	/// <returns>trueなら選択できている</returns>
+	bool IsSelect()
 	{
-		return m_isTransitionScene;
+		return m_isSelect;
+	}
+
+	/// <summary>
+	/// 選択したときの演出が終わったか?
+	/// </summary>
+	/// <returns>trueなら選択したときの演出が終わっている</returns>
+	bool IsFinishSelectDecisionDirection() const
+	{
+		return m_isFinishSelectDecisionDirection;
 	}
 
 	/// <summary>
@@ -108,8 +117,8 @@ private://メンバ変数
 	float m_time = 0.0f;//時間
 	bool m_isDrawingCurrentSelectUI = true;//現在何を選択しているかを表すUIを描画するか?
 	bool m_isSelect = false;//選択できたか?
-	bool m_isTransitionScene = false;//シーンの遷移をするか?
 	bool m_isDrawingUI = false;//UIを描画するか?
+	bool m_isFinishSelectDecisionDirection = false;//選択したときの演出が終わったか?
 
 private://表示するUIのファイルパス用のメンバ変数
 

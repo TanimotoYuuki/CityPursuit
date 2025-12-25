@@ -27,6 +27,10 @@ void QteEventInput::Execute()
 	//コマンド入力が一致していたら
 	if (commandList[m_nowInputCommandOrder] == m_inputCommand)
 	{
+		if (!m_isInputLastCommand)
+		{
+			GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_InputSuccess, 1.0f);
+		}
 		m_qteEvent->SuccessInputCommand(m_inputCommand);//コマンド入力成功を通知する
 
 		//次のコマンドがあるかどうか
@@ -47,6 +51,7 @@ void QteEventInput::Execute()
 		{
 			if (m_inputCommand != -1)
 			{
+				GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_InputFailed, 1.0f);
 				m_isInputFailed = true;//コマンド入力失敗している
 			}
 		}

@@ -6,6 +6,16 @@
 #include "GameTimeLimit.h"
 #include "GameResult.h"
 #include "GameEndSelect.h"
+#include "SceneManager.h"
+#include "FadeManager.h"
+#include "Loading.h"
+
+namespace {
+	//BGM
+	const float BGM_VOLUME_DOWN = 0.04f;//BGMの音量を下げる
+
+	const float BGM_VOLUME_NONE = 0.0f;//BGMの音量なし
+}
 
 //デストラクタ
 GameClear::~GameClear()
@@ -30,7 +40,8 @@ bool GameClear::Start()
 	m_gameResult->SetGameClearTimeLimit(m_game->GetGameTimeLimitPtr()->GetTimeLimit());
 
 	m_gameEndSelect = NewGO<GameEndSelect>(0,"gameendselect");
-
+	DeleteGO(GameSoundEngine::GetInstance()->GetSoundInstance(GameSoundList_BGM_InGame));
+	GameSoundEngine::GetInstance()->PlayBGM(GameSoundList_BGM_GameClear, 1.0f);
 	return true;
 }
 
@@ -48,6 +59,9 @@ void GameClear::Update()
 		break;
 	case GameClear::enGameClearState_Select://選択
 		SelectUpdate();
+		break;
+	case enGameClearState_TransitionScene://シーン遷移
+		TransitionSceneUpdate();
 		break;
 	default:
 		break;
@@ -98,10 +112,57 @@ void GameClear::SelectUpdate()
 {
 	m_gameEndSelect->Execute();
 
-	//シーンを遷移するならタイトルの削除処理する
-	if (m_gameEndSelect->IsTransitionScene())
+	//選択したときの演出が終わっていたら次のステートに移行する
+	if (m_gameEndSelect->IsFinishSelectDecisionDirection())
 	{
-		DeleteGO(m_game);
-		DeleteGO(this);
+		m_gameClearState = enGameClearState_TransitionScene;
+	}
+}
+
+//シーンの遷移の更新処理
+void GameClear::TransitionSceneUpdate()
+{
+	float bgmVolume = GameSoundEngine::GetInstance()->GetSoundInstance(GameSoundList_BGM_GameClear)->GetVolume();
+
+	if (bgmVolume > BGM_VOLUME_NONE)
+	{
+		//ゲームクリアまたはゲームオーバーBGMの音量を下げる
+		bgmVolume -= BGM_VOLUME_DOWN;
+		GameSoundEngine::GetInstance()->SetVolume(GameSoundList_BGM_GameClear, bgmVolume);
+	}
+	else
+	{
+		//ゲームクリアまたはゲームオーバーBGMの音量を0に固定する
+		bgmVolume = BGM_VOLUME_NONE;
+		GameSoundEngine::GetInstance()->SetVolume(GameSoundList_BGM_GameClear, bgmVolume);
+	}
+
+	//現在の選択
+	FadeManager::GetInstance()->SetFadeState(FadeManager::enFadeState_FadeOut);
+	switch (m_gameEndSelect->GetCurrentSelect())
+	{
+	case GameEndSelect::enGameEndSelect_Retry:
+		if (FadeManager::GetInstance()->IsFinishFade())
+		{
+			Loading::GetInstance()->StartLoading();
+			//3秒経過したらインゲームシーンへ遷移する
+			if (g_gameTime->StopWatch(3.0f))
+			{
+				SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_InGame);//インゲームシーンの生成
+				DeleteGO(m_game);
+				DeleteGO(this);
+			}
+		}
+		break;
+	case GameEndSelect::enGameEndSelect_ReturnTitle:
+		if (FadeManager::GetInstance()->IsFinishFade())
+		{
+			SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_Title);//タイトルシーンの生成
+			DeleteGO(m_game);
+			DeleteGO(this);
+		}
+		break;
+	default:
+		break;
 	}
 }
