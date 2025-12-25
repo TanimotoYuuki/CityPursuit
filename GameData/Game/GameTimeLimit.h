@@ -3,6 +3,7 @@
 /// <summary>
 /// ゲームの制限時間を管理するクラス
 /// </summary>
+class Game;
 class GameTimeLimit :public IGameObject
 {
 public:
@@ -76,6 +77,11 @@ private://メンバ関数
 	/// <param name="timeLimitUI">制限時間UI</param>
 	void TimeLimitUIPositionUpdate(std::vector<EnTimeLimitDisplayUI> timeLimitData, int dataNum, SpriteRender& timeLimitUI);
 
+	/// <summary>
+	/// 時間切れの演出
+	/// </summary>
+	void TimeUpDirection();
+
 public://メンバ関数
 
 	/// <summary>
@@ -143,9 +149,13 @@ public://メンバ関数
 	}
 
 	/// <summary>
-	/// 時間切れの演出
+	/// ゲーム全体を管理するクラスのポインタの設定
 	/// </summary>
-	void TimeUpDirection();
+	/// <param name="game">ゲーム全体を管理するクラスのポインタ</param>
+	void SetGamePtr(Game* game)
+	{
+		m_game = game;
+	}
 
 	/// <summary>
 	/// 演出が終わったか?
@@ -154,6 +164,15 @@ public://メンバ関数
 	bool IsFinishDirection() const
 	{
 		return m_isFinishDirection;
+	}
+
+	/// <summary>
+	/// ゲーム全体を管理するクラスのポインタの取得
+	/// </summary>
+	/// <returns>ゲーム全体を管理するクラスのポインタ</returns>
+	Game* GetGamePtr() const
+	{
+		return m_game;
 	}
 
 private://メンバ変数
@@ -166,6 +185,7 @@ private://メンバ変数
 	bool m_isTimeStop = false;//時間を止めるか?
 	bool m_isFinishDirection = false;//演出が終わったか?
 	std::vector<EnTimeLimitDisplayUI> m_timeLimitManage;//制限時間を管理する変数
+	Game* m_game = nullptr;//ゲーム全体を管理する用のインスタンス
 
 private://表示するUIのファイルパス用のメンバ変数
 

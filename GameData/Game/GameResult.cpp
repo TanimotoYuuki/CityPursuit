@@ -37,7 +37,7 @@ namespace {
 	//アニメーション
 	const float ANIMATION_PLAY_SPEED = 2.5f;//リザルトUIのアニメーションの再生速度
 
-	const Vector3 RESULT_UI_AFTER_ANIMATION_POSITION{ 300.0f,-25.0f,0.0f };//リザルトUIのアニメーション後の位置
+	const Vector3 RESULT_UI_AFTER_ANIMATION_POSITION{ 300.0f,-40.0f,0.0f };//リザルトUIのアニメーション後の位置
 
 	const float RESULT_UI_AFTER_ANIMATION_ALPHA = 1.0f;//リザルトUIのアニメーション後の透明度
 

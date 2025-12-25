@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GameTimeLimit.h"
+#include "Game.h"
 
 namespace {
 	//制限時間UI
@@ -76,7 +77,10 @@ void GameTimeLimit::Execute()
 	//毎フレーム制限時間を管理する変数で格納しているデータを削除する
 	m_timeLimitManage.clear();
 
-	m_timeLimit -= g_gameTime->GetFrameDeltaTime();
+	if (!m_game->IsGameEnd() && !m_game->IsFirstEnemyDirection())
+	{
+		m_timeLimit -= g_gameTime->GetFrameDeltaTime();
+	}
 
 	if (m_timeLimit < 0.0f)
 	{
