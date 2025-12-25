@@ -6,6 +6,7 @@
 #include "PlayerEffect.h"
 #include "SwingModel.h"
 #include "Enemy.h"
+#include "EnemyAI.h"
 #include "EnemyEffect.h"
 #include "QteEvent.h"
 #include "Game.h"
@@ -65,6 +66,12 @@ void PlayerCatchEnemy::Execute()
 		m_qteEvent->SetGamePtr(m_game);
 	}
 
+	//ゲームスタート演出が終わっていないとき処理をしない
+	if (!m_game->IsFinishGameStartDirection())
+	{
+		return;
+	}
+
 	//敵をキャッチする入力していないとき
 	if (m_isInputCatchEnemy != true)
 	{
@@ -73,6 +80,7 @@ void PlayerCatchEnemy::Execute()
 			if (!m_isQteEvent)
 			{
 				m_player->GetPlayerMove()->SetCanMove(true);
+				m_player->GetPlayerMove()->SetCanJump(true);
 				m_player->GetPlayerCamera().SetCanMoveCamera(true);
 				m_game->GetGameTimeLimitPtr()->DisableTimeStop();
 			}
@@ -257,6 +265,8 @@ void PlayerCatchEnemy::StartWireToEnemy(Enemy* enemy)
 {
 	//プレイヤーが移動できないようにする
 	m_player->GetPlayerMove()->SetCanMove(false);
+	//プレイヤーがジャンプできないようにする
+	m_player->GetPlayerMove()->SetCanJump(false);
 	//カメラ移動ができないようにする
 	m_player->GetPlayerCamera().SetCanMoveCamera(false);
 	//スイングアクション用の重力を使わないようににする

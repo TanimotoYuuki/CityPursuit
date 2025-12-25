@@ -1,5 +1,6 @@
 #pragma once
 #include "PlayerCamera.h"
+#include "Game.h"
 /// <summary>
 /// プレイヤークラス
 /// </summary>
@@ -8,7 +9,7 @@ class PlayerMove;
 class PlayerRotation;
 class PlayerCatchEnemy;
 class PlayerEffect;
-class Game;
+class Title;
 class Player : public IGameObject
 {
 public:
@@ -73,6 +74,15 @@ public://メンバ関数
 	const Vector3& GetScale() const
 	{
 		return m_scale;
+	}
+
+	/// <summary>
+	/// タイトルクラスのポインタの設定
+	/// </summary>
+	/// <param name="title">タイトルクラスのポインタ</param>
+	void SetTitlePtr(Title* title)
+	{
+		m_title = title;
 	}
 
 	/// <summary>
@@ -154,11 +164,29 @@ public://メンバ関数
 	}
 
 	/// <summary>
+	/// タイトルクラスのポインタの取得
+	/// </summary>
+	/// <returns>タイトルクラスのポインタ</returns>
+	Title* GetTitlePtr()
+	{
+		return m_title;
+	}
+
+	/// <summary>
 	/// ゲーム全体を管理するクラスのポインタの取得
 	/// </summary>
 	/// <returns>ゲーム全体を管理するクラスのポインタ</returns>
 	Game* GetGamePtr()
 	{
+		//ゲーム全体を管理するクラスが削除されていたらそのインスタンスをnullptrにする
+		if (m_game != nullptr)
+		{
+			if (m_game->IsDead())
+			{
+				m_game = nullptr;
+			}
+		}
+
 		return m_game;
 	}
 
@@ -176,6 +204,7 @@ private://メンバ変数
 	PlayerCatchEnemy* m_playerCatchEnemy = nullptr;//プレイヤーが敵をキャッチする用のインスタンス
 	PlayerEffect* m_playerEffect = nullptr;//プレイヤーのエフェクト用のインスタンス
 	PlayerCamera m_playerCamera;//プレイヤーカメラクラス
+	Title* m_title = nullptr;//タイトルクラスのインスタンス
 	Game* m_game = nullptr;//ゲーム全体を管理する用のインスタンス
 };
 

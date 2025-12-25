@@ -108,6 +108,15 @@ public://メンバ関数
 	}
 
 	/// <summary>
+	/// 敵の上に乗っているカメラになっているか？
+	/// </summary>
+	/// <returns>trueなら敵の上に乗っているカメラになっている</returns>
+	bool IsOnEnemyCamera() const
+	{
+		return m_isOnEnemyCamera;
+	}
+
+	/// <summary>
 	/// カメラの回転の取得
 	/// </summary>
 	/// <returns>カメラの回転</returns>

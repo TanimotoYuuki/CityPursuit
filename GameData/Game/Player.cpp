@@ -5,7 +5,6 @@
 #include "PlayerRotation.h"
 #include "PlayerCatchEnemy.h"
 #include "PlayerEffect.h"
-#include "Game.h"
 
 //デストラクタ
 Player::~Player()
@@ -24,7 +23,7 @@ bool Player::Start()
 	m_playerAnimation = NewGO<PlayerAnimation>(0,"playeranimation");
 
 	//アニメーションの初期化
-	m_playerAnimation->Init();
+	m_playerAnimation->Init(m_playerModel);
 
 	//プレイヤーモデルの初期化
 	m_playerModel.Init("Assets/modelData/player/player.tkm", m_playerAnimation->GetAnimationClips(), PlayerAnimation::enAnimationList_Num, enModelUpAxisZ, true);
@@ -68,12 +67,12 @@ void Player::Update()
 {
 	if (GetGamePtr() != nullptr)
 	{
-		if (!GetGamePtr()->IsGameEnd())
+		if (!GetGamePtr()->IsGameEnd() && !GetGamePtr()->IsFirstEnemyDirection())
 		{
 			//移動処理の実行
 			m_playerMove->Execute(m_position, m_charaCon);
 
-			//プレイヤー回転クラスの実行
+				//プレイヤー回転クラスの実行
 			m_playerRotation->Execute(m_rotation);
 
 			//プレイヤーが敵をキャッチする処理の実行
@@ -89,6 +88,10 @@ void Player::Update()
 
 			//プレイヤーのエフェクトの実行
 			m_playerEffect->Execute(effectPos, cameraRot);
+		}
+		else
+		{
+			m_playerMove->ResetMoveState();
 		}
 	}
 

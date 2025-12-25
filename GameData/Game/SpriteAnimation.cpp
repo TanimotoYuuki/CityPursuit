@@ -6,6 +6,9 @@ void PositionSpriteAnimation::Update()
 {
 	if (!m_isLoop && m_isCompleted)
 	{
+		Vector3 completePostion = m_targetPosition;
+		m_render->SetPosition(completePostion);
+		m_render->Update();
 		return;
 	}
 
@@ -52,6 +55,9 @@ void RotationSpriteAnimation::Update()
 {
 	if (!m_isLoop && m_isCompleted)
 	{
+		Quaternion completeRotation = m_targetRotation;
+		m_render->SetRotation(completeRotation);
+		m_render->Update();
 		return;
 	}
 
@@ -97,6 +103,9 @@ void ScaleSpriteAnimation::Update()
 	// 繰り返し実行するか
 	if (!m_isLoop && m_isCompleted)
 	{
+		Vector2 completeScale = m_targetScale;
+		m_render->SetScale(Vector3(completeScale.x, completeScale.y, 1.0f));
+		m_render->Update();
 		return;
 	}
 
@@ -147,6 +156,9 @@ void ColorSpriteAnimation::Update()
 {
 	if (!m_isLoop && m_isCompleted)
 	{
+		Vector4 completeColor = m_targetColor;
+		m_render->SetMulColor(completeColor);
+		m_render->Update();
 		return;
 	}
 
@@ -189,6 +201,9 @@ void AlphaSpriteAnimation::Update()
 {
 	if (!m_isLoop && m_isCompleted)
 	{
+		float completeAlpha = m_targetAlpha;
+		m_render->SetMulColor(Vector4(1.0f, 1.0f, 1.0f, completeAlpha));
+		m_render->Update();
 		return;
 	}
 
