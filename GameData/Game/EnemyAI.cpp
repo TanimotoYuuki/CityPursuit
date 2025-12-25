@@ -5,6 +5,7 @@
 #include "SwingTarget.h"
 #include "Buildings.h"
 #include "QteEvent.h"
+#include "DebugLog.h"
 
 namespace {
 	const float MOVE_SPEED = 1200.0f;//移動速度
@@ -118,6 +119,13 @@ void EnemyAI::Execute(Vector3& position, Quaternion& rotation)
 	{
 		m_qteFailedRotationCount = 0;
 		m_moveSpeed = MOVE_SPEED;
+
+		if (!GameSoundEngine::GetInstance()->IsPlayingSound(GameSoundList_SE_CarEngine))
+		{
+			GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_CarEngine, 5.0f, true);
+		}
+		GameSoundEngine::GetInstance()->SetPosition(GameSoundList_SE_CarEngine, position);
+
 		if (m_enemy->GetEnemyEffectPtr()->IsPlayEffect() != EnemyEffect::enEnemyEffectList_EngineSmoke_Large)
 		{
 			m_isSpeedUp = false;
@@ -208,7 +216,23 @@ void EnemyAI::QteEventSuccessEnemyMove(const Vector3& position)
 		if (distanceToTarget.LengthSq() <= BUILDING_DISTANCE_OFFSET * BUILDING_DISTANCE_OFFSET)
 		{
 			m_moveSpeed = 0.0f;//移動速度を0
-			m_enemy->GetEnemyEffectPtr()->ChangeEffect(EnemyEffect::enEnemyEffectList_Explosion);
+
+			if (!m_isPlayBuildingCollisionSe)
+			{
+				GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_BuildingCollision, 5.0f);
+				m_isPlayBuildingCollisionSe = true;
+			}
+			
+			if (!GameSoundEngine::GetInstance()->IsPlayingSound(GameSoundList_SE_BuildingCollision))
+			{
+				if (!m_isPlayExplosionSe)
+				{
+					GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Explosion, 1.0f);
+					m_enemy->GetEnemyEffectPtr()->ChangeEffect(EnemyEffect::enEnemyEffectList_Explosion);
+					m_isPlayExplosionSe = true;
+				}
+			}
+
 			return;
 		}
 

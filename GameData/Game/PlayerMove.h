@@ -46,6 +46,15 @@ public:
 	}
 
 	/// <summary>
+	/// ジャンプができるか？を設定する
+	/// </summary>
+	/// <param name="useGravity">trueならジャンプできる</param>
+	void SetCanJump(const bool canJump)
+	{
+		m_canMove = canJump;
+	}
+
+	/// <summary>
 	/// 移動速度の設定
 	/// </summary>
 	/// <param name="moveSpeed">移動速度</param>
@@ -135,7 +144,7 @@ public:
 	/// 移動速度の取得
 	/// </summary>
 	/// <returns>移動速度</returns>
-	const Vector3& GetMoveSpeed() const
+	Vector3& GetMoveSpeed()
 	{
 		return m_moveSpeed;
 	}
@@ -194,6 +203,7 @@ private://メンバ変数
 	Vector3 m_moveDirection = Vector3{ 0.0f,0.0f,1.0f };//進行方向
 	PlayerJump m_playerJump;//プレイヤージャンプクラス
 	bool m_canMove = true;//移動できるか？
+	bool m_camJump = true;//ジャンプできるか?
 	bool m_useGravity = true;//重力を使用するか？
 	bool m_ussSwingActionGravity = false;//スイングアクション用の重力を使用するか?
 	bool m_isWalk = false;//歩いているか?

@@ -30,12 +30,21 @@ public://列挙型
 		enAnimationList_Num//アニメーション数
 	};
 
+private://メンバ関数
+
+	/// <summary>
+	/// アニメーションイベント処理
+	/// </summary>
+	/// <param name="clipName">アニメーションの名前</param>
+	/// <param name="eventName">イベントの名前</param>
+	void OnAnimationEvent(const wchar_t* clipName, const wchar_t* eventName);
+
 public://メンバ関数
 
 	/// <summary>
 	/// 初期化処理
 	/// </summary>
-	void Init();
+	void Init(ModelRender& modeldata);
 
 	/// <summary>
 	/// アニメーションの実行処理

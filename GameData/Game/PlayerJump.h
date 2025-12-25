@@ -25,6 +25,14 @@ public:
 	}
 
 	/// <summary>
+	/// ジャンプ開始
+	/// </summary>
+	void JumpStart()
+	{
+		m_isJump = true;
+	}
+
+	/// <summary>
 	/// ジャンプ終了
 	/// </summary>
 	void JumpEnd()
@@ -32,7 +40,25 @@ public:
 		m_isJump = false;
 	}
 
+	/// <summary>
+	/// 地面に付いている
+	/// </summary>
+	void OnGround()
+	{
+		m_isOnGround = true;
+	}
+
+	/// <summary>
+	/// 地面に付いているか?
+	/// </summary>
+	/// <returns>trueなら地面に付いている</returns>
+	bool IsOnGround() const
+	{
+		return m_isOnGround;
+	}
+
 private:
 	bool m_isJump = false;//ジャンプしているか?
+	bool m_isOnGround = true;//地面に付いているか?
 };
 

@@ -27,8 +27,22 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 	//プレイヤーが地面に着いているときだけ左スティックの入力量を取得できる
 	if (characterController.IsOnGround())
 	{
-		//ジャンプ処理の実行
-		m_playerJump.Execute(m_moveSpeed, characterController);
+		if (!m_playerJump.IsOnGround())
+		{
+			GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Landing, 1.0f);
+		}
+
+		//地面に付いている
+		m_playerJump.OnGround();
+
+		//重力を無くす
+		m_moveSpeed.y = 0.0f;
+
+		if (m_camJump)
+		{
+			//ジャンプ処理の実行
+			m_playerJump.Execute(m_moveSpeed, characterController);
+		}
 	}
 	else
 	{

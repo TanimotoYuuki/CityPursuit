@@ -10,6 +10,7 @@
 /// </summary>
 class Enemy;
 class QteEvent;
+class Game;
 class EnemyAI : public IGameObject
 {
 public:
@@ -79,6 +80,8 @@ private://メンバ変数
 	bool m_isSetTargetPos = false;//目標位置を設定するかどうか?
 	bool m_isSetBuildingCollisionTargetPos = false;//ビルに衝突する位置を設定したか?
 	bool m_isSpeedUp = false;//急加速しているか?
+	bool m_isPlayBuildingCollisionSe = false;//ビル衝突SEが再生されているか?
+	bool m_isPlayExplosionSe = false;//爆発SEが再生されているか?
 	nsAI::NaviMesh m_navMesh;//ナビメッシュ
 	nsAI::Path m_path;//パス
 	nsAI::PathFinding m_pathFiding;//パス検索

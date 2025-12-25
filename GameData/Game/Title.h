@@ -24,6 +24,8 @@ public://列挙型
 		enTitleState_Fade,//フェード
 		enTitleState_TitleText,//タイトルのテキスト
 		enTitleState_Select,//選択
+		enTitleState_GameStartDirection,//ゲームスタート演出
+		enTitleState_TransitionScene,//シーン遷移
 		enTitleState_Num//タイトルの状態数
 	};
 
@@ -44,8 +46,29 @@ private://メンバ関数
 	/// </summary>
 	void SelectUpdate();
 
+	/// <summary>
+	/// ゲームスタート演出の更新処理
+	/// </summary>
+	void GameStartDirectionUpdate();
+
+	/// <summary>
+	/// シーンの遷移の更新処理
+	/// </summary>
+	void TransitionSceneUpdate();
+
+public://メンバ関数
+
+	/// <summary>
+	/// タイトルの状態の取得
+	/// </summary>
+	/// <returns>タイトルの状態</returns>
+	EnTitleState GetTitleState() const
+	{
+		return m_titleState;
+	}
+
 private:// メンバ変数
-	GameTime m_stopwatch;//ストップウォッチ
+	bool m_isGameStartDirectionPlayerJump = false;//ゲームスタート演出用でプレイヤーがジャンプしているか?
 	EnTitleState m_titleState = enTitleState_Fade;//タイトルの状態
 	TitleBackGround* m_titleBackGround = nullptr;//タイトル背景用のインスタンス
 	Player* m_player = nullptr;//プレイヤー用のインスタンス

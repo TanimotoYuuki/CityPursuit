@@ -23,6 +23,7 @@ public://列挙型
 		enGameOverState_Monochrome,//モノクロ化
 		enGameOverState_GameOverText,//ゲームオーバーのテキスト
 		enGameOverState_Select,//選択
+		enGameOverState_TransitionScene,//シーン遷移
 		enGameOverState_Num//ゲームオーバーの状態数
 	};
 
@@ -47,6 +48,11 @@ private://メンバ関数
 	/// 選択の更新処理
 	/// </summary>
 	void SelectUpdate();
+
+	/// <summary>
+	/// シーンの遷移の更新処理
+	/// </summary>
+	void TransitionSceneUpdate();
 
 public://メンバ関数
 

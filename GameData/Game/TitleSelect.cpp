@@ -1,9 +1,5 @@
 #include "stdafx.h"
-#include "system/system.h"
 #include "TitleSelect.h"
-#include "SceneManager.h"
-#include "FadeManager.h"
-#include "Loading.h"
 
 namespace {
 	//選択テキストUI
@@ -39,7 +35,12 @@ namespace {
 	const float ANIMATION_SPEED_SELECT = 5.0f;//選択したときのアニメーション再生速度
 
 	//カウント
-	const int NO_DRAWING_CURRENT_SELECT_UI_COUNT_MAX = 5;//現在何を選択しているかを表すUIを描画していない回数の上限
+	const int SELECT_GAME_START_NO_DRAWING_COUNT_MAX = 5;//ゲームスタートを選択した時に選択UIが描画していない回数の上限
+
+	const int SELECT_GAME_START_EXCEPT_NO_DRAWING_COUNT_MAX = 1;//ゲームスタート以外を選択した時に選択UIが描画していない回数の上限
+
+	//時間
+	const float DELAY_TIME = 0.2f;//待機時間
 }
 
 //開始処理
@@ -72,16 +73,32 @@ bool TitleSelect::Start()
 //実行処理
 void TitleSelect::Execute()
 {
-	//一定の回数までカウントしたら処理しない
-	if (m_noDrawingCurrentSelectUICount == NO_DRAWING_CURRENT_SELECT_UI_COUNT_MAX)
+	//現在の選択がゲームスタートのとき
+	if (m_currentSelect == enTitleSelect_GameStart)
 	{
-		//シーンの遷移処理
-		TransitionScene();
-		return;
+		//一定の回数までカウントしたら処理しない
+		if (m_noDrawingCurrentSelectUICount == SELECT_GAME_START_NO_DRAWING_COUNT_MAX)
+		{
+			if (g_gameTime->StopWatch(DELAY_TIME))
+			{
+				m_isFinishSelectDecisionDirection = true;
+			}
+			return;
+		}
 	}
-
-	//現在何を選択しているかを表すUIの更新処理
-	CurrentSelectUIUpdate((EnTitleSelect)m_currentSelect);
+	//現在の選択がゲームスタート以外のとき
+	else
+	{
+		//一定の回数までカウントしたら処理しない
+		if (m_noDrawingCurrentSelectUICount == SELECT_GAME_START_EXCEPT_NO_DRAWING_COUNT_MAX)
+		{
+			if (g_gameTime->StopWatch(DELAY_TIME))
+			{
+				m_isFinishSelectDecisionDirection = true;
+			}
+			return;
+		}
+	}
 
 	//選択できていないとき処理する
 	if (!m_isSelect)
@@ -89,6 +106,9 @@ void TitleSelect::Execute()
 		//入力の更新処理
 		InputUpdate();
 	}
+
+	//現在何を選択しているかを表すUIの更新処理
+	CurrentSelectUIUpdate((EnTitleSelect)m_currentSelect);
 }
 
 //描画処理
@@ -188,6 +208,10 @@ void TitleSelect::InputUpdate()
 	//左スティックを上に倒したとき
 	if (g_pad[0]->IsTrigger(enButtonUp) || g_pad[0]->IsTriggerLStickUp())
 	{
+		m_isDrawingCurrentSelectUI = true;
+		m_time = 0.0f;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Select, 1.2f);
+
 		if (m_currentSelect == enTitleSelect_GameStart)
 		{
 			m_currentSelect = enTitleSelect_GameFinish;
@@ -200,6 +224,10 @@ void TitleSelect::InputUpdate()
 	//左スティックを下に倒したとき
 	else if (g_pad[0]->IsTrigger(enButtonDown) || g_pad[0]->IsTriggerLStickDown())
 	{
+		m_isDrawingCurrentSelectUI = true;
+		m_time = 0.0f;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Select, 1.2f);
+
 		if (m_currentSelect == enTitleSelect_GameFinish)
 		{
 			m_currentSelect = enTitleSelect_GameStart;
@@ -212,36 +240,19 @@ void TitleSelect::InputUpdate()
 	//Aボタンを押したとき
 	if (g_pad[0]->IsTrigger(enButtonA))
 	{
+		m_isDrawingCurrentSelectUI = true;
+		m_time = 0.0f;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Decision, 1.2f);
 		m_isSelect = true;
 	}
 }
 
-//シーンの遷移処理
-void TitleSelect::TransitionScene()
+//リセット処理
+void TitleSelect::Reset()
 {
-	//現在の選択
-	switch (m_currentSelect)
-	{
-	case EnTitleSelect::enTitleSelect_GameStart:
-		FadeManager::GetInstance()->SetFadeState(FadeManager::enFadeState_FadeOut);
-		if (FadeManager::GetInstance()->IsFinishFade())
-		{
-			Loading::GetInstance()->StartLoading();
-			//3秒経過したらインゲームシーンへ遷移する
-			if (g_gameTime->StopWatch(3.0f))
-			{
-				SceneManager::GetInstance()->CreateScene(SceneManager::enSceneID_InGame);//インゲームシーンの生成
-				m_isTransitionScene = true;//シーンの遷移をする
-			}
-		}
-		break;
-	case EnTitleSelect::enTitleSelect_HowToPlay:
-		break;
-	case EnTitleSelect::enTitleSelect_GameFinish:
-		//ゲーム終了
-		g_gameLoop.m_isLoop = false;
-		break;
-	default:
-		break;
-	}
+	m_noDrawingCurrentSelectUICount = 0;
+	m_time = 0.0f;
+	m_isDrawingCurrentSelectUI = true;
+	m_isSelect = false;
+	m_isFinishSelectDecisionDirection = false;
 }

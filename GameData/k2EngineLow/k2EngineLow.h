@@ -226,6 +226,5 @@ namespace nsK2EngineLow {
 	extern GameTime* g_gameTime;
 	extern RenderingEngine* g_renderingEngine;
 	extern CollisionObjectManager* g_collisionObjectManager;
-	extern GameSoundEngine* g_gameSoundEngine;
 }
 
