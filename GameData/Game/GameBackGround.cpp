@@ -96,6 +96,9 @@ void GameBackGround::LoadLevel()
 			//レベルのデータに保存されている大きさを設定
 			car->SetScale(objData.scale);
 
+			//ゲーム全体を管理するクラスのポインタの設定
+			car->SetGamePtr(m_game);
+
 			//ノルマで捕獲する敵の数の加算
 			m_game->GetGameMissionPtr()->AddQuotaCaptureEnemyNum();
 

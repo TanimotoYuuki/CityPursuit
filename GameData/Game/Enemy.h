@@ -4,6 +4,7 @@
 /// </summary>
 class EnemyAI;
 class EnemyEffect;
+class Game;
 class Enemy : public IGameObject
 {
 public:
@@ -89,6 +90,15 @@ public://メンバ関数
 	}
 
 	/// <summary>
+	/// ゲーム全体を管理するクラスのポインタの設定
+	/// </summary>
+	/// <param name="game">ゲーム全体を管理するクラスのポインタ</param>
+	void SetGamePtr(Game* game)
+	{
+		m_game = game;
+	}
+
+	/// <summary>
 	/// 敵AIクラスのポインタの取得
 	/// </summary>
 	/// <returns></returns>
@@ -106,13 +116,23 @@ public://メンバ関数
 		return m_enemyEffect;
 	}
 
-public://メンバ変数
+	/// <summary>
+	/// ゲーム全体を管理するクラスのポインタの取得
+	/// </summary>
+	/// <returns>ゲーム全体を管理するクラスのポインタ</returns>
+	Game* GetGamePtr() const
+	{
+		return m_game;
+	}
+
+private://メンバ変数
 	ModelRender m_enemyModel;//敵モデル
 	Vector3 m_position = Vector3::Zero;//敵の位置
 	Quaternion m_rotation = Quaternion::Identity;//敵の回転
 	Vector3 m_scale = Vector3::Zero;//敵の大きさ
 	bool m_isOnPlayer = false;//プレイヤーに乗っているか
 	EnemyAI* m_enemyAI = nullptr;//敵AI用のインスタンス
-	EnemyEffect* m_enemyEffect = nullptr;//敵のエフェクトのインスタンス
+	EnemyEffect* m_enemyEffect = nullptr;//敵のエフェクト用のインスタンス
+	Game* m_game = nullptr;//ゲーム全体を管理する用のインスタン
 };
 

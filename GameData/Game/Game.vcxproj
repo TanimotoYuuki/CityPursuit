@@ -226,6 +226,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FirstEnemyDirection.cpp" />
     <ClCompile Include="GameBackGround.cpp" />
     <ClCompile Include="Buildings.cpp" />
     <ClCompile Include="DebugLog.cpp" />
@@ -277,6 +278,7 @@
     <ClCompile Include="TitleSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FirstEnemyDirection.h" />
     <ClInclude Include="GameBackGround.h" />
     <ClInclude Include="Buildings.h" />
     <ClInclude Include="DebugLog.h" />

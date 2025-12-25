@@ -33,6 +33,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	DebugLog::CreateInstance();
 
+	GameSoundEngine::CreateInstance();
+	GameSoundEngine::GetInstance()->Init();
+
 	// ここからゲームループ。
 	while (DispatchWindowMessage() && g_gameLoop.m_isLoop ==true)
 	{
@@ -43,6 +46,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 		// ゲームオブジェクトマネージャーの更新処理を呼び出す。
 		g_k2EngineLow->ExecuteUpdate();
+
+		GameSoundEngine::GetInstance()->Update();
 
 		// ゲームオブジェクトマネージャーの描画処理を呼び出す。
 		g_k2EngineLow->ExecuteRender();
