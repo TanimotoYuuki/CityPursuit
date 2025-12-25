@@ -53,6 +53,7 @@
     <ClCompile Include="Loading.cpp" />
     <ClCompile Include="TitleBackGround.cpp" />
     <ClCompile Include="TitleCamera.cpp" />
+    <ClCompile Include="FirstEnemyDirection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -102,6 +103,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="TitleBackGround.h" />
     <ClInclude Include="TitleCamera.h" />
+    <ClInclude Include="FirstEnemyDirection.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />

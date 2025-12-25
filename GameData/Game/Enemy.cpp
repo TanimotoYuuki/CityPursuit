@@ -2,6 +2,7 @@
 #include "Enemy.h"
 #include "EnemyAI.h"
 #include "EnemyEffect.h"
+#include "Game.h"
 
 //デストラクタ
 Enemy::~Enemy()
@@ -36,15 +37,18 @@ bool Enemy::Start()
 //更新処理
 void Enemy::Update()
 {
-	//敵AIの実行処理
-	m_enemyAI->Execute(m_position, m_rotation);
+	if (!m_game->IsGameEnd() && !m_game->IsFirstEnemyDirection())
+	{
+		//敵AIの実行処理
+		m_enemyAI->Execute(m_position, m_rotation);
 
-	////検証用のステージは直進のみなので
-	////敵を真っすぐ移動させる
-	//m_position.z += 900.0f * g_gameTime->GetFrameDeltaTime();
+		////検証用のステージは直進のみなので
+		////敵を真っすぐ移動させる
+		//m_position.z += 900.0f * g_gameTime->GetFrameDeltaTime();
 
-	//敵のエフェクトの実行処理
-	m_enemyEffect->Execute(m_position, m_rotation);
+		//敵のエフェクトの実行処理
+		m_enemyEffect->Execute(m_position, m_rotation);
+	}
 
 	//敵モデルの位置の設定
 	m_enemyModel.SetPosition(m_position);
