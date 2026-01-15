@@ -21,11 +21,9 @@ namespace{
 	
 	const float ON_ENEMY_HEIGHT = 150.0f;//敵の上に乗る時の高さ
 
-	const float ON_ENEMY_CENTER = 30.0f;//敵の上に乗る時の中央
-
 	const float GO_ON_ENEMY_TIME = 0.8f;//敵の上に行くまでの時間
 
-	const float ON_ENEMY_BACK_LENGTH = 70.0f;//敵の上に乗るときの後ろの長さ
+	const float ON_ENEMY_BACK_LENGTH = 1.0f;//敵の上に乗るときの後ろの長さ
 
 	const float WIREING_TO_ENEMY_JUMP_FORCE = 10.0f;//敵に糸を伸ばすときに、ジャンプの姿勢になるように、ちょっとジャンプさせる時の力
 
@@ -366,7 +364,6 @@ void PlayerCatchEnemy::OnEnemy(Enemy* enemy)
 	Vector3 targetPos = enemy->GetPosition();
 	//高さをちょっと上げる
 	targetPos.y += ON_ENEMY_HEIGHT;
-	targetPos.z += ON_ENEMY_CENTER;
 
 	// ちょっと後ろに乗る
 	Vector3 targetBackVec = Vector3::Back;

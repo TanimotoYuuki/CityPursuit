@@ -94,8 +94,6 @@ void PlayerCamera::Execute(Player* playerData, const Vector3& position)
 
 	//カメラの更新
 	m_springCamera.Update();
-
-	DebugLog::GetInstance()->SetDebugLogData("toCameraPos", m_toCameraPos);
 }
 
 //敵の上に乗っている用のカメラ
