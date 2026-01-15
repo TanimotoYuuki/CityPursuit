@@ -242,6 +242,7 @@
     <ClCompile Include="CameraCollisionSolver.cpp" />
     <ClCompile Include="GameEndPostEffect.cpp" />
     <ClCompile Include="ViewFrustum.cpp" />
+    <ClCompile Include="GotRay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="k2EngineLowPreCompile.h" />
@@ -533,6 +534,7 @@
     <ClInclude Include="CameraCollisionSolver.h" />
     <ClInclude Include="GameEndPostEffect.h" />
     <ClInclude Include="ViewFrustum.h" />
+    <ClInclude Include="GotRay.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="graphics">

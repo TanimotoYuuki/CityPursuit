@@ -9,15 +9,6 @@ namespace nsK2EngineLow
 		//メインレンダリングターゲットの初期化
 		InitMainRenderTarget();
 
-		//深度値用レンダリングターゲットの初期化
-		InitDepthRenderTarget();
-
-		//法線用レンダリングターゲットの初期化
-		InitNormalRenderTarget();
-
-		//スペキュラ用レンダリングターゲットの初期化
-		InitSpecularRenderTarget();
-
 		////背景の初期化
 		//InitBackGround();
 
@@ -33,6 +24,12 @@ namespace nsK2EngineLow
 
 		//ブルームの初期化
 		m_bloom.Init(m_mainRenderTarget);
+
+		//ゴッドレイの初期化
+		m_godRay.Init(m_mainRenderTarget, GetLuminnce());
+		m_godRay.SetGodRayBlurStrength(4.0f);
+		m_godRay.SetGodRayBlurCenter(Vector2(0.0f, 0.0f));
+		//m_godRay.SetGodRayBlurCenter(Vector2(FRAME_BUFFER_W / 2, FRAME_BUFFER_H / 2));
 
 		//SSRの初期化
 		//m_ssr.Init(m_mainRenderTarget, m_depthRenderTarget, m_normalRenderTarget, m_specularRenderTarget);
@@ -57,45 +54,6 @@ namespace nsK2EngineLow
 			DXGI_FORMAT_R32G32B32A32_FLOAT,
 			DXGI_FORMAT_D32_FLOAT,
 			clearColor
-		);
-	}
-
-	//深度値用レンダリングターゲットの初期化
-	void RenderingEngine::InitDepthRenderTarget()
-	{
-		m_depthRenderTarget.Create(
-			m_mainRenderTarget.GetWidth(),
-			m_mainRenderTarget.GetHeight(),
-			1,
-			1,
-			DXGI_FORMAT_R32_FLOAT,
-			DXGI_FORMAT_UNKNOWN
-		);
-	}
-
-	//法線用レンダリングターゲットの初期化
-	void RenderingEngine::InitNormalRenderTarget()
-	{
-		m_normalRenderTarget.Create(
-			m_mainRenderTarget.GetWidth(),
-			m_mainRenderTarget.GetHeight(),
-			1,
-			1,
-			DXGI_FORMAT_R32G32B32A32_FLOAT,
-			DXGI_FORMAT_UNKNOWN
-		);
-	}
-
-	//スペキュラ用レンダリングターゲットの初期化
-	void RenderingEngine::InitSpecularRenderTarget()
-	{
-		m_specularRenderTarget.Create(
-			m_mainRenderTarget.GetWidth(),
-			m_mainRenderTarget.GetHeight(),
-			1,
-			1,
-			DXGI_FORMAT_R32_FLOAT,
-			DXGI_FORMAT_UNKNOWN
 		);
 	}
 
@@ -216,6 +174,9 @@ namespace nsK2EngineLow
 		//ブルームの描画処理を実行
 		m_bloom.Execute(rc, m_mainRenderTarget);
 
+		//ゴッドレイの描画処理を実行
+		m_godRay.Execute(rc, m_mainRenderTarget);
+
 		//SSRの描画処理を実行
 		//m_ssr.Execute(rc, m_mainRenderTarget);
 
@@ -271,19 +232,12 @@ namespace nsK2EngineLow
 	//モデルの描画
 	void RenderingEngine::ModelDraw(RenderContext& rc)
 	{
-		RenderTarget* rts[] = {
-			&m_mainRenderTarget,
-			&m_depthRenderTarget,
-			&m_normalRenderTarget,
-			&m_specularRenderTarget
-		};
-
 		//レンダリングターゲットとして利用できるまで待つ
-		rc.WaitUntilToPossibleSetRenderTargets(4,rts);
+		rc.WaitUntilToPossibleSetRenderTarget(m_mainRenderTarget);
 		//レンダリングターゲットを設定
-		rc.SetRenderTargetsAndViewport(4,rts);
+		rc.SetRenderTargetAndViewport(m_mainRenderTarget);
 		//レンダリングターゲットをクリア
-		rc.ClearRenderTargetViews(4,rts);
+		rc.ClearRenderTargetView(m_mainRenderTarget);
 
 		for (auto renderObj : m_renderObjects)
 		{
@@ -292,7 +246,7 @@ namespace nsK2EngineLow
 		}
 
 		//レンダリングターゲットへの書き込み終了待ち
-		rc.WaitUntilFinishDrawingToRenderTargets(4,rts);
+		rc.WaitUntilFinishDrawingToRenderTarget(m_mainRenderTarget);
 	}
 
 	//2D(フォントとスプライト)の描画

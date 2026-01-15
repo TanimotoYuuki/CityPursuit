@@ -3,11 +3,11 @@
 #include "SceneLight.h"
 #include "IRenderer.h"
 #include "Bloom.h"
+#include "GotRay.h"
 #include "Shadow.h"
 #include "GameEndPostEffect.h"
 
-namespace nsK2EngineLow
-{
+namespace nsK2EngineLow{
 	/// <summary>
 	/// レンダリングエンジン
 	/// </summary>
@@ -91,21 +91,21 @@ namespace nsK2EngineLow
 		}
 
 		/// <summary>
-		/// ライトカメラの注視点を設定する
-		/// </summary>
-		/// <param name="target">注視点</param>
-		void SetLightCameraTarget(const Vector3& target)
-		{
-			m_sceneLight.SetLightCameraTarget(target);
-		}
-
-		/// <summary>
 		/// ゲーム終了のときにするポストエフェクトの取得
 		/// </summary>
 		/// <returns>ゲーム終了のときにするポストエフェクト</returns>
 		GameEndPostEffect& GetGameEndPostEffect()
 		{
 			return m_gameEndPostEffect;
+		}
+
+		/// <summary>
+		/// 輝度のレンダーターゲットの取得
+		/// </summary>
+		/// <returns>輝度のレンダーターゲット</returns>
+		RenderTarget& GetLuminnce()
+		{
+			return m_bloom.GetLuminnceRenderTarget();
 		}
 
 		/// <summary>
@@ -150,21 +150,6 @@ namespace nsK2EngineLow
 		/// </summary>
 		void InitMainRenderTarget();
 
-		/// <summary>
-		/// 深度値用レンダリングターゲットの初期化
-		/// </summary>
-		void InitDepthRenderTarget();
-
-		/// <summary>
-		/// 法線用レンダリングターゲットの初期化
-		/// </summary>
-		void InitNormalRenderTarget();
-
-		/// <summary>
-		/// スペキュラ用レンダリングターゲットの初期化
-		/// </summary>
-		void InitSpecularRenderTarget();
-
 		///// <summary>
 		///// 背景の初期化
 		///// </summary>
@@ -207,9 +192,6 @@ namespace nsK2EngineLow
 
 		SceneLight m_sceneLight;						//シーンライト
 		RenderTarget m_mainRenderTarget;				//メインレンダリングターゲット
-		RenderTarget m_depthRenderTarget;				//深度値用レンダリングターゲット
-		RenderTarget m_normalRenderTarget;				//法線用レンダリングターゲット
-		RenderTarget m_specularRenderTarget;			//スペキュラ用レンダリングターゲット
 		//RenderTarget m_backGroundRenderTarget;		//背景用レンダリングターゲット
 		RenderTarget m_2DRenderTarget;					//2D用レンダリングターゲット
 		Sprite m_backGroundSprite;						//背景用スプライト
@@ -217,6 +199,7 @@ namespace nsK2EngineLow
 		Sprite m_mainSprite;							//メイン(モデル)用スプライト
 		Sprite m_copyToFrameBufferSprite;				//メインレンダリングターゲットをフレームバッファにコピーするためのスプライト
 		Bloom m_bloom;									//ブルーム
+		GotRay m_godRay;								//ゴッドレイ
 		Shadow m_shadow;								//シャドウマップ
 		GameEndPostEffect m_gameEndPostEffect;			//ゲーム終了のときにするポストエフェクト
 		std::vector< IRenderer* > m_renderObjects;		//レンダリングオブジェクトの格納

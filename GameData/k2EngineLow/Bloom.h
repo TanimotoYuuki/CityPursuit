@@ -20,6 +20,15 @@ namespace nsK2EngineLow
 		/// <param name="rt">レンダリングターゲット</param>
 		void Execute(RenderContext& rc, RenderTarget& rt);
 
+		/// <summary>
+		/// 輝度抽出用レンダリングターゲットの取得
+		/// </summary>
+		/// <returns>輝度抽出用レンダリングターゲット</returns>
+		RenderTarget& GetLuminnceRenderTarget()
+		{
+			return m_luminnceRenderTarget;
+		}
+
 	private:
 		/// <summary>
 		/// 輝度抽出用レンダリングターゲットの初期化
