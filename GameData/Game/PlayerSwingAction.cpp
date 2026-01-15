@@ -576,9 +576,12 @@ void PlayerSwingAction::SwingPlayerMove()
 	Vector3 rightDirXZ = g_camera3D->GetRight();
 	rightDirXZ.y = 0.0f;
 	rightDirXZ.Normalize();
-	float rightPower = g_pad[0]->GetLStickXF() / 4.5f;
-	rightDirXZ.Scale(rightPower);
-	m_inputMoveDirXZ.Lerp(0.2f, m_inputMoveDirXZ, rightDirXZ);
+	if (fabsf(g_pad[0]->GetLStickXF()) >= 0.45f)
+	{
+		float rightPower = g_pad[0]->GetLStickXF() / 4.5f;
+		rightDirXZ.Scale(rightPower);
+		m_inputMoveDirXZ.Lerp(0.2f, m_inputMoveDirXZ, rightDirXZ);
+	}
 	addMoveDir += m_inputMoveDirXZ;
 
 	//正規化して方向ベクトルにする
