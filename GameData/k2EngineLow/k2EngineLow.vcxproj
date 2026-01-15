@@ -350,6 +350,7 @@
     <ClCompile Include="tkFile\TknFile.cpp" />
     <ClCompile Include="tkFile\TksFile.cpp" />
     <ClCompile Include="ViewFrustum.cpp" />
+    <ClCompile Include="GotRay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\PathFinding\Cell.h" />
@@ -461,6 +462,7 @@
     <ClInclude Include="tkFile\TksFile.h" />
     <ClInclude Include="util\TResourceBank.h" />
     <ClInclude Include="ViewFrustum.h" />
+    <ClInclude Include="GotRay.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

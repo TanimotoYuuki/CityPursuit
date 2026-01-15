@@ -26,14 +26,10 @@ struct SPSIn{
     float3 worldPos : TEXCOORD1;        //ワールド空間座標
     float3 normalInView : TEXCOORD2;    //カメラ空間の法線
     float4 posInLVP : TEXCOORD3;        //ライトビュースクリーン空間でのピクセルの座標
-    float3 depthInView : TEXCOORD4;     //カメラ空間でのピクセルの深度
 };
 
 struct SPSOut{
     float4 color : SV_Target0;
-    float depth : SV_Target1;
-    float3 normal : SV_Target2;
-    float specular : SV_Target3;
 };
 
 //ディレクションライト
@@ -154,7 +150,6 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin)
     psIn.worldPos = psIn.pos;
     float4 worldPos = psIn.pos;
 	psIn.pos = mul(mView, psIn.pos);
-    psIn.depthInView = psIn.pos.z;
 	psIn.pos = mul(mProj, psIn.pos);
 
     psIn.normal = normalize(mul(m, vsIn.normal));
@@ -239,10 +234,6 @@ SPSOut PSMain(SPSIn psIn, int isShadowReceiver) : SV_Target0
     lig += limLig;
     
 	float4 albedoColor = g_albedo.Sample(g_sampler, psIn.uv);
-    
-    psOut.depth = psIn.depthInView;
-    psOut.normal = normalize(mul(mView, normalMap));
-    psOut.specular = specularMap;
     
     ///最終出力カラーに光を乗算する
     albedoColor.xyz *= lig;
