@@ -36,6 +36,8 @@ cbuffer ShadowMapCb : register(b1)
     float alphaColor; //透明度
 }
 
+static float LIGHT_RANGE = 100000000.0f;
+
 StructuredBuffer<float4x4> g_boneMatrix : register(t3); //ボーン行列
 
 /// <summary>
@@ -75,7 +77,7 @@ SPSIn VSMainCore(SVSIn vsIn, uniform bool hasSkin)
     psIn.pos = mul(mView, psIn.pos);
     psIn.pos = mul(mProj, psIn.pos);
     
-    psIn.depth.x = length(worldPos - lightPos) / 1000.0f;
+    psIn.depth.x = length(worldPos - lightPos) / LIGHT_RANGE;
     psIn.depth.y = psIn.depth.x * psIn.depth.x;
     
     psIn.uv = vsIn.uv;

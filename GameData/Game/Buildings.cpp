@@ -36,8 +36,18 @@ bool Buildings::Start()
 		break;
 	}
 
-	//建物モデルの初期化
-	m_buildingsModel[m_buildingsType].Init(m_buildingsModelPath.c_str());
+	//建物のタイプがビルの場合
+	if (m_buildingsType == enBuildingsType_Building)
+	{
+		//建物モデルの初期化
+		m_buildingsModel[m_buildingsType].Init(m_buildingsModelPath.c_str(), nullptr, 0, enModelUpAxisZ, false, true);
+	}
+	//建物のタイプがタワーの場合
+	else if (m_buildingsType == enBuildingsType_Tower)
+	{
+		//建物モデルの初期化
+		m_buildingsModel[m_buildingsType].Init(m_buildingsModelPath.c_str(), nullptr, 0, enModelUpAxisZ);
+	}
 	
 	//建物モデルの位置設定
 	m_buildingsModel[m_buildingsType].SetPosition(m_position);

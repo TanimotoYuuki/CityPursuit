@@ -32,9 +32,9 @@ namespace nsK2EngineLow
 		m_light.hemLight.groundNormal = Vector3(0.0f, 1.0f, 0.0f);
 
 		//カメラの位置を設定
-		m_lightCamera.SetPosition(GetLightCamera().GetTarget() + Vector3(0, 600, -300));
+		m_lightCamera.SetPosition(m_lightCameraPosition);
 		//カメラの注視点を設定
-		m_lightCamera.SetTarget(GetLightCamera().GetTarget());
+		m_lightCamera.SetTarget(0, 0, 0);
 		//上方向を設定
 		m_lightCamera.SetUp(1, 0, 0);
 		//ライトビュープロジェクション行列の計算
@@ -47,11 +47,16 @@ namespace nsK2EngineLow
 	void SceneLight::LightCameraUpdate()
 	{
 		//カメラの位置を設定
-		m_lightCamera.SetPosition(GetLightCamera().GetTarget() + Vector3(0, 600, -300));
+		Vector3 lightCamPos = g_camera3D->GetTarget();
+		lightCamPos.x += m_lightCameraPosition.x;
+		lightCamPos.y = m_lightCameraPosition.y;
+		lightCamPos.z += m_lightCameraPosition.z;
+		m_lightCamera.SetPosition(lightCamPos);
 		//カメラの注視点を設定
-		m_lightCamera.SetTarget(GetLightCamera().GetTarget());
+		m_lightCamera.SetTarget(g_camera3D->GetTarget());
+		m_light.mLVP = m_lightCamera.GetViewProjectionMatrix();
+		m_light.lightPos.Set(m_lightCamera.GetPosition());
 		//ライトビュープロジェクション行列の計算
 		m_lightCamera.Update();
-		m_light.mLVP = m_lightCamera.GetViewProjectionMatrix();
 	}
 }
