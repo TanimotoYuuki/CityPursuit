@@ -140,16 +140,6 @@ namespace nsK2EngineLow
 		}
 
 		/// <summary>
-		/// ライトカメラの注視点を設定する
-		/// </summary>
-		/// <param name="target">注視点</param>
-		void SetLightCameraTarget(const Vector3& target)
-		{
-			m_lightCameraTarget = target;
-			m_lightCamera.SetTarget(m_lightCameraTarget);
-		}
-
-		/// <summary>
 		/// シーンライトを取得
 		/// </summary>
 		/// <returns></returns>
@@ -169,7 +159,7 @@ namespace nsK2EngineLow
 	private:
 		Light m_light;					//ライト
 		Camera m_lightCamera;			//ライトカメラ
-		Vector3 m_lightCameraTarget;	//ライトカメラの注視点
+		Vector3 m_lightCameraPosition = Vector3(0, 600, -300);//ライトカメラの注視点
 	};
 }
 
