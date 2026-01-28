@@ -45,7 +45,7 @@ void DebugLog::DebugLogUpdate()
 			swprintf_s(floatDebug, 256, L"F:%0.2f", float(floatDataIt->second));
 
 			m_debugLog[i].SetText(floatDebug);
-			m_debugLog[i].SetPosition(Vector3{ m_DebugLogPosition.x,m_DebugLogPosition.y - i + 50,m_DebugLogPosition.z });
+			m_debugLog[i].SetPosition(Vector3{ m_DebugLogPosition.x,m_DebugLogPosition.y - i * 50,m_DebugLogPosition.z });
 			m_debugLog[i].SetScale(1.0f);
 			m_debugLog[i].SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		}
