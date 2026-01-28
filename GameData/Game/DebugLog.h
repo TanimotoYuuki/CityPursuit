@@ -64,7 +64,7 @@ private://メンバ変数
 	std::map<std::string, Vector3> m_vector3DebugLogData;//Vector3格納用のデバッグログ用のデータ
 	std::vector<std::string> m_debugLogName;//デバッグログの名前
 	int m_debugLogID = 0;//デバッグログID
-	Vector3 m_DebugLogPosition = Vector3{ 300.0f, 500.0f, 0.0f };//デバッグログの表示位置
+	Vector3 m_debugLogPosition = Vector3{ 300.0f, 500.0f, 0.0f };//デバッグログの表示位置
 	
 private:
 	static DebugLog* m_instance;//シングルトンインスタンス

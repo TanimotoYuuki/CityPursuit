@@ -33,7 +33,7 @@ void DebugLog::DebugLogUpdate()
 			swprintf_s(intDebug, 256, L"I:%d", int(intDataIt->second));
 
 			m_debugLog[i].SetText(intDebug);
-			m_debugLog[i].SetPosition(Vector3{ m_DebugLogPosition.x,m_DebugLogPosition.y - i * 50,m_DebugLogPosition.z });
+			m_debugLog[i].SetPosition(Vector3{ m_debugLogPosition.x,m_debugLogPosition.y - i * 50,m_debugLogPosition.z });
 			m_debugLog[i].SetScale(1.0f);
 			m_debugLog[i].SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		}
@@ -45,7 +45,7 @@ void DebugLog::DebugLogUpdate()
 			swprintf_s(floatDebug, 256, L"F:%0.2f", float(floatDataIt->second));
 
 			m_debugLog[i].SetText(floatDebug);
-			m_debugLog[i].SetPosition(Vector3{ m_DebugLogPosition.x,m_DebugLogPosition.y - i + 50,m_DebugLogPosition.z });
+			m_debugLog[i].SetPosition(Vector3{ m_debugLogPosition.x,m_debugLogPosition.y - i * 50,m_debugLogPosition.z });
 			m_debugLog[i].SetScale(1.0f);
 			m_debugLog[i].SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		}
@@ -57,7 +57,7 @@ void DebugLog::DebugLogUpdate()
 			swprintf_s(vector3Debug, 256, L"X:%0.2f Y:%0.2f Z:%0.2f", float(vector3DataIt->second.x), float(vector3DataIt->second.y), float(vector3DataIt->second.z));
 
 			m_debugLog[i].SetText(vector3Debug);
-			m_debugLog[i].SetPosition(Vector3{ m_DebugLogPosition.x,m_DebugLogPosition.y - i * 50,m_DebugLogPosition.z });
+			m_debugLog[i].SetPosition(Vector3{ m_debugLogPosition.x,m_debugLogPosition.y - i * 50,m_debugLogPosition.z });
 			m_debugLog[i].SetScale(1.0f);
 			m_debugLog[i].SetColor({ 1.0f, 1.0f, 1.0f, 1.0f });
 		}
