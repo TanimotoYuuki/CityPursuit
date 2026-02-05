@@ -61,7 +61,7 @@ bool Title::Start()
 	m_titleCamera = NewGO<TitleCamera>(0, "titlecamera");
 
 	m_titleSprite = NewGO<TitleSprite>(0, "titlesprite");
-	m_titleSprite->EnableDrawingUI();
+	m_titleSprite->EnableDrawingUI(TitleSprite::enDrawingUI_TextUI);
 
 	m_titleSelect = NewGO<TitleSelect>(0, "titleselect");
 
@@ -114,7 +114,7 @@ void Title::TitleTextUpdate()
 	//Aボタンを押したら次のステートに移行する
 	if (g_pad[0]->IsTrigger(enButtonA))
 	{
-		m_titleSprite->DisableDrawingUI();
+		m_titleSprite->DisableDrawingUI(TitleSprite::enDrawingUI_TextUI);
 		m_titleSelect->EnableDrawingUI();
 		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Decision, 1.2f);
 		m_titleState = enTitleState_Select;
@@ -132,7 +132,7 @@ void Title::SelectUpdate()
 		//Bボタンを押したら前のステートに移行する
 		if (g_pad[0]->IsTrigger(enButtonB))
 		{
-			m_titleSprite->EnableDrawingUI();
+			m_titleSprite->EnableDrawingUI(TitleSprite::enDrawingUI_TextUI);
 			m_titleSelect->DisableDrawingUI();
 			m_titleSelect->Reset();
 			GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Cancel, 1.5f);
@@ -143,9 +143,25 @@ void Title::SelectUpdate()
 	//選択したときの演出が終わっていたら次のステートに移行する
 	if (m_titleSelect->IsFinishSelectDecisionDirection())
 	{
-		m_titleSelect->DisableDrawingUI();
-		m_player->GetPlayerMove()->GetPlayerJump().JumpStart();
-		m_titleState = enTitleState_GameStartDirection;
+		//ゲームスタートを選択したら演出ステートに移行する
+		if (m_titleSelect->GetCurrentSelect() == TitleSelect::enTitleSelect_GameStart)
+		{
+			m_titleSelect->DisableDrawingUI();
+			m_player->GetPlayerMove()->GetPlayerJump().JumpStart();
+			m_titleState = enTitleState_GameStartDirection;
+		}
+		//遊び方を選択したらシーン遷移ステートに移行する
+		else if (m_titleSelect->GetCurrentSelect() == TitleSelect::enTitleSelect_HowToPlay)
+		{
+			m_titleSprite->EnableDrawingUI(TitleSprite::enDrawingUI_HowToPlayUI);
+			m_titleSelect->DisableDrawingUI();
+			m_titleState = enTitleState_TransitionScene;
+		}
+		//ゲーム終了を選択したらシーン遷移ステートに移行する
+		else
+		{
+			m_titleState = enTitleState_TransitionScene;
+		}
 	}
 }
 
@@ -210,6 +226,7 @@ void Title::TransitionSceneUpdate()
 	case TitleSelect::enTitleSelect_HowToPlay:
 		if(g_pad[0]->IsTrigger(enButtonA))
 		{
+			m_titleSprite->DisableDrawingUI(TitleSprite::enDrawingUI_HowToPlayUI);
 			m_titleSelect->EnableDrawingUI();
 			m_titleSelect->Reset();
 			GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Decision, 1.2f);
