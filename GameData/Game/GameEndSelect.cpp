@@ -18,7 +18,7 @@ namespace {
 
 	const float CURRENT_SELECT_UI_HEIGHT = 1024.0f;//現在何を選択しているかを表すUIの縦幅
 
-	const float CURRENT_SELECT_UI_POSITION_Y_OFFSET = 300.0f;//現在何を選択しているかを表すUIのY座標のオフセット
+	const float CURRENT_SELECT_UI_POSITION_Y_OFFSET = 310.0f;//現在何を選択しているかを表すUIのY座標のオフセット
 
 	const Vector3 CURRENT_SELECT_UI_SCALE{ 0.15f,0.15f,0.15f };//現在何を選択しているかを表すUIの大きさ
 
@@ -28,12 +28,14 @@ namespace {
 	const int SELECT_DOWN = 1;//下に選択
 
 	//アニメーション
-	const float ANIMATION_SPEED_NORMAL = 1.5f;//通常のアニメーション再生速度
+	const float ANIMATION_SPEED_NORMAL = 5.0f;//通常のアニメーション再生速度
 
-	const float ANIMATION_SPEED_SELECT = 5.0f;//選択したときのアニメーション再生速度
+	const float ANIMATION_SPEED_SELECT = 3.5f;//選択したときのアニメーション再生速度
 
-	//カウント
-	const int NO_DRAWING_CURRENT_SELECT_UI_COUNT_MAX = 5;//現在何を選択しているかを表すUIを描画していない回数の上限
+	//スプライトのアニメーション
+	const Vector2 AFTER_SCALE_DOWN_SCALE{ 0.115f,0.115f };//スプライトのアニメーション後の大きさ
+
+	const Vector3 AFTER_PUSH_DOWN_COLOR{ 0.82f,0.82f,0.82f };//スプライトの押されたときのアニメーション後の色
 
 	//時間
 	const float DELAY_TIME = 0.2f;//待機時間
@@ -58,10 +60,60 @@ bool GameEndSelect::Start()
 		//選択テキストUI用の座標の設定
 		m_currentSelectUIPosition[i] = m_selectTextUIPosition[i];
 		m_currentSelectUIPosition[i].x -= CURRENT_SELECT_UI_POSITION_Y_OFFSET;
+		m_defaultCurrentSelectUIPosition[i] = m_currentSelectUIPosition[i];
 	}
 
 	//現在何を選択しているかを表すUIの初期化
 	InitCurrentSelectUI();
+
+	Vector2 currentSelectUIScale = {
+	m_currentSelectUI.GetScale().x,
+	m_currentSelectUI.GetScale().y
+	};
+
+	//大きさを変えるアニメーションクラス
+	m_currentSelectUIScaleDownAnimation = std::make_unique<ScaleSpriteAnimation>(
+		&m_currentSelectUI,//アニメーションをさせるスプライト
+		1.0f,//ターゲットの割合
+		ANIMATION_SPEED_SELECT,//アニメーションの再生速度
+		false,//ループするか？
+		currentSelectUIScale,//元の大きさ
+		AFTER_SCALE_DOWN_SCALE//ターゲットの大きさ
+	);
+
+	m_currentSelectUIScaleUpAnimation = std::make_unique<ScaleSpriteAnimation>(
+		&m_currentSelectUI,//アニメーションをさせるスプライト
+		1.0f,//ターゲットの割合
+		ANIMATION_SPEED_SELECT,//アニメーションの再生速度
+		false,//ループするか？
+		AFTER_SCALE_DOWN_SCALE,//元の大きさ
+		currentSelectUIScale//ターゲットの大きさ
+	);
+
+	Vector3 currentSelectUIColor = {
+		m_currentSelectUI.GetMulColor().x,
+		m_currentSelectUI.GetMulColor().y,
+		m_currentSelectUI.GetMulColor().z
+	};
+
+	//色を変えるアニメーションクラス
+	m_currentSelectUIPushDownAnimation = std::make_unique<ColorSpriteAnimation>(
+		&m_currentSelectUI,//アニメーションをさせるスプライト
+		1.0f,//ターゲットの割合
+		ANIMATION_SPEED_SELECT,//アニメーションの再生速度
+		false,//ループするか？
+		currentSelectUIColor,//元の色
+		AFTER_PUSH_DOWN_COLOR//ターゲットの色
+	);
+
+	m_currentSelectUIPushUpAnimation = std::make_unique<ColorSpriteAnimation>(
+		&m_currentSelectUI,//アニメーションをさせるスプライト
+		1.0f,//ターゲットの割合
+		ANIMATION_SPEED_SELECT,//アニメーションの再生速度
+		false,//ループするか？
+		AFTER_PUSH_DOWN_COLOR,//元の色
+		currentSelectUIColor//ターゲットの色
+	);
 
 	return true;
 }
@@ -70,7 +122,7 @@ bool GameEndSelect::Start()
 void GameEndSelect::Execute()
 {
 	//一定の回数までカウントしたら処理しない
-	if (m_noDrawingCurrentSelectUICount == NO_DRAWING_CURRENT_SELECT_UI_COUNT_MAX)
+	if (m_currentSelectUIScaleUpAnimation->IsCompleted())
 	{
 		if (g_gameTime->StopWatch(DELAY_TIME))
 		{
@@ -105,11 +157,8 @@ void GameEndSelect::Render(RenderContext& rc)
 		m_selectTextUI[i].Draw(rc);
 	}
 
-	if (m_isDrawingCurrentSelectUI)
-	{
-		//現在何を選択しているかを表すUIの描画
-		m_currentSelectUI.Draw(rc);
-	}
+	//現在何を選択しているかを表すUIの描画
+	m_currentSelectUI.Draw(rc);
 }
 
 //選択テキストUIの初期化
@@ -141,16 +190,12 @@ void GameEndSelect::InitCurrentSelectUI()
 //現在何を選択しているかを表すUIの更新処理
 void GameEndSelect::CurrentSelectUIUpdate(EnGameEndSelect enGameEndSelect)
 {
-	if (m_isSelect)
-	{
-		//現在何を選択しているかを表すUIのアニメーションの更新処理
-		CurrentSelectUIAnimationUpdate(ANIMATION_SPEED_SELECT);
-	}
-	else
-	{
-		//現在何を選択しているかを表すUIのアニメーションの更新処理
-		CurrentSelectUIAnimationUpdate(ANIMATION_SPEED_NORMAL);
-	}
+	//前に選択したところの位置をデフォルトに戻す
+	m_currentSelectUIPosition[m_previousSelect] = m_defaultCurrentSelectUIPosition[m_previousSelect];
+
+	//現在何を選択しているかを表すUIのアニメーションの更新処理
+	CurrentSelectUIAnimationUpdate();
+	
 	//現在何を選択しているかを表すUIの座標の設定
 	m_currentSelectUI.SetPosition(m_currentSelectUIPosition[enGameEndSelect]);
 	//現在何を選択しているかを表すUIの更新処理
@@ -158,26 +203,28 @@ void GameEndSelect::CurrentSelectUIUpdate(EnGameEndSelect enGameEndSelect)
 }
 
 //現在何を選択しているかを表すUIのアニメーションの更新処理
-void GameEndSelect::CurrentSelectUIAnimationUpdate(float speed)
+void GameEndSelect::CurrentSelectUIAnimationUpdate()
 {
-	m_time += speed * g_gameTime->GetFrameDeltaTime();
-
-	if (int(m_time) % 2 == 0)
+	if (m_isSelect)
 	{
-		//選択している　かつ
-		//現在何を選択しているかを表すUIを描画していないとき
-		if (m_isSelect)
-		{
-			if (!m_isDrawingCurrentSelectUI)
-			{
-				m_noDrawingCurrentSelectUICount++;
-			}
-		}
+		//大きさを変えるアニメーション
+		//大きさを縮小するアニメーションの再生が終わっているか?
+		m_currentSelectUIScaleDownAnimation->IsCompleted() != true ?
+			m_currentSelectUIScaleDownAnimation->Update() ://終わっていなければ引き継ぎ、縮小するアニメーションの再生をする
+			m_currentSelectUIScaleUpAnimation->Update();//終わっていたら拡大するアニメーションの再生をする
 
-		m_isDrawingCurrentSelectUI = true;
+
+		//色を変えるアニメーション
+		//押されたときのアニメーションの再生が終わっているか?
+		m_currentSelectUIPushDownAnimation->IsCompleted() != true ?
+			m_currentSelectUIPushDownAnimation->Update() ://終わっていなければ引き継ぎ、押されたときのアニメーションの再生をする
+			m_currentSelectUIPushUpAnimation->Update();//終わっていたら離したときのアニメーションの再生をする
+
 		return;
 	}
-	m_isDrawingCurrentSelectUI = false;
+
+	m_time += ANIMATION_SPEED_NORMAL * g_gameTime->GetFrameDeltaTime();
+	m_currentSelectUIPosition[m_currentSelect].x += sin(m_time) * 0.5f;
 }
 
 //入力の更新処理
@@ -187,8 +234,8 @@ void GameEndSelect::InputUpdate()
 	//左スティックを上に倒したとき
 	if (g_pad[0]->IsTrigger(enButtonUp) || g_pad[0]->IsTriggerLStickUp())
 	{
-		m_isDrawingCurrentSelectUI = true;
 		m_time = 0.0f;
+		m_previousSelect = m_currentSelect;
 		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Select, 1.2f);
 
 		if (m_currentSelect == enGameEndSelect_Retry)
@@ -203,8 +250,8 @@ void GameEndSelect::InputUpdate()
 	//左スティックを下に倒したとき
 	else if (g_pad[0]->IsTrigger(enButtonDown) || g_pad[0]->IsTriggerLStickDown())
 	{
-		m_isDrawingCurrentSelectUI = true;
 		m_time = 0.0f;
+		m_previousSelect = m_currentSelect;
 		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Select, 1.2f);
 
 		if (m_currentSelect == enGameEndSelect_ReturnTitle)
@@ -219,7 +266,6 @@ void GameEndSelect::InputUpdate()
 	//Aボタンを押したとき
 	if (g_pad[0]->IsTrigger(enButtonA))
 	{
-		m_isDrawingCurrentSelectUI = true;
 		m_time = 0.0f;
 		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Decision, 1.2f);
 		m_isSelect = true;
