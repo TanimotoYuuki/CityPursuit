@@ -85,8 +85,11 @@ void PlayerCamera::Execute(Player* playerData, const Vector3& position)
 		m_toCameraPos = toCameraPosOld;
 	}
 
+	float zOffset = m_toCameraPos.z <= 0.0f ? -m_afterLarpToCameraPosZOffset : m_afterLarpToCameraPosZOffset;
+
 	//視点を計算する
 	Vector3 pos = target + m_toCameraPos;
+	target.z += zOffset;
 
 	//メインカメラに注視点と視点を設定する
 	m_springCamera.SetTarget(target);

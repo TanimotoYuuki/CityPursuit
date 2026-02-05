@@ -72,21 +72,12 @@ public://メンバ関数
 	}
 
 	/// <summary>
-	/// 注視点の上方向のオフセットをイージングする
+	/// 注視点から視点までのベクトルをイージングする
 	/// </summary>
 	/// <param name="rate">割合</param>
-	void LerpTargetOffsetUp(const float rate)
+	void LerpTarget(const float rate)
 	{
-		m_targetOffsetUp = Math::Lerp<float>(rate, 120.0f, 170.0f);
-	}
-
-	/// <summary>
-	/// 注視点のXZ方向のオフセットをイージングする
-	/// </summary>
-	/// <param name="rate">割合</param>
-	void LerpTargetOffsetForward(const float rate)
-	{
-		m_targetOffsetXZ = Math::Lerp<float>(rate, 0.0f, 150.0f);
+		m_afterLarpToCameraPosZOffset = Math::Lerp<float>(rate, 0.0f, 100.0f);
 	}
 
 	/// <summary>
@@ -138,6 +129,7 @@ private://メンバ変数
 	SpringCamera m_springCamera;//バネカメラ
 	float m_targetOffsetUp = 0.0f;//注視点の上方向オフセット
 	float m_targetOffsetXZ = 0.0f;//注視点のXZ方向オフセット
+	float m_afterLarpToCameraPosZOffset = 0.0f;//注視点から視点までのベクトルのZ方向のイージング後の値
 	Vector3 m_toCameraPos = Vector3::Zero;//注視点から視点までのベクトル
 	Vector2 m_inputRStick = Vector2::Zero;//右スティックの入力量
 	bool m_isOnEnemyCamera = false;//敵の上に乗っているときのカメラか？
