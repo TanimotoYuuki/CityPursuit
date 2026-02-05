@@ -145,7 +145,7 @@ void PlayerSwingAction::PreSwingAction()
 	{
 		m_swingRollFlag = true;
 
-		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_AfterSwing, 1.0f);
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_AfterSwing, 0.5f);
 
 		//ステートをスイング後の空中状態に遷移する
 		ChangeState(enSwingState_AirAfterSwing);
@@ -618,7 +618,7 @@ void PlayerSwingAction::SwingPlayerMove()
 
 	if (!GameSoundEngine::GetInstance()->IsPlayingSound(GameSoundList_SE_Swing))
 	{
-		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Swing,1.0f);
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Swing,0.5f);
 	}
 }
 

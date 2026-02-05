@@ -122,7 +122,7 @@ void EnemyAI::Execute(Vector3& position, Quaternion& rotation)
 
 		if (!GameSoundEngine::GetInstance()->IsPlayingSound(GameSoundList_SE_CarEngine))
 		{
-			GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_CarEngine, 5.0f, true);
+			GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_CarEngine, 15.0f, true);
 		}
 		GameSoundEngine::GetInstance()->SetPosition(GameSoundList_SE_CarEngine, position);
 

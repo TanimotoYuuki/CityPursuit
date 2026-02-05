@@ -83,6 +83,7 @@ bool Game::Start()
 	m_gameStartSprite->DisableDrawingUI();
 	m_invisibleWall = NewGO<InvisibleWall>(0, "invisiblewall");
 	g_renderingEngine->GetGameEndPostEffect().SetDrawingGameEndPostEffect(GameEndPostEffect::enGameEndPostEffect_None);
+	GameSoundEngine::GetInstance()->PlayBGM(GameSoundList_BGM_InGame, 0.4f);
 	return true;
 }
 
