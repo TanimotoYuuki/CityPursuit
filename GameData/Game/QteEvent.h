@@ -98,6 +98,11 @@ private://メンバ関数
 	void InitQteEventResultUI(EnQteEventResult enQteEventReulst);
 
 	/// <summary>
+	/// ×を表すUIの初期化
+	/// </summary>
+	void InitWrongUI();
+
+	/// <summary>
 	/// ゲームパッドの入力前後のUIの更新処理
 	/// </summary>
 	void GamePadInputUIUpdate();
@@ -250,12 +255,15 @@ private://メンバ変数
 	SpriteRender m_gamePadInputBeforeUI[enGamePadInputList_Num];//ゲームパッドのボタンや方向キーを入力前のUI
 	SpriteRender m_gamePadInputAfterUI[enQteEventResult_Num][enGamePadInputList_Num];//ゲームパッドのボタンや方向キーを入力後のUI
 	SpriteRender m_qteEventResultUI[enQteEventResult_Num];//QTEイベントの結果UI
+	SpriteRender m_wrongUI;//×を表すUI
 	SpriteRender m_timeLimitUI;//制限時間UI
 	SpriteRender m_timeLimitBerUI;//制限時間バーUI
 	Vector3 m_gamePadInputUIBeforeEasingPosition[enQteEventResult_Num][enGamePadInputList_Num];//ゲームパッドUIイージング前用の位置
 	Vector3 m_gamePadInputUIAfterEasingPosition[enQteEventResult_Num][enGamePadInputList_Num];//ゲームパッドUIイージング後用の位置
 	Vector3 m_gamePadInputUIEasingPosition[enQteEventResult_Num][enGamePadInputList_Num];//ゲームパッドUIイージング中用の位置
+	Vector3 m_wrongUIPosition = Vector3::Zero;//×を表すUIの位置
 	Vector4 m_timeLimitUIColor = Vector4::White;//制限時間UIの色
+	Quaternion m_qteEventResultFailedUIDefaultRotation = Quaternion::Identity;//QTEイベントの結果UI(失敗)のデフォルトの回転
 	EnCommandList m_nowInputCommand = enCommandList_None;//現在入力しているコマンド
 	EnCommandList m_nextInputCommand = enCommandList_None;//次入力するコマンド
 	EnQteEventResult m_qteEventResult = enQteEventResult_Num;//QTEイベントの結果

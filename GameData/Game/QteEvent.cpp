@@ -55,6 +55,13 @@ namespace {
 
 	const Vector4 QTE_EVENT_RESULT_UI_MULCOLOR{ 1.0f,1.0f,1.0f,0.0f };//QTEイベントの結果の乗算カラー
 
+	//×を表すUI
+	const float WRONG_UI_WIDTH_AND_HEIGHT = 1024;//QTEイベントの結果UIの横幅
+
+	const Vector3 WRONG_UI_INIT_POSITION{ 0.0f,0.0f,0.0f };//QTEイベントの結果UIの初期位置
+
+	const Vector3 WRONG_UI_SCALE{ 0.1f,0.1f,0.1f };//QTEイベントの結果UIの大きさ
+
 	//時間
 	const float DELAY_TIME = 1.0f;//待機時間
 
@@ -157,6 +164,9 @@ bool QteEvent::Start()
 		);
 	}
 
+	//QTEイベントの結果UI(失敗)のデフォルトの回転の設定
+	m_qteEventResultFailedUIDefaultRotation = m_qteEventResultUI[enQteEventResult_Failed].GetRotation();
+
 	//QTEイベントの結果UIのアニメーション後の回転(終了演出)の設定
 	Quaternion afterEndDirectionAnimationRotation;
 	afterEndDirectionAnimationRotation.SetRotationDegZ(AFTER_END_DIRECTION_ANIMATION_ANGLE);
@@ -188,16 +198,20 @@ void QteEvent::Update()
 	//ゲームパッドの入力前後のUIの更新処理
 	GamePadInputUIUpdate();
 
-	//QTEイベントでコマンド入力に失敗したら処理する
-	if (m_qteEventInput->IsInputFailed())
+	//QTEイベントでコマンド入力に失敗していない かつ
+	//ゲームパッドUIのイージングし終わっていなければ処理する
+	if (m_qteEventInput->IsInputFailed() && m_isGamePadUIEasingEnd[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] != true)
 	{
 		//入力に失敗したときの処理
 		InputFailed();
 	}
 
-	//制限時間が止まっていなかったら かつ
-	//プレイヤー側が最後のコマンドを入力していないときに処理する
-	if (!m_isStopTimeLimit && !(m_qteEventInput->IsInputLastCommand() && m_succesInputCommandCount >= SUCCESS_INPUT_COMMAND_COUNT_MAX))
+	//制限時間が止まっていない かつ
+	//プレイヤー側が最後のコマンドを入力していない かつ
+	//入力が失敗しなければ処理する
+	if (!m_isStopTimeLimit && !(m_qteEventInput->IsInputLastCommand() && 
+		m_succesInputCommandCount >= SUCCESS_INPUT_COMMAND_COUNT_MAX) &&
+		!m_qteEventInput->IsInputFailed())
 	{
 		//制限時間の更新処理
 		TimeLimitUpdate();
@@ -299,6 +313,8 @@ void QteEvent::Init()
 		InitQteEventResultUI((EnQteEventResult)j);//QTEイベントの結果UIの初期化
 	}
 
+	InitWrongUI();//×を表すUIの初期化
+
 	//コマンド入力リストのコンテナのメモリ容量の確保
 	m_inputCommandList.reserve(15);
 }
@@ -368,6 +384,15 @@ void QteEvent::InitQteEventResultUI(EnQteEventResult enQteEventResult)
 	m_qteEventResultUI[enQteEventResult].SetScale(QTE_EVENT_RESULT_UI_SCALE);
 	m_qteEventResultUI[enQteEventResult].SetMulColor(QTE_EVENT_RESULT_UI_MULCOLOR);
 	m_qteEventResultUI[enQteEventResult].Update();
+}
+
+//×を表すUIの初期化
+void QteEvent::InitWrongUI()
+{
+	m_wrongUI.Init("Assets/sprite/wrong/wrong.dds", WRONG_UI_WIDTH_AND_HEIGHT, WRONG_UI_WIDTH_AND_HEIGHT);
+	m_wrongUI.SetPosition(WRONG_UI_INIT_POSITION);
+	m_wrongUI.SetScale(WRONG_UI_SCALE);
+	m_wrongUI.Update();
 }
 
 //入力するコマンドの設定
@@ -714,12 +739,16 @@ void QteEvent::InputFailed()
 		);
 	}
 
+	//×を表すUIの位置の設定
+	m_wrongUI.SetPosition(m_gamePadInputUIAfterEasingPosition[enQteEventResult_Failed][(EnGamePadInputList)m_qteEventInput->GetInputCommand()]);
+	//×を表すUIの更新処理
+	m_wrongUI.Update();
+
 	//イージングが終わったら入力に失敗したときのリセット処理をする
 	if (m_isGamePadUIEasingEnd[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] == true)
 	{
-		m_isGamePadUIEasingStart[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] = false;
-		m_isGamePadUIEasingEnd[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] = false;
-		m_qteEventInput->ResetInputFailed();
+		m_qteEventResult = enQteEventResult_Failed;
+		m_isQteEventResult[enQteEventResult_Failed] = true;
 	}
 }
 
@@ -737,6 +766,18 @@ void QteEvent::Reset()
 	m_alphaSpriteAnimation[m_qteEventResult][enQteEventResultUIDirection_End]->Reset();
 
 	m_rotationSpriteAnimation->Reset();
+
+	if (m_qteEventResult == enQteEventResult_Failed)
+	{
+		m_isGamePadUIEasingStart[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] = false;
+		m_isGamePadUIEasingEnd[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()] = false;
+		m_qteEventInput->ResetInputFailed();
+		
+		m_qteEventResultUI[enQteEventResult_Failed].SetRotation(m_qteEventResultFailedUIDefaultRotation);
+		m_qteEventResultUI[enQteEventResult_Failed].Update();
+
+		GamePadPushUIReset();
+	}
 
 	m_qteEventResult = enQteEventResult_Num;
 
@@ -795,6 +836,9 @@ void QteEvent::Render(RenderContext& rc)
 		{
 			//ゲームパッドのボタンや方向キーを入力後のUIの描画処理(QTEイベント失敗用)
 			m_gamePadInputAfterUI[enQteEventResult_Failed][m_qteEventInput->GetInputCommand()].Draw(rc);
+
+			//×を表すUIの描画処理
+			m_wrongUI.Draw(rc);
 		}
 	}
 
