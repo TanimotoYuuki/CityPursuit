@@ -16,6 +16,8 @@ namespace{
 
 	const float SWING_ROLL_UP_POWER = 125.0f;//スイングロールの上昇力
 
+	const float CAN_SWING_MAX_HEIGHT = 1500.0f;//スイングできる最大高度
+
 //歩き
 	const float WALK_ACCELERATION = 10.0f;//歩き時の加速度
 
@@ -185,7 +187,10 @@ void PlayerSwingAction::SwingActionUpdate()
 	case PlayerSwingAction::enSwingState_FindSwingTarget://スイングターゲット検索状態
 		if (m_swingActionManager->IsSwingTargetScopeRadiusFound())//スイングターゲットが見つかったか？
 		{
-			ChangeState(enSwingState_WireStretching);//ワイヤーを伸ばしている状態に変更
+			if (m_player->GetPosition().y < CAN_SWING_MAX_HEIGHT)//一定の高さまで到達していないか?
+			{
+				ChangeState(enSwingState_WireStretching);//ワイヤーを伸ばしている状態に変更
+			}
 		}
 		break;
 	case PlayerSwingAction::enSwingState_WireStretching://ワイヤーを伸ばしている状態
