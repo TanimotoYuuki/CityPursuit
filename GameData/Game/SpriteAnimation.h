@@ -156,7 +156,7 @@ public:
 	/// <param name="isLoop">ループするか?</param>
 	/// <param name="baseColor">元の色</param>
 	/// <param name="targetColor">ターゲットの色</param>
-	ColorSpriteAnimation(SpriteRender* render, const float targetTime, const float playSpeed, const bool isLoop, const Vector4 baseColor, const Vector3 targetColor)
+	ColorSpriteAnimation(SpriteRender* render, const float targetTime, const float playSpeed, const bool isLoop, const Vector3 baseColor, const Vector3 targetColor)
 		: SpriteAnimationBase(render, targetTime, playSpeed, isLoop)
 		, m_baseColor(baseColor)
 		, m_targetColor(targetColor)

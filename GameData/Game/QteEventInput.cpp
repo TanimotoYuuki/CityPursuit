@@ -47,8 +47,11 @@ void QteEventInput::Execute()
 	//コマンド入力が一致していなければ
 	else
 	{
-		if (!m_qteEvent->IsStopTimeLimit())
+		//制限時間が止まっていない かつ
+		//入力が失敗していなければ処理する
+		if (!m_qteEvent->IsStopTimeLimit() && !m_isInputFailed)
 		{
+			//入力した方向がデフォルトではなければ処理する
 			if (m_inputCommand != -1)
 			{
 				GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_InputFailed, 1.0f);
