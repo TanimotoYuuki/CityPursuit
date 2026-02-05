@@ -1,4 +1,5 @@
 #pragma once
+#include "SpriteAnimation.h"
 /// <summary>
 /// ゲーム終了したときに選択するクラス
 /// </summary>
@@ -48,8 +49,7 @@ private://メンバ関数
 	/// <summary>
 	/// 現在何を選択しているかを表すUIのアニメーションの更新処理
 	/// </summary>
-	/// <param name="speed">再生速度</param>
-	void CurrentSelectUIAnimationUpdate(float speed = 1.0f);
+	void CurrentSelectUIAnimationUpdate();
 
 public://メンバ関数
 
@@ -97,13 +97,18 @@ private://メンバ変数
 	SpriteRender m_currentSelectUI;//現在何を選択しているか表すUI
 	Vector3 m_selectTextUIPosition[enGameEndSelect_Num];//選択テキストUIの座標
 	Vector3 m_currentSelectUIPosition[enGameEndSelect_Num];//現在何を選択しているか表すUI
+	Vector3 m_defaultCurrentSelectUIPosition[enGameEndSelect_Num];//現在何を選択しているか表すUIの初期座標
+	Vector3 m_currentSelectUIScale = Vector3::Zero;//現在何を選択しているか表すUIの大きさ
 	int m_currentSelect = enGameEndSelect_Retry;//現在何を選択しているかを表すための変数
-	int m_noDrawingCurrentSelectUICount = 0;//現在何を選択しているかを表すUIを描画していない回数
+	int m_previousSelect = -1;//前に何を選択していたかを表すための変数
 	float m_time = 0.0f;//時間
-	bool m_isDrawingCurrentSelectUI = true;//現在何を選択しているかを表すUIを描画するか?
 	bool m_isSelect = false;//選択できたか?
 	bool m_isDrawingUI = false;//UIを描画するか?
 	bool m_isFinishSelectDecisionDirection = false;//選択したときの演出が終わったか?
+	std::unique_ptr<ScaleSpriteAnimation> m_currentSelectUIScaleDownAnimation;//何を選択しているか表すUIの大きさを縮小するアニメーション
+	std::unique_ptr<ScaleSpriteAnimation> m_currentSelectUIScaleUpAnimation;//何を選択しているか表すUIの大きさを拡大するアニメーション
+	std::unique_ptr<ColorSpriteAnimation> m_currentSelectUIPushDownAnimation;//何を選択しているか表すUIで押されたときのアニメーション
+	std::unique_ptr<ColorSpriteAnimation> m_currentSelectUIPushUpAnimation;//何を選択しているか表すUIで離したときのアニメーション
 
 private://表示するUIのファイルパス用のメンバ変数
 
