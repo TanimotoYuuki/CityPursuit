@@ -94,25 +94,23 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 	if(m_canMove)
 	{
 		//ダッシュ
-		if (g_pad[0]->IsPress(enButtonRB2))
+		//地面に着いているときのみダッシュできる
+		if (g_pad[0]->IsPress(enButtonRB2) &&
+			characterController.IsOnGround())
 		{
-			//地面に着いているときのみダッシュできる
-			if (characterController.IsOnGround())
-			{
-				//XZ成分の移動速度をクリア
-				m_moveSpeed += m_cameraForward * m_inputLStick.y * 700.0f;	//奥方向への移動速度を加算
-				m_moveSpeed += m_cameraRight * m_inputLStick.x * 700.0f;	//右方向への移動速度を加算
+			//XZ成分の移動速度をクリア
+			m_moveSpeed += m_cameraForward * m_inputLStick.y * 700.0f;	//奥方向への移動速度を加算
+			m_moveSpeed += m_cameraRight * m_inputLStick.x * 700.0f;	//右方向への移動速度を加算
 
-				if (m_moveSpeed.Length() != 0.0f)
-				{
-					m_isRun = true;//走っている
-					m_isWalk = false;//歩いていない
-				}
-				else
-				{
-					m_isRun = false;//走っていない
-					m_isWalk = false;//歩いていない
-				}
+			if (m_moveSpeed.Length() != 0.0f)
+			{
+				m_isRun = true;//走っている
+				m_isWalk = false;//歩いていない
+			}
+			else
+			{
+				m_isRun = false;//走っていない
+				m_isWalk = false;//歩いていない
 			}
 		}
 		//歩き
@@ -137,6 +135,11 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 
 	//スイングアクションの更新処理
 	m_playerSwingAction->Execute();
+
+	if (m_playerSwingAction->GetSwingState() != PlayerSwingAction::enSwingState_AirAfterSwing)
+	{
+		m_swingActionMoveSpeed = m_moveSpeed;
+	}
 	
 	//プレイヤーのが移動しているときに処理する
 	if (m_moveSpeed.x != 0.0f ||

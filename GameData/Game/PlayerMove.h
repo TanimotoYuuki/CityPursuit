@@ -84,7 +84,7 @@ public:
 	/// <returns>移動速度</returns>
 	float GetXZSpeed() const
 	{
-		Vector3 moveVecXZ = m_moveSpeed;
+		Vector3 moveVecXZ = m_swingActionMoveSpeed;
 		moveVecXZ.y = 0.0f;
 		return moveVecXZ.Length();
 	}
@@ -201,6 +201,7 @@ private://メンバ変数
 	Vector3 m_cameraRight = Vector3::Zero;//カメラの横方向
 	Vector3 m_moveSpeed = Vector3::Zero;//移動速度
 	Vector3 m_moveDirection = Vector3{ 0.0f,0.0f,1.0f };//進行方向
+	Vector3 m_swingActionMoveSpeed = Vector3::Zero;//スイングアクション時の移動速度
 	PlayerJump m_playerJump;//プレイヤージャンプクラス
 	bool m_canMove = true;//移動できるか？
 	bool m_camJump = true;//ジャンプできるか?

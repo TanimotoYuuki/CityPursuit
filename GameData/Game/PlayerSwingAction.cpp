@@ -12,21 +12,21 @@ namespace{
 //スイング
 	const float MIN_VELOCITY_OF_AFTER_SWING_ACCELERATION = 50.0f;//スイング後の加速の最低速度
 
-	const float INIT_VELOCITY_OF_ATER_SWING_ACCELERATION = 1200.0f;//スイング後の加速の初速度
+	const float INIT_VELOCITY_OF_ATER_SWING_ACCELERATION = 450.0f;//スイング後の加速の初速度
 
-	const float SWING_ROLL_UP_POWER = 500.0f;//スイングロールの上昇力
+	const float SWING_ROLL_UP_POWER = 125.0f;//スイングロールの上昇力
 
 //歩き
-	const float WALK_ACCELERATION = 50.0f;//歩き時の加速度
+	const float WALK_ACCELERATION = 10.0f;//歩き時の加速度
 
 	const float WALK_MAX_SPEED = 325.0f;//歩き時の最高速度
 
 //スピード
-	const float START_DECELERATE_SWING_SPEED_INIT_VALUE = -700.0f;//減速し始めるスピードの初期値
+	const float START_DECELERATE_SWING_SPEED_INIT_VALUE = -1200.0f;//減速し始めるスピードの初期値
 
 	const float CAN_START_SWING_FALL_SPEED = -10.0f;//スイングを開始できる落下速度
 
-	const float INIT_SWING_SPEED = 900.0f;//最初のスイングスピード
+	const float INIT_SWING_SPEED = 150.0f;//最初のスイングスピード
 }
 
 //デストラクタ
@@ -88,6 +88,7 @@ void PlayerSwingAction::Execute()
 			m_isInputSwingAction = false;
 		}
 	}
+	//プレイヤーモデルが地面に付いているときに処理する
 	else
 	{
 		//地面に付いている時にスイングの状態がスイング終了状態だったら
@@ -330,8 +331,7 @@ void PlayerSwingAction::SwingEnd()
 	m_swingSpeed = 0.0f;
 	//カメラの値をリセット
 	m_player->GetPlayerCamera().LerpDampingRate(0.0f);
-	m_player->GetPlayerCamera().LerpTargetOffsetUp(0.0f);
-	m_player->GetPlayerCamera().LerpTargetOffsetForward(0.0f);
+	m_player->GetPlayerCamera().LerpTarget(0.0f);
 }
 
 //スイングの状態の変更
@@ -634,8 +634,7 @@ void PlayerSwingAction::CameraEasing()
 
 		m_cameraEasingTime += 1.75f * g_gameTime->GetFrameDeltaTime();
 		m_player->GetPlayerCamera().LerpDampingRate(m_cameraEasingTime * m_cameraEasingTime);
-		m_player->GetPlayerCamera().LerpTargetOffsetUp(m_cameraEasingTime * m_cameraEasingTime);
-		m_player->GetPlayerCamera().LerpTargetOffsetForward(m_cameraEasingTime * m_cameraEasingTime);
+		m_player->GetPlayerCamera().LerpTarget(m_cameraEasingTime * m_cameraEasingTime);
 	}
 	else if (m_swingState == enSwingState_AirAfterSwing)//スイング後の空中状態のカメラのイージング処理
 	{
@@ -647,8 +646,7 @@ void PlayerSwingAction::CameraEasing()
 
 		m_cameraEasingTime -= 3.0f * g_gameTime->GetFrameDeltaTime();
 		m_player->GetPlayerCamera().LerpDampingRate((m_cameraEasingTime * m_cameraEasingTime) / 2.0f);
-		m_player->GetPlayerCamera().LerpTargetOffsetUp(m_cameraEasingTime * m_cameraEasingTime);
-		m_player->GetPlayerCamera().LerpTargetOffsetForward(m_cameraEasingTime * m_cameraEasingTime);
+		m_player->GetPlayerCamera().LerpTarget(m_cameraEasingTime * m_cameraEasingTime);
 	}
 }
 
