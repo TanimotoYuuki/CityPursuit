@@ -9,6 +9,7 @@ class GameMission;
 class MiniMap;
 class GameStartSprite;
 class FirstEnemyDirection;
+class InvisibleWall;
 class DebugLog;
 class Game : public IGameObject
 {
@@ -164,6 +165,7 @@ private://メンバ変数
 	GameStartSprite* m_gameStartSprite = nullptr;//ゲームスタートのスプライトを表示する用のインスタンス
 	FirstEnemyDirection* m_firstEnemyDirection = nullptr;//敵を初めて発見したときの演出用のインスタンス
 	MiniMap* m_miniMap = nullptr;//ミニマップ用のインスタンス
+	InvisibleWall* m_invisibleWall = nullptr;//見えない壁用のインスタンス
 	DebugLog* m_debugLog = nullptr;//デバッグログ用のインスタンス
 };
 

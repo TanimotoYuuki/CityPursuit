@@ -54,6 +54,7 @@
     <ClCompile Include="TitleBackGround.cpp" />
     <ClCompile Include="TitleCamera.cpp" />
     <ClCompile Include="FirstEnemyDirection.cpp" />
+    <ClCompile Include="InvisibleWall.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -104,6 +105,7 @@
     <ClInclude Include="TitleBackGround.h" />
     <ClInclude Include="TitleCamera.h" />
     <ClInclude Include="FirstEnemyDirection.h" />
+    <ClInclude Include="InvisibleWall.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Game.rc" />
