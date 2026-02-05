@@ -9,6 +9,7 @@
 #include "MiniMap.h"
 #include "GameStartSprite.h"
 #include "FirstEnemyDirection.h"
+#include "InvisibleWall.h"
 #include "SceneManager.h"
 #include "FadeManager.h"
 #include "Loading.h"
@@ -54,6 +55,7 @@ Game::~Game()
 	DeleteGO(m_gameTimeLimit);
 	DeleteGO(m_gameMission);
 	DeleteGO(m_miniMap);
+	DeleteGO(m_invisibleWall);
 }
 
 //開始処理
@@ -79,8 +81,8 @@ bool Game::Start()
 	m_miniMap->DisableDrawingUI();
 	m_gameStartSprite = NewGO<GameStartSprite>(0, "gamestartsprite");
 	m_gameStartSprite->DisableDrawingUI();
+	m_invisibleWall = NewGO<InvisibleWall>(0, "invisiblewall");
 	g_renderingEngine->GetGameEndPostEffect().SetDrawingGameEndPostEffect(GameEndPostEffect::enGameEndPostEffect_None);
-	GameSoundEngine::GetInstance()->PlayBGM(GameSoundList_BGM_InGame, 1.0f);
 	return true;
 }
 

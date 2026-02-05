@@ -244,6 +244,7 @@
     <ClCompile Include="GameOverSprite.cpp" />
     <ClCompile Include="GameStartSprite.cpp" />
     <ClCompile Include="GameTimeLimit.cpp" />
+    <ClCompile Include="InvisibleWall.cpp" />
     <ClCompile Include="Loading.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MiniMap.cpp" />
@@ -296,6 +297,7 @@
     <ClInclude Include="GameOverSprite.h" />
     <ClInclude Include="GameStartSprite.h" />
     <ClInclude Include="GameTimeLimit.h" />
+    <ClInclude Include="InvisibleWall.h" />
     <ClInclude Include="Loading.h" />
     <ClInclude Include="MiniMap.h" />
     <ClInclude Include="Player.h" />
