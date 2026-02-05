@@ -175,7 +175,7 @@ void FirstEnemyDirection::DrawUIDrectionUpdate()
 	m_arrowUI.Update();
 }
 
-//カメラ演出の更新処理(演出開始時)
+//カメラ演出の更新処理(演出終了時)
 void FirstEnemyDirection::CameraEndDirectionUpdate(Player* playerData, Enemy* enemyData)
 {
 	m_cameraLarpRate -= CAMERA_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();//カメラの補間率
