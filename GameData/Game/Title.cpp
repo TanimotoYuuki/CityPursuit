@@ -193,23 +193,23 @@ void Title::TransitionSceneUpdate()
 {
 	float bgmVolume = GameSoundEngine::GetInstance()->GetSoundInstance(GameSoundList_BGM_Title)->GetVolume();
 
-	if (bgmVolume > BGM_VOLUME_NONE)
-	{
-		//タイトル画面BGMの音量を下げる
-		bgmVolume -= BGM_VOLUME_DOWN;
-		GameSoundEngine::GetInstance()->SetVolume(GameSoundList_BGM_Title, bgmVolume);
-	}
-	else
-	{
-		//タイトル画面BGMの音量を0に固定する
-		bgmVolume = BGM_VOLUME_NONE;
-		GameSoundEngine::GetInstance()->SetVolume(GameSoundList_BGM_Title, bgmVolume);
-	}
-
 	//現在の選択
 	switch (m_titleSelect->GetCurrentSelect())
 	{
 	case TitleSelect::enTitleSelect_GameStart:
+		if (bgmVolume > BGM_VOLUME_NONE)
+		{
+			//タイトル画面BGMの音量を下げる
+			bgmVolume -= BGM_VOLUME_DOWN;
+			GameSoundEngine::GetInstance()->SetVolume(GameSoundList_BGM_Title, bgmVolume);
+		}
+		else
+		{
+			//タイトル画面BGMの音量を0に固定する
+			bgmVolume = BGM_VOLUME_NONE;
+			GameSoundEngine::GetInstance()->SetVolume(GameSoundList_BGM_Title, bgmVolume);
+		}
+
 		FadeManager::GetInstance()->SetFadeState(FadeManager::enFadeState_FadeOut);
 		if (FadeManager::GetInstance()->IsFinishFade())
 		{
