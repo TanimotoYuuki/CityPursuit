@@ -3,6 +3,9 @@
 #include "Enemy.h"
 #include "EnemyEffect.h"
 #include "SwingTarget.h"
+#include "Player.h"
+#include "Game.h"
+#include "GameMission.h"
 #include "Buildings.h"
 #include "QteEvent.h"
 #include "DebugLog.h"
@@ -11,6 +14,8 @@ namespace {
 	const float MOVE_SPEED = 1200.0f;//移動速度
 	const float QTE_FAILED_MOVE_SPEED = 2000.0f;//移動速度(QTEイベントで失敗したとき)
 	const float BUILDING_DISTANCE_OFFSET = 650.0f;//ビルの距離用のオフセット
+	const float DISTANCE_OFFSET = 1500.0f * 1500.0f;//距離用のオフセット
+	const int CELL_NUM = 480;//ナビメッシュのセル数
 }
 
 //開始処理
@@ -19,14 +24,14 @@ bool EnemyAI::Start()
 	//ナビメッシュの初期化
 	m_navMesh.Init("Assets/navMesh/enemyNavMesh.tkn");
 
-	int numCells = m_navMesh.GetNumCell();
+	m_numCells = m_navMesh.GetNumCell();
 
 	//乱数生成器の初期化
 	std::random_device rd;
 	m_randomEngine.seed(rd());
 
 	//乱数の範囲の設定
-	m_cellDistribution = std::uniform_int_distribution<int>(0, numCells - 1);
+	m_cellDistribution = std::uniform_int_distribution<int>(0, m_numCells - 1);
 
 	//目標位置を設定する
 	m_isSetTargetPos = true;
@@ -36,6 +41,12 @@ bool EnemyAI::Start()
 
 	//QTEイベントクラスのインスタンスの生成
 	m_qteEvent = FindGO<QteEvent>("qteevent");
+
+	//ナビメッシュのセルインデックスのメモリ確保
+	m_cellIndices.reserve(CELL_NUM);
+
+	//距離データ格納用の配列のメモリ確保
+	m_distanceData.reserve(CELL_NUM);
 
 	return true;
 }
@@ -89,16 +100,16 @@ void EnemyAI::Execute(Vector3& position, Quaternion& rotation)
 	}
 
 	//回転処理
-	Vector3 moveDir = position - oldPosition;
-	moveDir.y = 0.0f;
+	m_moveDirection = position - oldPosition;
+	m_moveDirection.y = 0.0f;
 
-	if (moveDir.LengthSq() > 0.001f)
+	if (m_moveDirection.LengthSq() > 0.001f)
 	{
-		moveDir.Normalize();//方向ベクトル化
+		m_moveDirection.Normalize();//方向ベクトル化
 
 		Quaternion targetRotation;
 
-		targetRotation.SetRotation(Vector3::Front, moveDir);
+		targetRotation.SetRotation(Vector3::Front, m_moveDirection);
 
 		float interpolationFactor = 0.1f;
 		m_rotation.Slerp(interpolationFactor, m_rotation, targetRotation);
@@ -140,16 +151,96 @@ void EnemyAI::Execute(Vector3& position, Quaternion& rotation)
 //目標位置を設定する処理
 void EnemyAI::SetTargetPos()
 {
+	auto* capruterEnemy = m_enemy->GetGamePtr()->GetGameMissionPtr();
+
+	//逃走車を何台か捕獲したときに処理する
+	if (capruterEnemy->GetCurrentCaptureEnemyNum() > 0)
+	{
+		//捕獲する逃走車の数が少ないときの目標位置を設定する処理
+		FewEscapeCarSetTargetPos();
+	}
+	//それ以外の場合
+	else
+	{
+		//通常の目標位置の設定する処理
+		NormalSetTargetPos();
+	}
+
+	m_isSetTargetPos = false;//目標位置の設定が終わった
+}
+
+//通常の目標位置の設定する処理
+void EnemyAI::NormalSetTargetPos()
+{
 	//乱数生成器の実行
 	int randomCellIndex = m_cellDistribution(m_randomEngine);
-	
+
 	//乱数生成器で出た値を使ってナビメッシュのセルを取得
 	const nsAI::Cell& randomCell = m_navMesh.GetCell(randomCellIndex);
 
 	//ナビメッシュの中央座標の取得
 	m_targetPos = randomCell.GetCenterPosition();
+}
 
-	m_isSetTargetPos = false;//目標位置の設定が終わった
+//捕獲する逃走車の数が少ないときの目標位置を設定する処理
+void EnemyAI::FewEscapeCarSetTargetPos()
+{
+	//この関数を実行するたびにコンテナをクリアする
+	m_cellIndices.clear();
+	m_distanceData.clear();
+
+	m_totalDistance = 0;
+
+	//プレイヤーの位置の取得
+	Vector3 playerPosition = m_enemy->GetGamePtr()->GetPlayerPtr()->GetPosition();
+
+	for (int i = 0; i < m_numCells; i++)
+	{
+		//乱数生成器で出た値を使ってナビメッシュのセルを取得
+		const nsAI::Cell& randomCell = m_navMesh.GetCell(i);
+
+		//ナビメッシュの中央座標の取得
+		Vector3 cellCenterPos = randomCell.GetCenterPosition();
+
+		//プレイヤーとの距離を計算
+		Vector3 distanceToPlayer = cellCenterPos - playerPosition;
+
+		//距離データの格納
+		m_distanceData.push_back(distanceToPlayer.LengthSq());
+
+		//距離の加算
+		m_totalDistance += distanceToPlayer.LengthSq();
+
+		//進行方向データの格納
+		distanceToPlayer.Normalize();
+		distanceToPlayer.y = 0.0f;
+	}
+
+	//平均の距離の計算
+	float averageDistance = m_totalDistance / m_numCells;
+
+	//目標位置を設定する距離の計算
+	float setTargetPosDistance = averageDistance - DISTANCE_OFFSET;
+
+	for (int i = 0; i < m_numCells; i++)
+	{
+		if (m_distanceData[i] < setTargetPosDistance)
+		{
+			m_cellIndices.push_back(i);
+		}
+	}
+
+	//乱数の範囲の設定
+	m_cellDistribution = std::uniform_int_distribution<int>(m_cellIndices[0], m_cellIndices[m_cellIndices.size() - 1]);
+
+	//乱数生成器の実行
+	int randomCellIndex = m_cellDistribution(m_randomEngine);
+
+	//乱数生成器で出た値を使ってナビメッシュのセルを取得
+	const nsAI::Cell& randomCell = m_navMesh.GetCell(randomCellIndex);
+
+	//ナビメッシュの中央座標の取得
+	m_targetPos = randomCell.GetCenterPosition();
 }
 
 //目標地点への経路の更新処理
