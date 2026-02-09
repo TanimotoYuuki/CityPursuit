@@ -27,6 +27,16 @@ private://メンバ関数
 	void SetTargetPos();
 
 	/// <summary>
+	/// 通常の目標位置の設定する処理
+	/// </summary>
+	void NormalSetTargetPos();
+
+	/// <summary>
+	/// 捕獲する逃走車の数が少ないときの目標位置を設定する処理
+	/// </summary>
+	void FewEscapeCarSetTargetPos();
+
+	/// <summary>
 	/// 目標地点への経路の更新処理
 	/// </summary>
 	/// <param name="position">敵の位置</param>
@@ -73,9 +83,12 @@ public://メンバ関数
 
 private://メンバ変数
 	Vector3 m_targetPos = Vector3::Zero;//目標位置
+	Vector3 m_moveDirection = Vector3::Zero;//進行方向
 	Quaternion m_rotation = Quaternion::Identity;//回転
 	int m_qteFailedRotationCount = 0;//QTEイベントで失敗したときに敵が回転した回数
+	int m_numCells = 0;//ナビメッシュのセル数
 	float m_moveSpeed = 0.0f;//移動速度
+	float m_totalDistance = 0.0f;//合計距離
 	Vector3 m_buildingCollisionShortDistance = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);//ビルに衝突する最短距離
 	bool m_isSetTargetPos = false;//目標位置を設定するかどうか?
 	bool m_isSetBuildingCollisionTargetPos = false;//ビルに衝突する位置を設定したか?
@@ -87,6 +100,8 @@ private://メンバ変数
 	nsAI::PathFinding m_pathFiding;//パス検索
 	std::mt19937 m_randomEngine;//乱数生成器
 	std::uniform_int_distribution<int> m_cellDistribution;//セル番号を均一に選ぶための分布
+	std::vector<int> m_cellIndices;//ナビメッシュのセル番号の配列
+	std::vector<float> m_distanceData;//距離データ格納用の配列
 	Enemy* m_enemy = nullptr;//敵用のインスタンス
 	QteEvent* m_qteEvent = nullptr;//QTEイベント用のインスタンス
 };
