@@ -80,9 +80,19 @@ void EnemyAI::Execute(Vector3& position, Quaternion& rotation)
 		}
 	}
 
+	Vector3 currentForward = Vector3::Front;
+	m_rotation.Apply(currentForward);
+	float dot = currentForward.Dot(m_moveDirection);
+
+	float speedMultiplier = 1.0f;
+	if (dot < 0.7f)
+	{
+		speedMultiplier = Math::Lerp(0.4f, 1.0f, (dot + 1.0f) / 1.7f);
+	}
+
 	//移動処理
 	Vector3 oldPosition = position;//前の位置を設定
-	float moveAmount = m_moveSpeed * g_gameTime->GetFrameDeltaTime();
+	float moveAmount = (m_moveSpeed * speedMultiplier) * g_gameTime->GetFrameDeltaTime();
 	bool isEnd = false;
 	position = m_path.Move(
 		position,//移動位置
@@ -102,19 +112,32 @@ void EnemyAI::Execute(Vector3& position, Quaternion& rotation)
 	//回転処理
 	m_moveDirection = position - oldPosition;
 	m_moveDirection.y = 0.0f;
-
+	
 	if (m_moveDirection.LengthSq() > 0.001f)
 	{
 		m_moveDirection.Normalize();//方向ベクトル化
 
 		Quaternion targetRotation;
-
 		targetRotation.SetRotation(Vector3::Front, m_moveDirection);
 
-		float interpolationFactor = 0.1f;
+		float interpolationFactor = (dot < 0.0f) ? 0.05f : 0.1f;
 		m_rotation.Slerp(interpolationFactor, m_rotation, targetRotation);
+
+		Vector3 currentRight = Vector3::Right;
+		m_rotation.Apply(currentRight);
+		float steerAmount = m_moveDirection.Dot(currentRight);
+
+		Quaternion rollRotation;
+
+		float rollAngle = -steerAmount * Math::DegToRad(5.0f);
+		rollRotation.SetRotation(Vector3::Front, rollAngle);
+
+		rotation = m_rotation * rollRotation;
 	}
-	rotation = m_rotation;
+	else
+	{
+		rotation = m_rotation;
+	}
 
 	//プレイヤーが乗っているときに処理する
 	if (m_enemy->IsOnPlayer())
