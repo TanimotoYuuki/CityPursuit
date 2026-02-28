@@ -196,7 +196,7 @@ void GameResult::Render(RenderContext& rc)
 	//リザルトUIの描画
 	m_resultUI.Draw(rc);
 
-	if (m_isStartResultUIDirection[enResultDirection_QteSuccessCountUI])
+	if (m_isDrawingUI[enResultDirection_QteSuccessCountUI])
 	{
 		for (int i = 0; i < m_qteEventSuccessCountManage.size(); i++)
 		{
@@ -205,7 +205,7 @@ void GameResult::Render(RenderContext& rc)
 		}
 	}
 
-	if (m_isStartResultUIDirection[enResultDirection_QteFailedCountUI])
+	if (m_isDrawingUI[enResultDirection_QteFailedCountUI])
 	{
 		for (int j = 0; j < m_qteEventFailedCountManage.size(); j++)
 		{
@@ -214,7 +214,7 @@ void GameResult::Render(RenderContext& rc)
 		}
 	}
 
-	if (m_isStartResultUIDirection[enResultDirection_GameClearTimeLimitUI])
+	if (m_isDrawingUI[enResultDirection_GameClearTimeLimitUI])
 	{
 		for (int k = 0; k < m_gameClearTimeLimitManage.size(); k++)
 		{
@@ -421,14 +421,18 @@ void GameResult::DirectionSkip()
 	switch (m_resultDirectionState)
 	{
 	case GameResult::enResultDirection_QteSuccessCountUI://QTEイベントで成功した回数のUIの演出
-		m_isStartResultUIDirection[enResultDirection_QteFailedCountUI] = true;
+		m_isDrawingUI[enResultDirection_QteSuccessCountUI] = true;
 		m_resultDirectionState = enResultDirection_QteFailedCountUI;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_ViewScore, 2.0f);
 		break;
 	case GameResult::enResultDirection_QteFailedCountUI://QTEイベントで失敗した回数のUIの演出
-		m_isStartResultUIDirection[enResultDirection_GameClearTimeLimitUI] = true;
+		m_isDrawingUI[enResultDirection_QteFailedCountUI] = true;
 		m_resultDirectionState = enResultDirection_GameClearTimeLimitUI;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_ViewScore, 2.0f);
 		break;
 	case GameResult::enResultDirection_GameClearTimeLimitUI://ゲームクリアしたときの残り時間のUIの演出
+		m_isDrawingUI[enResultDirection_GameClearTimeLimitUI] = true;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_ViewScore, 2.0f);
 		m_isFinishAllResultDirection = true;
 		break;
 	default:
@@ -443,10 +447,20 @@ void GameResult::ResultUIDirection()
 	m_resultUIFullAlphaAnimation->Update();
 	if (m_resultUIPositionAnimation->IsCompleted())
 	{
-		if (g_gameTime->StopWatch(0.5f))
+		if (g_gameTime->StopWatch(0.1f))
 		{
-			m_isStartResultUIDirection[enResultDirection_QteSuccessCountUI] = true;
 			m_resultDirectionState = enResultDirection_QteSuccessCountUI;
+		}
+	}
+	else
+	{
+		if (!m_isPlaySwipeSe)
+		{
+			if (g_gameTime->StopWatch(0.1f))
+			{
+				GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Swipe, 2.0f);
+				m_isPlaySwipeSe = true;
+			}
 		}
 	}
 }
@@ -454,10 +468,11 @@ void GameResult::ResultUIDirection()
 //QTEイベントで成功した回数のUIの演出
 void GameResult::QteSuccessCountUIDirection()
 {
-	if (g_gameTime->StopWatch(1.0f))
+	if (g_gameTime->StopWatch(0.5f))
 	{
-		m_isStartResultUIDirection[enResultDirection_QteFailedCountUI] = true;
+		m_isDrawingUI[enResultDirection_QteSuccessCountUI] = true;
 		m_resultDirectionState = enResultDirection_QteFailedCountUI;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_ViewScore, 2.0f);
 	}
 }
 
@@ -466,8 +481,9 @@ void GameResult::QteFailedCountUIDirection()
 {
 	if (g_gameTime->StopWatch(1.0f))
 	{
-		m_isStartResultUIDirection[enResultDirection_GameClearTimeLimitUI] = true;
+		m_isDrawingUI[enResultDirection_QteFailedCountUI] = true;
 		m_resultDirectionState = enResultDirection_GameClearTimeLimitUI;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_ViewScore, 2.0f);
 	}
 }
 
@@ -476,6 +492,8 @@ void GameResult::GameClearTimeLimitUIDirection()
 {
 	if (g_gameTime->StopWatch(1.0f))
 	{
+		m_isDrawingUI[enResultDirection_GameClearTimeLimitUI] = true;
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_ViewScore, 2.0f);
 		m_isFinishAllResultDirection = true;
 	}
 }
@@ -485,7 +503,7 @@ void GameResult::PlayNoneAlphaAnimation()
 {
 	m_resultUINoneAlphaAnimation->Update();
 
-	if (m_isStartResultUIDirection[enResultDirection_QteSuccessCountUI])
+	if (m_isDrawingUI[enResultDirection_QteSuccessCountUI])
 	{
 		for (int i = 0; i < m_qteEventSuccessCountManage.size(); i++)
 		{
@@ -493,7 +511,7 @@ void GameResult::PlayNoneAlphaAnimation()
 		}
 	}
 
-	if (m_isStartResultUIDirection[enResultDirection_QteFailedCountUI])
+	if (m_isDrawingUI[enResultDirection_QteFailedCountUI])
 	{
 		for (int j = 0; j < m_qteEventFailedCountManage.size(); j++)
 		{
@@ -501,7 +519,7 @@ void GameResult::PlayNoneAlphaAnimation()
 		}
 	}
 
-	if (m_isStartResultUIDirection[enResultDirection_GameClearTimeLimitUI])
+	if (m_isDrawingUI[enResultDirection_GameClearTimeLimitUI])
 	{
 		for (int k = 0; k < m_gameClearTimeLimitManage.size(); k++)
 		{

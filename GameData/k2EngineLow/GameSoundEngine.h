@@ -26,7 +26,11 @@ enum GameSoundList
 	GameSoundList_SE_BuildingCollision,//ビル衝突SE
 	GameSoundList_SE_Explosion,//爆発SE
 	GameSoundList_SE_CarEngine,//車エンジンSE
+	GameSoundList_SE_OnCar,//車の上に乗るSE
+	GameSoundList_SE_CarBrake,//車のブレーキSE
 	GameSoundList_SE_TimeUp,//タイムアップSE
+	GameSoundList_SE_Swipe,//スワイプSE
+	GameSoundList_SE_ViewScore,//スコア表示SE
 	GameSoundList_Num//ゲームサウンドリスト数
 };
 
@@ -57,7 +61,7 @@ namespace nsK2EngineLow
 		void PlayBGM(GameSoundList gameSoundList, float soundVolume, bool is3DSound = false);
 
 		/// <summary>
-		/// SEを再生(2Dサウンド)
+		/// SEを再生
 		/// </summary>
 		/// <param name="soundList">ゲームサウンドリスト</param>
 		/// <param name="soundVolume">サウンドの音量</param>

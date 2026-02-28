@@ -172,13 +172,18 @@ void Title::GameStartDirectionUpdate()
 	{
 		if (g_gameTime->StopWatch(0.2f))
 		{
+			GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_Jump, 3.0f);
 			m_isGameStartDirectionPlayerJump = true;
 		}
 		return;
 	}
 
-	Vector3 position = m_player->GetPosition();
-	position.y += 60.0f;
+	Vector3 moveSpeed;
+	moveSpeed.y = 2850.0f;
+
+	Vector3 position = m_player->GetCharacterController().Execute(moveSpeed, g_gameTime->GetFrameDeltaTime());
+	m_player->GetCharacterController().SetPosition(position);
+
 	m_player->SetPosition(position);
 
 	//プレイヤーが特定の高さまで到達したら次のステートに移行する

@@ -20,6 +20,7 @@ GameOver::~GameOver()
 {
 	DeleteGO(m_gameOverSprite);
 	DeleteGO(m_gameEndSelect);
+	DeleteGO(GameSoundEngine::GetInstance()->GetSoundInstance(GameSoundList_BGM_GameOver));
 }
 
 //開始処理

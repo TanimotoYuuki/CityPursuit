@@ -68,6 +68,8 @@ bool Game::Start()
 	m_player->SetScale(PLAYER_IN_GAME_SCALE);
 	m_player->GetPlayerMove()->SetCanMove(false);
 	m_player->GetPlayerMove()->SetCanJump(false);
+	m_player->GetPlayerCamera().SetCanMoveCamera(false);
+	m_player->GetPlayerMove()->GetPlayerJump().NotOnGround();
 	m_player->SetGamePtr(this);
 	m_player->GetPlayerCamera().Reset(m_player);
 	m_gameTimeLimit = NewGO<GameTimeLimit>(0, "gametimelimit");
@@ -135,6 +137,7 @@ void Game::Update()
 		{
 			m_player->GetPlayerMove()->SetCanMove(true);
 			m_player->GetPlayerMove()->SetCanJump(true);
+			m_player->GetPlayerCamera().SetCanMoveCamera(true);
 			m_isFinishGameStartDirection = true;
 		}
 		else
@@ -246,7 +249,7 @@ void Game::ViewFrustumCollisionUpdate()
 	//敵全てに対して視錐台との当たり判定を行う
 	for (auto& enemy : enemys)
 	{
-		Vector3 enemyPos = enemy->GetPosition();
+		Vector3 enemyPos = enemy->GetEnemyModel().GetDrawPosition();
 
 		//敵が視錐台内に存在するかどうかを判定
 		bool isVisible = m_viewFrustum.CheckSphere(enemyPos, 100.0f);

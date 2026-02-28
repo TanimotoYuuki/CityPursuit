@@ -119,10 +119,30 @@ namespace nsK2EngineLow
 		m_isPlayingSound[GameSoundList_SE_CarEngine] = false;
 		m_sound[GameSoundList_SE_CarEngine] = nullptr;
 
-		//17.タイムアップSE
+		//17.車の上に乗るSE
+		g_soundEngine->ResistWaveFileBank(GameSoundList_SE_OnCar, "Assets/sound/se/onCar.wav");
+		m_isPlayingSound[GameSoundList_SE_OnCar] = false;
+		m_sound[GameSoundList_SE_OnCar] = nullptr;
+
+		//18.車のブレーキSE
+		g_soundEngine->ResistWaveFileBank(GameSoundList_SE_CarBrake, "Assets/sound/se/carBrake.wav");
+		m_isPlayingSound[GameSoundList_SE_CarBrake] = false;
+		m_sound[GameSoundList_SE_CarBrake] = nullptr;
+
+		//19.タイムアップSE
 		g_soundEngine->ResistWaveFileBank(GameSoundList_SE_TimeUp, "Assets/sound/se/timeUp.wav");
 		m_isPlayingSound[GameSoundList_SE_TimeUp] = false;
 		m_sound[GameSoundList_SE_TimeUp] = nullptr;
+
+		//20.スワイプSE
+		g_soundEngine->ResistWaveFileBank(GameSoundList_SE_Swipe, "Assets/sound/se/swipe.wav");
+		m_isPlayingSound[GameSoundList_SE_Swipe] = false;
+		m_sound[GameSoundList_SE_Swipe] = nullptr;
+
+		//21.スコア表示SE
+		g_soundEngine->ResistWaveFileBank(GameSoundList_SE_ViewScore, "Assets/sound/se/viewScore.wav");
+		m_isPlayingSound[GameSoundList_SE_ViewScore] = false;
+		m_sound[GameSoundList_SE_ViewScore] = nullptr;
 	}
 
 	//BGMを再生
