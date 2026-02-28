@@ -70,9 +70,9 @@ void Player::Update()
 		if (!GetGamePtr()->IsGameEnd() && !GetGamePtr()->IsFirstEnemyDirection())
 		{
 			//移動処理の実行
-			m_playerMove->Execute(m_position, m_charaCon);
+			m_playerMove->Execute(m_position, m_rotation, m_charaCon);
 
-				//プレイヤー回転クラスの実行
+			//プレイヤー回転の実行
 			m_playerRotation->Execute(m_rotation);
 
 			//プレイヤーが敵をキャッチする処理の実行

@@ -11,7 +11,7 @@ namespace {
 
 	const float DISTANCE_OFFSET = 50.0f;//距離のオフセット値
 
-	const float Z_OFFSET = 75.0f;//Z軸のオフセット
+	const float Z_OFFSET = 35.0f;//Z軸のオフセット
 
 	const float CAMERA_MOVE_SPEED = 600.0f;//カメラの移動速度
 
@@ -44,7 +44,7 @@ bool GameClearCamera::Start()
 
 	//カメラからプレイヤーまでの距離を求める
 	m_playerPosition = m_player->GetPosition();
-	m_cameraToPlayer = m_cameraTarget - m_cameraPosition;
+	m_cameraToPlayer = m_playerPosition - m_cameraPosition;
 
 	//ゲームクリア時にカメラがプレイヤーに向かって回転する角度を求める
 	//1.プレイヤーの進行方向を取得
@@ -112,7 +112,7 @@ void GameClearCamera::CameraRotation()
 	currentPosition.x = m_playerPosition.x + (m_cameraToPlayer.x * cosRad - m_cameraToPlayer.z * sinRad);
 	currentPosition.y = m_cameraPosition.y;
 	currentPosition.z = m_playerPosition.z + (m_cameraToPlayer.x * sinRad - m_cameraToPlayer.z * cosRad);
-	currentPosition.z -= Z_OFFSET;
+	currentPosition.z >= 0.0f ? currentPosition.z -= Z_OFFSET : currentPosition.z += Z_OFFSET;
 
 	//カメラの位置を設定
 	m_gameClearCamera.SetPosition(currentPosition);
