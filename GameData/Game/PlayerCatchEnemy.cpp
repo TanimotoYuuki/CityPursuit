@@ -227,7 +227,7 @@ void PlayerCatchEnemy::FindTarget()
 	for (const auto& enemy : enemys)
 	{
 		//プレイヤーから敵の距離を求める
-		Vector3 playerToEnemyDis = enemy->GetPosition() - m_player->GetPosition();
+		Vector3 playerToEnemyDis = enemy->GetEnemyModel().GetDrawPosition() - m_player->GetPosition();
 		const float playerToEnemyLen = playerToEnemyDis.Length();
 
 		//距離が一定以上離れているか?
@@ -239,7 +239,7 @@ void PlayerCatchEnemy::FindTarget()
 		}
 
 		//カメラから敵の角度差を求める
-		Vector3 cameraToEnemyDis = enemy->GetPosition() - g_camera3D->GetPosition();
+		Vector3 cameraToEnemyDis = enemy->GetEnemyModel().GetDrawPosition() - g_camera3D->GetPosition();
 		Vector3 cameraToEnemyNorm = cameraToEnemyDis;
 		cameraToEnemyNorm.Normalize();
 		float angleDiff = Dot(cameraToEnemyNorm, g_camera3D->GetForward());
@@ -287,7 +287,7 @@ void PlayerCatchEnemy::StartWireToEnemy(Enemy* enemy)
 void PlayerCatchEnemy::LookAtEnemy(Enemy* enemy)
 {
 	// プレイヤーから敵への方向ベクトル
-	Vector3 playerToEnemyNorm = enemy->GetPosition() - m_player->GetPosition();
+	Vector3 playerToEnemyNorm = enemy->GetEnemyModel().GetDrawPosition() - m_player->GetPosition();
 	playerToEnemyNorm.y = 0.0f;
 	playerToEnemyNorm.Normalize();	// 正規化する
 	// 回転
@@ -303,7 +303,7 @@ void PlayerCatchEnemy::LookAtEnemy(Enemy* enemy)
 void PlayerCatchEnemy::WireingToEnemy(Enemy* enemy)
 {
 	// ターゲット座標は、敵の座標
-	Vector3 targetPos = enemy->GetPosition();
+	Vector3 targetPos = enemy->GetEnemyModel().GetDrawPosition();
 	// 高さをちょっと上げる
 	targetPos.y += ON_ENEMY_HEIGHT;
 
@@ -321,7 +321,7 @@ void PlayerCatchEnemy::WireingToEnemy(Enemy* enemy)
 void PlayerCatchEnemy::GoOnEnemy(Enemy* enemy)
 {
 	//ターゲット座標は、敵の座標
-	Vector3 targetPos = enemy->GetPosition();
+	Vector3 targetPos = enemy->GetEnemyModel().GetDrawPosition();
 	//高さをちょっと上げる
 	targetPos.y += ON_ENEMY_HEIGHT;
 
@@ -361,7 +361,7 @@ void PlayerCatchEnemy::OnEnemy(Enemy* enemy)
 	Quaternion qRot = enemy->GetRotation();
 
 	//ターゲット座標は、敵の座標
-	Vector3 targetPos = enemy->GetPosition();
+	Vector3 targetPos = enemy->GetEnemyModel().GetDrawPosition();
 	//高さをちょっと上げる
 	targetPos.y += ON_ENEMY_HEIGHT;
 
@@ -397,7 +397,7 @@ void PlayerCatchEnemy::ChangeState(Enemy* enemy, const EnCatchEnemyState newStat
 	case enWireingToEnemy:
 		//糸を伸ばし始めて、重力を切って、敵の上に乗っているカメラにする。
 		m_player->GetPlayerCamera().SetIsOnEnemyCamera(true);
-		m_swingModel->StartWireStretchToPos(enemy->GetPosition());
+		m_swingModel->StartWireStretchToPos(enemy->GetEnemyModel().GetDrawPosition());
 		m_player->GetPlayerMove()->SetUseGravity(false);
 		//ジャンプの姿勢になるように、ちょっとジャンプさせる
 		m_player->GetPlayerMove()->AddMoveSpeed(Vector3::Up * WIREING_TO_ENEMY_JUMP_FORCE);

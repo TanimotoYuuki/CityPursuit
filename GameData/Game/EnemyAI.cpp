@@ -13,7 +13,11 @@
 namespace {
 	const float MOVE_SPEED = 1200.0f;//移動速度
 	const float QTE_FAILED_MOVE_SPEED = 2000.0f;//移動速度(QTEイベントで失敗したとき)
-	const float BUILDING_DISTANCE_OFFSET = 650.0f;//ビルの距離用のオフセット
+	const float STEER_SPEED = 4.0f;//旋回速度
+	const float GRIP_FACTOR = 0.25f;//グリップ係数
+	const float AVOID_RADIUS = 750.0f;//回避を開始する距離
+	const float REPULSION_POWER = 275.0f;//反発の強さ
+	const float BUILDING_DISTANCE_OFFSET = 800.0f;//ビルの距離用のオフセット
 	const float DISTANCE_OFFSET = 1500.0f * 1500.0f;//距離用のオフセット
 	const int CELL_NUM = 480;//ナビメッシュのセル数
 }
@@ -80,25 +84,137 @@ void EnemyAI::Execute(Vector3& position, Quaternion& rotation)
 		}
 	}
 
-	Vector3 currentForward = Vector3::Front;
-	m_rotation.Apply(currentForward);
-	float dot = currentForward.Dot(m_moveDirection);
-
-	float speedMultiplier = 1.0f;
-	if (dot < 0.7f)
-	{
-		speedMultiplier = Math::Lerp(0.4f, 1.0f, (dot + 1.0f) / 1.7f);
-	}
-
 	//移動処理
 	Vector3 oldPosition = position;//前の位置を設定
-	float moveAmount = (m_moveSpeed * speedMultiplier) * g_gameTime->GetFrameDeltaTime();
+	float stepAmount = m_moveSpeed * g_gameTime->GetFrameDeltaTime();
 	bool isEnd = false;
-	position = m_path.Move(
+
+	//パス移動の実行
+	Vector3 nextPosition = m_path.Move(
 		position,//移動位置
-		moveAmount,//移動速度
+		stepAmount,//移動速度
 		isEnd//パス移動が終了したかどうかのフラグ
 	);
+
+	//進行方向の計算
+	Vector3 targetVector = nextPosition - oldPosition;
+
+	Vector3 desireDir = targetVector;
+	desireDir.y = 0.0f;
+
+	//回転処理
+	if (desireDir.LengthSq() > 0.001f)
+	{
+		desireDir.Normalize();
+
+		//目標の回転
+		Quaternion targetRotation;
+		targetRotation.SetRotation(Vector3::Front, desireDir);
+
+		//現在の正面ベクトル
+		Vector3 currentForward = Vector3::Front;
+		m_rotation.Apply(currentForward);
+
+		float dot = currentForward.Dot(desireDir);
+		if (dot > 1.0f) dot = 1.0f;
+		if (dot < -1.0f) dot = -1.0f;
+		float angleDiff = acosf(dot);
+
+		// 旋回速度
+		float maxStep = STEER_SPEED * g_gameTime->GetFrameDeltaTime();
+
+		if (angleDiff > 0.05f)
+		{
+			float t = maxStep / angleDiff;
+			if (t > 1.0f) t = 1.0f;
+			m_rotation.Slerp(t, m_rotation, targetRotation);
+		}
+
+	}
+	rotation = m_rotation;
+
+	//速度制御
+	Vector3 carForward = Vector3::Front;
+	m_rotation.Apply(carForward);
+	float dotForSpeed = carForward.Dot(desireDir);
+
+	//カーブがきつい場合は減速
+	float speedMultiplier = 1.0f;
+	if (dotForSpeed < 0.5f)
+	{
+		speedMultiplier = Math::Lerp(0.6f, 1.0f, (dotForSpeed + 1.0f) / 1.5f);
+	}
+
+	float currentSpeedLen = targetVector.Length() * speedMultiplier;
+	Vector3 carPhysicsVelocity = carForward * currentSpeedLen;
+
+	float currentGrip = GRIP_FACTOR;
+	if (isEnd)
+	{
+		currentGrip = 0.8f;
+	}
+	else if (dotForSpeed < 0.0f)
+	{
+		currentGrip = min(GRIP_FACTOR * 2.0f, 0.5f);
+	}
+
+	m_velocity.Lerp(currentGrip, m_velocity, carPhysicsVelocity);
+	
+	//QTEイベントで成功していないときにビルに衝突するのを防止する処理
+	if (!m_qteEvent->IsQteEventResult(QteEvent::enQteEventResult_Success))
+	{
+		auto& buildings = FindGOs<Buildings>("buildings");
+		Vector3 avoidanceForce = Vector3::Zero;
+
+		for (auto& building : buildings)
+		{
+			if (building->GetBuildingType() == Buildings::enBuildingsType_Tower) continue;
+
+			Vector3 toPlayer = position - building->GetPosition();
+			toPlayer.y = 0.0f; // 高さは無視して平面で考える
+			float distSq = toPlayer.LengthSq();
+
+			//一定距離以内なら、逆方向へ押し返す力を加える
+			if (distSq < AVOID_RADIUS * AVOID_RADIUS)
+			{
+				float dist = sqrtf(distSq);
+				//近ければ近いほど強く押し返す
+				float pushStrength = (AVOID_RADIUS - dist) / AVOID_RADIUS;
+
+				//押し返すベクトルを加算
+				toPlayer.Normalize();
+				avoidanceForce += toPlayer * pushStrength * REPULSION_POWER;
+			}
+		}
+
+		//回避力を速度に加算する
+		m_velocity += avoidanceForce;
+
+		//道路への復帰補正
+		if (!isEnd && targetVector.LengthSq() > 0.0001f)
+		{
+			Vector3 roadDirection = targetVector;
+			roadDirection.Normalize();
+
+			//現在の速度の速さ
+			float velocityMagnitude = m_velocity.Length();
+
+			//現在の進行方向
+			Vector3 currentVelDir = m_velocity;
+			if (velocityMagnitude > 0.001f) currentVelDir.Normalize();
+
+			float dot = currentVelDir.Dot(roadDirection);
+
+			Vector3 idealVelocity = roadDirection * velocityMagnitude;
+
+			//補正の強さの設定
+			float correctionStrength = Math::Lerp(0.8f, 0.1f, (dot + 1.0f) * 0.5f);
+
+			m_velocity.Lerp(correctionStrength, m_velocity, idealVelocity);
+		}
+	}
+
+	position += m_velocity;
 
 	//目標位置まで行ったら
 	if (isEnd)
@@ -107,36 +223,6 @@ void EnemyAI::Execute(Vector3& position, Quaternion& rotation)
 		{
 			m_isSetTargetPos = true;//目標位置を設定する
 		}
-	}
-
-	//回転処理
-	m_moveDirection = position - oldPosition;
-	m_moveDirection.y = 0.0f;
-	
-	if (m_moveDirection.LengthSq() > 0.001f)
-	{
-		m_moveDirection.Normalize();//方向ベクトル化
-
-		Quaternion targetRotation;
-		targetRotation.SetRotation(Vector3::Front, m_moveDirection);
-
-		float interpolationFactor = (dot < 0.0f) ? 0.05f : 0.1f;
-		m_rotation.Slerp(interpolationFactor, m_rotation, targetRotation);
-
-		Vector3 currentRight = Vector3::Right;
-		m_rotation.Apply(currentRight);
-		float steerAmount = m_moveDirection.Dot(currentRight);
-
-		Quaternion rollRotation;
-
-		float rollAngle = -steerAmount * Math::DegToRad(5.0f);
-		rollRotation.SetRotation(Vector3::Front, rollAngle);
-
-		rotation = m_rotation * rollRotation;
-	}
-	else
-	{
-		rotation = m_rotation;
 	}
 
 	//プレイヤーが乗っているときに処理する
@@ -156,7 +242,7 @@ void EnemyAI::Execute(Vector3& position, Quaternion& rotation)
 
 		if (!GameSoundEngine::GetInstance()->IsPlayingSound(GameSoundList_SE_CarEngine))
 		{
-			GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_CarEngine, 15.0f, true);
+			GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_CarEngine, 50.0f, true);
 		}
 		GameSoundEngine::GetInstance()->SetPosition(GameSoundList_SE_CarEngine, position);
 
@@ -269,30 +355,14 @@ void EnemyAI::FewEscapeCarSetTargetPos()
 //目標地点への経路の更新処理
 void EnemyAI::PathUpdate(const Vector3& position)
 {
-	//ビルに衝突する位置が設定されていたら処理する
-	if (m_isSetBuildingCollisionTargetPos)
-	{
-		//パス検索(QTEイベントで成功用の演出)
-		m_pathFiding.Execute(
-			m_path,//構築されたパスの格納先
-			m_navMesh,//ナビメッシュ
-			position,//開始処理
-			m_targetPos,//移動目標位置
-			PhysicsWorld::GetInstance(),//物理エンジン
-			50000.0f,//AIエージェントの半径
-			200000.0f//AIエージェントの高さ
-		);
-		return;
-	}
-
-	//パス検索(通常)
+	//パス検索
 	m_pathFiding.Execute(
 		m_path,//構築されたパスの格納先
 		m_navMesh,//ナビメッシュ
 		position,//開始処理
 		m_targetPos,//移動目標位置
 		PhysicsWorld::GetInstance(),//物理エンジン
-		50.0f,//AIエージェントの半径
+		350.0f,//AIエージェントの半径
 		200.0f//AIエージェントの高さ
 	);
 }
@@ -336,7 +406,7 @@ void EnemyAI::QteEventSuccessEnemyMove(const Vector3& position)
 				GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_BuildingCollision, 5.0f);
 				m_isPlayBuildingCollisionSe = true;
 			}
-			
+
 			if (!GameSoundEngine::GetInstance()->IsPlayingSound(GameSoundList_SE_BuildingCollision))
 			{
 				if (!m_isPlayExplosionSe)
@@ -349,7 +419,6 @@ void EnemyAI::QteEventSuccessEnemyMove(const Vector3& position)
 
 			return;
 		}
-
 		return;
 	}
 

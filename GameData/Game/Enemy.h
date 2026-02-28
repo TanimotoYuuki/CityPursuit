@@ -99,6 +99,15 @@ public://メンバ関数
 	}
 
 	/// <summary>
+	/// 敵モデルの取得
+	/// </summary>
+	/// <returns>敵モデル</returns>
+	ModelRender& GetEnemyModel()
+	{
+		return m_enemyModel;
+	}
+
+	/// <summary>
 	/// 敵AIクラスのポインタの取得
 	/// </summary>
 	/// <returns></returns>

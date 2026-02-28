@@ -42,7 +42,7 @@ void MiniMap::Execute()
 
 	for (int i = 0; i < m_enemy.size(); i++)
 	{
-		Vector3 enemyPosition = m_enemy[i]->GetPosition();
+		Vector3 enemyPosition = m_enemy[i]->GetEnemyModel().GetDrawPosition();
 
 		//ワールド座標系からマップ座標系に変換
 		WorldPositionConvertToMapPosition(playerPosition, enemyPosition, mapPosition);

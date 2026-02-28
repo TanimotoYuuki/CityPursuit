@@ -151,6 +151,35 @@ namespace nsK2EngineLow
 		}
 
 		/// <summary>
+		/// 回転軸の中心を設定
+		/// </summary>
+		/// <param name="pivot">回転軸の中心</param>
+		void SetPivot(const Vector3& pivot)
+		{
+			m_pivot = pivot;
+		}
+
+		/// <summary>
+		/// 回転軸の中心を取得
+		/// </summary>
+		/// <returns>回転軸の中心</returns>
+		const Vector3& GetPivot() const
+		{
+			return m_pivot;
+		}
+
+		/// <summary>
+		/// ピボット計算後の実際の描画位置を取得
+		/// </summary>
+		/// <returns>描画位置</returns>
+		const Vector3& GetDrawPosition() const
+		{
+			Vector3 rotationOffset = m_pivot;
+			m_rotation.Apply(rotationOffset);
+			return m_position + m_pivot - rotationOffset;
+		}
+
+		/// <summary>
 		/// アニメーションイベントの追加
 		/// </summary>
 		/// <param name="eventListener">アニメーションイベント</param>
@@ -281,6 +310,7 @@ namespace nsK2EngineLow
 		float m_alpha = 1.0f;							//透明度
 		float m_scrollSpeed = 0.0f;						//スクロール速度
 		float m_deltaTime = 0.0f;						//時間
+		Vector3 m_pivot = Vector3::Zero;				//回転の中心
 	};
 }
 

@@ -50,13 +50,13 @@ void FirstEnemyDirection::Update()
 	switch (m_firstEnemyDirectionState)
 	{
 	case enFirstEnemyDirectionState_CameraStart://カメラ(演出開始時)
-		CameraStartDirectionUpdate(m_player, m_enemy);
+		CameraStartDirectionUpdate(m_enemy);
 		break;
 	case enFirstEnemyDirectionState_DrawUI://UI描画
 		DrawUIDrectionUpdate();
 		break;
 	case enFirstEnemyDirectionState_CameraEnd://カメラ(演出終了時)
-		CameraEndDirectionUpdate(m_player, m_enemy);
+		CameraEndDirectionUpdate(m_enemy);
 		break;
 	default:
 		break;
@@ -129,7 +129,7 @@ void FirstEnemyDirection::InitSpringCamera()
 }
 
 //カメラ演出の更新処理(演出開始時)
-void FirstEnemyDirection::CameraStartDirectionUpdate(Player* playerData, Enemy* enemyData)
+void FirstEnemyDirection::CameraStartDirectionUpdate(Enemy* enemyData)
 {
 	m_cameraLarpRate += CAMERA_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();//カメラの補間率
 
@@ -142,13 +142,13 @@ void FirstEnemyDirection::CameraStartDirectionUpdate(Player* playerData, Enemy* 
 	m_larpCameraTarget.Lerp(
 		m_cameraLarpRate,//補間率
 		m_directionCamera.GetTarget(),//プレイヤーのカメラの注視点
-		enemyData->GetPosition() + Vector3(0.0f, 100.0f, 0.0f)//敵の位置
+		enemyData->GetEnemyModel().GetDrawPosition() + Vector3(0.0f, 100.0f, 0.0f)//敵の位置+オフセット
 	);
 
 	m_larpCameraPosition.Lerp(
 		m_cameraLarpRate,//補間率
 		m_directionCamera.GetPosition(),//プレイヤーのカメラの位置
-		enemyData->GetPosition() + Vector3(0.0f, 300.0f, 450.0f)//敵の位置+オフセット
+		enemyData->GetEnemyModel().GetDrawPosition() + Vector3(0.0f, 300.0f, 450.0f)//敵の位置+オフセット
 	);
 
 	m_directionCamera.SetTarget(m_larpCameraTarget);
@@ -176,7 +176,7 @@ void FirstEnemyDirection::DrawUIDrectionUpdate()
 }
 
 //カメラ演出の更新処理(演出終了時)
-void FirstEnemyDirection::CameraEndDirectionUpdate(Player* playerData, Enemy* enemyData)
+void FirstEnemyDirection::CameraEndDirectionUpdate(Enemy* enemyData)
 {
 	m_cameraLarpRate -= CAMERA_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();//カメラの補間率
 
@@ -188,14 +188,14 @@ void FirstEnemyDirection::CameraEndDirectionUpdate(Player* playerData, Enemy* en
 
 	m_larpCameraTarget.Lerp(
 		m_cameraLarpRate,//補間率
-		m_directionCamera.GetPosition(),//プレイヤーのカメラの注視点
-		m_player->GetPlayerCamera().GetSpringCamera().GetPosition()//敵の位置
+		enemyData->GetEnemyModel().GetDrawPosition() + Vector3(0.0f, 100.0f, 0.0f),//敵の位置+オフセット
+		m_player->GetPlayerCamera().GetSpringCamera().GetTarget()//プレイヤーのカメラの注視点
 	);
 
 	m_larpCameraPosition.Lerp(
 		m_cameraLarpRate,//補間率
-		m_directionCamera.GetTarget(),//プレイヤーのカメラの位置
-		m_player->GetPlayerCamera().GetSpringCamera().GetTarget()//敵の位置+オフセット
+		enemyData->GetEnemyModel().GetDrawPosition() + Vector3(0.0f, 300.0f, 450.0f),//敵の位置+オフセット
+		m_player->GetPlayerCamera().GetSpringCamera().GetPosition()//プレイヤーのカメラの位置
 	);
 
 	m_directionCamera.SetTarget(m_larpCameraTarget);
