@@ -25,7 +25,9 @@ namespace {
 	const float ARROW_UI_MOVE_SPEED = 10.0f;//矢印UIの動作速度
 
 	//カメラ演出
-	const float CAMERA_MOVE_SPEED = 0.5f;//カメラ移動速度
+	const float CAMERA_START_MOVE_SPEED = 0.5f;//カメラ移動速度(演出開始時)
+
+	const float CAMERA_END_MOVE_SPEED = 1.35f;//カメラ移動速度(演出終了時)
 }
 
 //開始処理
@@ -131,7 +133,7 @@ void FirstEnemyDirection::InitSpringCamera()
 //カメラ演出の更新処理(演出開始時)
 void FirstEnemyDirection::CameraStartDirectionUpdate(Enemy* enemyData)
 {
-	m_cameraLarpRate += CAMERA_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();//カメラの補間率
+	m_cameraLarpRate += CAMERA_START_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();//カメラの補間率
 
 	if (m_cameraLarpRate > 1.0f)
 	{
@@ -162,6 +164,7 @@ void FirstEnemyDirection::DrawUIDrectionUpdate()
 	if (g_pad[0]->IsTrigger(enButtonA))
 	{
 		m_firstEnemyDirectionState = enFirstEnemyDirectionState_CameraEnd;
+		m_cameraLarpRate = 0.0f;
 		return;
 	}
 
@@ -178,9 +181,9 @@ void FirstEnemyDirection::DrawUIDrectionUpdate()
 //カメラ演出の更新処理(演出終了時)
 void FirstEnemyDirection::CameraEndDirectionUpdate(Enemy* enemyData)
 {
-	m_cameraLarpRate -= CAMERA_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();//カメラの補間率
+	m_cameraLarpRate += CAMERA_END_MOVE_SPEED * g_gameTime->GetFrameDeltaTime();//カメラの補間率
 
-	if (m_cameraLarpRate < 1.0f)
+	if (m_cameraLarpRate > 1.0f)
 	{
 		DeleteGO(this);
 		return;
