@@ -84,6 +84,7 @@ public://メンバ関数
 private://メンバ変数
 	Vector3 m_targetPos = Vector3::Zero;//目標位置
 	Vector3 m_moveDirection = Vector3::Zero;//進行方向
+	Vector3 m_velocity = Vector3::Zero;//慣性
 	Quaternion m_rotation = Quaternion::Identity;//回転
 	int m_qteFailedRotationCount = 0;//QTEイベントで失敗したときに敵が回転した回数
 	int m_numCells = 0;//ナビメッシュのセル数

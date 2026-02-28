@@ -216,6 +216,15 @@ namespace nsAI {
 		const Cell& startCell = naviMesh.FindNearestCell(startPos);
 		// 終了位置に最も近いセルを検索。
 		const Cell& endCell = naviMesh.FindNearestCell(endPos);
+
+		//開始セルと終了セルが同じ場合は直線パスを作って終了する
+		if (&startCell == &endCell) {
+			path.AddPoint(startPos);
+			path.AddPoint(endPos);
+			path.Build();
+			return;
+		}
+
 		// A*を解く時に、セルにいろいろな情報を埋め込むので、情報を埋め込む作業領域を確保。
 		m_cellWork.resize(naviMesh.GetNumCell());
 

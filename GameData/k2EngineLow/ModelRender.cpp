@@ -169,10 +169,17 @@ namespace nsK2EngineLow
 		//スケルトンを更新
 		m_skeleton.Update(m_model.GetWorldMatrix());
 
+		//ピポットを考慮した回転のオフセットを計算
+		Vector3 rotationOffset = m_pivot;
+		m_rotation.Apply(rotationOffset);
+
+		//実際の描画位置を計算
+		Vector3 position = m_position + m_pivot - rotationOffset;
+
 		//モデルの更新
-		m_model.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		m_model.UpdateWorldMatrix(position, m_rotation, m_scale);
 		//ワールド行列の更新
-		m_shadowModel.UpdateWorldMatrix(m_position, m_rotation, m_scale);
+		m_shadowModel.UpdateWorldMatrix(position, m_rotation, m_scale);
 
 		//アニメーションを進める
 		m_animation.Progress(g_gameTime->GetFrameDeltaTime() * m_animationSpeed);

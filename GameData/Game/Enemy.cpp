@@ -21,6 +21,8 @@ bool Enemy::Start()
 	m_enemyModel.SetRotation(m_rotation);
 	//敵モデルの大きさの設定
 	m_enemyModel.SetScale(m_scale);
+	//敵モデルのピポットの設定
+	m_enemyModel.SetPivot(Vector3(0.0f, 0.0f, -75.0f));
 	//敵モデルの更新処理
 	m_enemyModel.Update();
 
@@ -47,7 +49,7 @@ void Enemy::Update()
 		//m_position.z += 900.0f * g_gameTime->GetFrameDeltaTime();
 
 		//敵のエフェクトの実行処理
-		m_enemyEffect->Execute(m_position, m_rotation);
+		m_enemyEffect->Execute(m_enemyModel.GetDrawPosition(), m_rotation);
 	}
 
 	//敵モデルの位置の設定

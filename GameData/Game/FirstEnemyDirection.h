@@ -45,9 +45,8 @@ private://メンバ関数
 	/// <summary>
 	/// カメラ演出の更新処理(演出開始時)
 	/// </summary>
-	/// <param name="playerData">プレイヤーのデータ</param>
 	/// <param name="enemyData">敵のデータ</param>
-	void CameraStartDirectionUpdate(Player* playerData, Enemy* enemyData);
+	void CameraStartDirectionUpdate(Enemy* enemyData);
 
 	/// <summary>
 	/// UI描画の演出の更新処理
@@ -57,9 +56,8 @@ private://メンバ関数
 	/// <summary>
 	/// カメラ演出の更新処理(演出終了時)
 	/// </summary>
-	/// <param name="playerData">プレイヤーのデータ</param>
 	/// <param name="enemyData">敵のデータ</param>
-	void CameraEndDirectionUpdate(Player* playerData, Enemy* enemyData);
+	void CameraEndDirectionUpdate(Enemy* enemyData);
 
 public://メンバ関数
 
