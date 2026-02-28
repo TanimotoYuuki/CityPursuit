@@ -18,7 +18,7 @@ bool PlayerMove::Start()
 }
 
 //移動処理の実行
-void PlayerMove::Execute(Vector3& position, CharacterController& characterController)
+void PlayerMove::Execute(Vector3& position, const Quaternion& rotation, CharacterController& characterController)
 {	
 	m_moveSpeed.x = 0.0f;
 	m_moveSpeed.z = 0.0f;
@@ -38,7 +38,7 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 		//重力を無くす
 		m_moveSpeed.y = 0.0f;
 
-		if (m_camJump)
+		if (m_canJump)
 		{
 			//ジャンプ処理の実行
 			m_playerJump.Execute(m_moveSpeed, characterController);
@@ -141,15 +141,8 @@ void PlayerMove::Execute(Vector3& position, CharacterController& characterContro
 		m_swingActionMoveSpeed = m_moveSpeed;
 	}
 	
-	//プレイヤーのが移動しているときに処理する
-	if (m_moveSpeed.x != 0.0f ||
-		m_moveSpeed.z != 0.0f)
-	{
-		//プレイヤーの進行方向を計算
-		m_moveDirection = m_moveSpeed;
-		m_moveDirection.y = 0.0f;
-		m_moveDirection.Normalize();
-	}
+	m_moveDirection = Vector3::Front;
+	rotation.Apply(m_moveDirection);
 
 	position = characterController.Execute(m_moveSpeed, g_gameTime->GetFrameDeltaTime());
 	characterController.SetPosition(position);

@@ -16,7 +16,7 @@ public:
 	/// <summary>
 	/// 移動処理の実行
 	/// </summary>
-	void Execute(Vector3& position, CharacterController& characterController);
+	void Execute(Vector3& position, const Quaternion& rotation,CharacterController& characterController);
 
 	/// <summary>
 	/// 重力を使用するか？を設定する
@@ -51,7 +51,7 @@ public:
 	/// <param name="useGravity">trueならジャンプできる</param>
 	void SetCanJump(const bool canJump)
 	{
-		m_canMove = canJump;
+		m_canJump = canJump;
 	}
 
 	/// <summary>
@@ -204,7 +204,7 @@ private://メンバ変数
 	Vector3 m_swingActionMoveSpeed = Vector3::Zero;//スイングアクション時の移動速度
 	PlayerJump m_playerJump;//プレイヤージャンプクラス
 	bool m_canMove = true;//移動できるか？
-	bool m_camJump = true;//ジャンプできるか?
+	bool m_canJump = true;//ジャンプできるか?
 	bool m_useGravity = true;//重力を使用するか？
 	bool m_ussSwingActionGravity = false;//スイングアクション用の重力を使用するか?
 	bool m_isWalk = false;//歩いているか?

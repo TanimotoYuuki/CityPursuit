@@ -49,6 +49,14 @@ public:
 	}
 
 	/// <summary>
+	/// 地面に付いていない
+	/// </summary>
+	void NotOnGround()
+	{
+		m_isOnGround = false;
+	}
+
+	/// <summary>
 	/// 地面に付いているか?
 	/// </summary>
 	/// <returns>trueなら地面に付いている</returns>

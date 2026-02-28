@@ -351,6 +351,8 @@ void PlayerCatchEnemy::GoOnEnemy(Enemy* enemy)
 	{
 		// 敵の上まで着いたら、ステートを遷移する。
 		ChangeState(enemy, enOnEnemy);
+
+		GameSoundEngine::GetInstance()->PlaySE(GameSoundList_SE_OnCar, 4.0f);
 	}
 }
 

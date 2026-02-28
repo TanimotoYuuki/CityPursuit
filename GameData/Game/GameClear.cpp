@@ -24,6 +24,7 @@ GameClear::~GameClear()
 	DeleteGO(m_gameClearSprite);
 	DeleteGO(m_gameResult);
 	DeleteGO(m_gameEndSelect);
+	DeleteGO(GameSoundEngine::GetInstance()->GetSoundInstance(GameSoundList_BGM_GameClear));
 }
 
 //開始処理

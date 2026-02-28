@@ -235,10 +235,11 @@ private://メンバ変数
 	int m_qteEventSuccessCount = 0;//QTEイベントで成功した回数
 	int m_qteEventFaileCount = 0;//QTEイベントで失敗した回数
 	float m_gameClearTimeLimit = 0.0f;//ゲームクリアしたときの残り時間
-	bool m_isStartResultUIDirection[enResultDirection_Num] = { false };//リザルトUIの演出が始まったか?
+	bool m_isDrawingUI[enResultDirection_Num] = { false };//UIを描画するか?
 	bool m_isFinishAllResultDirection = false;//全てのリザルトの演出が終わったか?
 	bool m_isPlayNoneAlphaAnimation = false;//透明度(不透明から透明)を変えるアニメーションを再生しているか?
 	bool m_isFinishNoneAlphaAnimation = false;//透明度(不透明から透明)を変えるアニメーションを再生終了したか?
+	bool m_isPlaySwipeSe = false;//スワイプSEが再生されているか?
 	EnResultDirection m_resultDirectionState = enResultDirection_ResultUI;//リザルトの演出ステート
 	std::vector<EnResultDisplayUI> m_qteEventSuccessCountManage;//QTEイベントで成功した回数を管理する変数
 	std::vector<EnResultDisplayUI> m_qteEventFailedCountManage;//QTEイベントで失敗した回数を管理する変数
